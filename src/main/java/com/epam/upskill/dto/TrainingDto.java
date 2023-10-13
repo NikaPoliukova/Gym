@@ -1,7 +1,5 @@
 package com.epam.upskill.dto;
 
-import lombok.Getter;
-
 import java.util.Date;
 
 
