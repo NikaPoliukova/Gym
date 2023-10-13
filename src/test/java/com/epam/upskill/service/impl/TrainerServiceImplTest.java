@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class TrainerServiceImplTest {
+
   @InjectMocks
   private TrainerServiceImpl trainerService;
 
@@ -26,55 +27,76 @@ public class TrainerServiceImplTest {
 
   @BeforeEach
   public void setUp() {
-    MockitoAnnotations.initMocks(this);
+    MockitoAnnotations.openMocks(this);
   }
 
   @Test
   public void testGetTrainerByIdFound() {
+    // Arrange
     long trainerId = 1;
     Trainer expectedTrainer = new Trainer();
     expectedTrainer.setId(trainerId);
     when(trainerRepository.findById(trainerId)).thenReturn(expectedTrainer);
+
+    // Act
     Trainer resultTrainer = trainerService.getTrainerById(trainerId);
+
+    // Assert
     assertEquals(expectedTrainer, resultTrainer);
   }
 
   @Test
   public void testGetTrainerByIdNotFound() {
+    // Arrange
     long trainerId = 1;
     when(trainerRepository.findById(trainerId)).thenReturn(null);
+
+    // Act
     Trainer resultTrainer = trainerService.getTrainerById(trainerId);
+
+    // Assert
     assertNull(resultTrainer);
   }
 
   @Test
   public void testCreateTrainer() {
-    TrainerRegistration trainerRegistration = new TrainerRegistration(
-        "Doe", "John", "Specialization");
+    // Arrange
+    TrainerRegistration trainerRegistration = new TrainerRegistration("Doe", "John", "Specialization");
+
+    // Act and Assert
     assertDoesNotThrow(() -> trainerService.createTrainer(trainerRegistration));
   }
 
   @Test
   public void testUpdateTrainerFound() {
+    // Arrange
     TrainerDto trainerDto = new TrainerDto(1, "newPassword", "newSpecialization");
     Trainer existingTrainer = new Trainer();
     existingTrainer.setId(1);
     when(trainerRepository.findById(trainerDto.id())).thenReturn(existingTrainer);
+
+    // Act
     trainerService.updateTrainer(trainerDto);
+
+    // No need for an explicit Assert in this case
   }
 
   @Test
   public void testDeleteTrainerSuccess() {
+    // Arrange
     long trainerId = 1;
     doNothing().when(trainerRepository).deleteTrainerById(trainerId);
+
+    // Act
     trainerService.deleteTrainerById(trainerId);
   }
 
   @Test
   public void testDeleteTrainerWithFailure() {
+    // Arrange
     long trainerId = 1;
     doThrow(new RuntimeException("Failed to delete Trainer")).when(trainerRepository).deleteTrainerById(trainerId);
     trainerService.deleteTrainerById(trainerId);
   }
-
 }
+

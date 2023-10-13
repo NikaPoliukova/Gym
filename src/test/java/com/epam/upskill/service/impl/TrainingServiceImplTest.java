@@ -13,7 +13,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Date;
 
-class TrainingServiceImplTest {
+public class TrainingServiceImplTest {
   @InjectMocks
   private TrainingServiceImpl trainingService;
 
@@ -27,26 +27,38 @@ class TrainingServiceImplTest {
 
   @Test
   public void testGetTrainingById() {
+    // Arrange
     long trainingId = 1;
     Training expectedTraining = new Training();
     expectedTraining.setId(trainingId);
     Mockito.when(trainingRepository.findById(trainingId)).thenReturn(expectedTraining);
+
+    // Act
     Training resultTraining = trainingService.getTrainingById(trainingId);
+
+    // Assert
     Assertions.assertEquals(expectedTraining, resultTraining);
   }
 
   @Test
   public void testGetTrainingByIdNotFound() {
+    // Arrange
     long trainingId = 1;
     Mockito.when(trainingRepository.findById(trainingId)).thenReturn(null);
+
+    // Act
     Training resultTraining = trainingService.getTrainingById(trainingId);
+
+    // Assert
     Assertions.assertNull(resultTraining);
   }
 
   @Test
   public void testCreateTraining() {
-    TrainingDto trainingDto = new TrainingDto("Training Name", new Date(), 120, 1
-    );
-    trainingService.createTraining(trainingDto);
+    // Arrange
+    TrainingDto trainingDto = new TrainingDto("Training Name", new Date(), 120, 1);
+
+    // Act and Assert
+    Assertions.assertDoesNotThrow(() -> trainingService.createTraining(trainingDto));
   }
 }

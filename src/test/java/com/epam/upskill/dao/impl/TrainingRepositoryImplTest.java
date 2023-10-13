@@ -33,24 +33,42 @@ public class TrainingRepositoryImplTest {
 
   @Test
   public void testCreateTraining() {
+    // Arrange
     Training training = new Training();
+
+    // Act
     trainingRepository.create(training);
+
+    // Assert
     verify(trainingStorage, times(1)).save(training);
   }
 
   @Test
   public void testFindTrainingById() {
+    // Arrange
     long trainingId = 1;
-    when(trainingStorage.findById(trainingId)).thenReturn(new Training());
+    Training expectedTraining = new Training();
+    when(trainingStorage.findById(trainingId)).thenReturn(expectedTraining);
+
+    // Act
     Training foundTraining = trainingRepository.findById(trainingId);
+
+    // Assert
     assertNotNull(foundTraining);
+    assertEquals(expectedTraining, foundTraining);
   }
 
   @Test
   public void testFindAllTrainings() {
+    // Arrange
     Map<Long, Training> trainingMap = Collections.singletonMap(1L, new Training());
     when(trainingStorage.getTrainingMap()).thenReturn(trainingMap);
+
+    // Act
     Map<Long, Training> allTrainings = trainingRepository.findAll();
+
+    // Assert
     assertEquals(trainingMap, allTrainings);
   }
 }
+

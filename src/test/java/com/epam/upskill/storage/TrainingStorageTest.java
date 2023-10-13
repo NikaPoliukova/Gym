@@ -23,11 +23,14 @@ public class TrainingStorageTest {
 
   @Test
   public void testSaveTraining() {
+    // Arrange
     Training training = new Training();
     training.setId(1);
 
+    // Act
     trainingStorage.save(training);
 
+    // Assert
     Map<Long, Training> trainingMap = trainingStorage.getTrainingMap();
     assertEquals(1, trainingMap.size());
     assertEquals(training, trainingMap.get(1L));
@@ -35,20 +38,24 @@ public class TrainingStorageTest {
 
   @Test
   public void testFindTrainingById() {
+    // Arrange
     long trainingId = 1;
     Training training = new Training();
     training.setId(trainingId);
 
+    // Act
     trainingStorage.save(training);
 
+    // Assert
     Training foundTraining = trainingStorage.findById(trainingId);
     assertEquals(training, foundTraining);
   }
 
   @Test
   public void testFindTrainingByIdNotFound() {
+    // Arrange
     long trainingId = 1;
-
+    // Act and Assert
     Training foundTraining = trainingStorage.findById(trainingId);
     assertEquals(null, foundTraining);
   }
