@@ -22,7 +22,7 @@ public class GymFacade {
     this.trainerService = trainerService;
     this.trainingService = trainingService;
 
-    // Используйте уровень DEBUG для отладочных сообщений
+
     if (logger.isDebugEnabled()) {
       logger.debug("GymFacade instance created.");
       logger.debug("TraineeService: " + traineeService);

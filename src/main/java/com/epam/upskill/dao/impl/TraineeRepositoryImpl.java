@@ -4,6 +4,7 @@ import com.epam.upskill.dao.TraineeRepository;
 import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.storage.TraineeStorage;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Component
 public class TraineeRepositoryImpl implements TraineeRepository {
   private static final Logger logger = LoggerFactory.getLogger(TraineeRepositoryImpl.class);
