@@ -1,0 +1,112 @@
+[
+  {
+    "id": 1,
+    "isActive": true,
+    "password": "password1",
+    "username": "John.Smith",
+    "lastName": "Smith",
+    "firstName": "John",
+    "userId": 101,
+    "address": "123 Main St",
+    "date": "2023-10-12T15:30:00Z"
+  },
+  {
+    "id": 2,
+    "isActive": true,
+    "password": "password2",
+    "username": "Alice.Johnson",
+    "lastName": "Johnson",
+    "firstName": "Alice",
+    "userId": 102,
+    "address": "456 Elm St",
+    "date": "2022-10-12T15:30:00Z"
+  },
+  {
+    "id": 3,
+    "isActive": true,
+    "password": "password3",
+    "username": "David.Williams",
+    "lastName": "Williams",
+    "firstName": "David",
+    "userId": 103,
+    "address": "789 Oak St",
+    "date": "2023-08-12T15:30:00Z"
+  },
+  {
+    "id": 4,
+    "isActive": true,
+    "password": "password4",
+    "username": "Emily.Davis",
+    "lastName": "Davis",
+    "firstName": "Emily",
+    "userId": 104,
+    "address": "567 Pine St",
+    "date": "2023-11-12T15:30:00Z"
+  },
+  {
+    "id": 5,
+    "isActive": true,
+    "password": "password5",
+    "username": "Daniel.Martin",
+    "lastName": "Martin",
+    "firstName": "Daniel",
+    "userId": 105,
+    "address": "890 Cedar St",
+    "date": "2020-10-12T15:30:00Z"
+  },
+  {
+    "id": 6,
+    "isActive": true,
+    "password": "password6",
+    "username": "Olivia.Anderson",
+    "lastName": "Anderson",
+    "firstName": "Olivia",
+    "userId": 106,
+    "address": "345 Birch St",
+    "date": "2023-10-12T15:35:00Z"
+  },
+  {
+    "id": 7,
+    "isActive": true,
+    "password": "password7",
+    "username": "Liam.Thomas",
+    "lastName": "Thomas",
+    "firstName": "Liam",
+    "userId": 107,
+    "address": "234 Maple St",
+    "date": "2023-11-12T15:20:00Z"
+  },
+  {
+    "id": 8,
+    "isActive": true,
+    "password": "password8",
+    "username": "Sophia.Hernandez",
+    "lastName": "Hernandez",
+    "firstName": "Sophia",
+    "userId": 108,
+    "address": "456 Willow St",
+    "date": "2023-10-10T15:30:00Z"
+  },
+  {
+    "id": 9,
+    "isActive": true,
+    "password": "password9",
+    "username": "Mason.Lopez",
+    "lastName": "Lopez",
+    "firstName": "Mason",
+    "userId": 109,
+    "address": "678 Elm St",
+    "date": "2023-10-15T15:30:00Z"
+  },
+  {
+    "id": 10,
+    "isActive": true,
+    "password": "password10",
+    "username": "Isabella.Roberts",
+    "lastName": "Roberts",
+    "firstName": "Isabella",
+    "userId": 110,
+    "address": "123 Redwood St",
+    "date": "2023-02-12T15:30:00Z"
+  }
+]

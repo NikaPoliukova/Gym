@@ -1,4 +1,4 @@
-package org.example;
+package com.epam.upskill;
 
 
 import org.springframework.boot.SpringApplication;
@@ -10,5 +10,4 @@ public class GymApplication {
   public static void main(String[] args) {
     SpringApplication.run(GymApplication.class, args);
   }
-
 }
