@@ -53,7 +53,7 @@ public class DataInitializer {
   public void initializeData() {
     Logger logger = LoggerFactory.getLogger(getClass());
 
-    logger.info("PostConstruct method is executed.");
+    logger.info("PostConstruct method was started");
     Resource traineePathFile = new ClassPathResource("data/trainee.json");
     Resource trainerPathFile = new ClassPathResource("data/trainer.json");
     Resource trainingPathFile = new ClassPathResource("data/training.json");
@@ -76,6 +76,6 @@ public class DataInitializer {
     logger.info("Map1: " + traineeStorage.getTraineeMap());
     logger.info("Map2: " + trainerStorage.getTrainerMap());
     logger.info("Map3: " + trainingStorage.getTrainingMap());
-    logger.info("PostConstruct method was finished  with success");
+    logger.info("PostConstruct method was finished successfully");
   }
 }
