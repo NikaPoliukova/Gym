@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+    <Appenders>
+        <File name="File" fileName="logs.txt" append="true">
+            <DefaultRolloverStrategy max="10"/>
+        </File>
+    </Appenders>
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="File" />
+        </Root>
+    </Loggers>
+</Configuration>
