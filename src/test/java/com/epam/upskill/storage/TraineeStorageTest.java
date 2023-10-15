@@ -17,7 +17,7 @@ public class TraineeStorageTest {
 
   @BeforeEach
   public void setUp() {
-    MockitoAnnotations.initMocks(this);
+    MockitoAnnotations.openMocks(this);
     traineeStorage = new TraineeStorage();
   }
 

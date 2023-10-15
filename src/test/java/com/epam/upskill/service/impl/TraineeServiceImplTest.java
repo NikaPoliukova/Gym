@@ -42,10 +42,8 @@ public class TraineeServiceImplTest {
     Trainee expectedTrainee = new Trainee();
     expectedTrainee.setId(traineeId);
     when(traineeRepository.findById(traineeId)).thenReturn(expectedTrainee);
-
     // Act
     Trainee resultTrainee = traineeService.getTraineeById(traineeId);
-
     // Assert
     assertEquals(expectedTrainee, resultTrainee);
   }
@@ -84,10 +82,8 @@ public class TraineeServiceImplTest {
   public void testDeleteTraineeById() {
     // Arrange
     long traineeId = 1;
-
     // Act
     traineeService.deleteTraineeById(traineeId);
-
     // Assert
     verify(traineeRepository, times(1)).deleteTraineeById(traineeId);
   }
@@ -97,23 +93,37 @@ public class TraineeServiceImplTest {
     // Arrange
     long nonExistentTraineeId = 999;
     when(traineeRepository.findById(nonExistentTraineeId)).thenReturn(null);
-
     // Act
     Trainee resultTrainee = traineeService.getTraineeById(nonExistentTraineeId);
-
     // Assert
     assertNull(resultTrainee);
   }
 
   @Test
+  public void testFindAllTrainees() {
+    // Arrange
+    Map<Long, Trainee> traineeMap = new HashMap<>();
+    traineeMap.put(1L, new Trainee(1L, "John", "Doe", "John.Doe", "password",
+        true, 1L, new Date(), "123 Main Street"));
+    traineeMap.put(2L, new Trainee(3L,"John", "Doe", "John.Doe2", "password",
+        true, 1L, new Date(), "123 Main Street"));
+    when(traineeRepository.findAll()).thenReturn(traineeMap);
+    // Act
+    Map<Long, Trainee> result = traineeService.findAll();
+    // Assert
+    assertNotNull(result);
+    assertEquals(2, result.size());
+  }
+
+  @Test
   public void testCreateTraineeWithDuplicateUsername() {
     // Arrange
-    TraineeRegistration traineeRegistration = new TraineeRegistration("Jimnov", "Liin", "Street22", new Date());
+    TraineeRegistration traineeRegistration = new TraineeRegistration("Jimnov", "Liin",
+        "Street22", new Date());
     Map<Long, Trainee> traineeMap = new HashMap<>();
     traineeMap.put(1L, new Trainee());
     when(traineeRepository.findAll()).thenReturn(traineeMap);
     when(trainerRepository.findAll()).thenReturn(Collections.emptyMap());
-
     // Act and Assert
     assertThrows(Exception.class, () -> traineeService.createTrainee(traineeRegistration));
   }
@@ -123,7 +133,6 @@ public class TraineeServiceImplTest {
     // Arrange
     TraineeDto traineeDto = new TraineeDto(999, "newPassword", "newAddress");
     when(traineeRepository.findById(traineeDto.id())).thenReturn(null);
-
     // Act and Assert
     assertThrows(Exception.class, () -> traineeService.updateTrainee(traineeDto));
   }
@@ -133,7 +142,6 @@ public class TraineeServiceImplTest {
     // Arrange
     long traineeId = 1;
     doThrow(new RuntimeException("Failed to delete Trainee")).when(traineeRepository).deleteTraineeById(traineeId);
-
     // Act and Assert
     assertThrows(Exception.class, () -> traineeService.deleteTraineeById(traineeId));
   }

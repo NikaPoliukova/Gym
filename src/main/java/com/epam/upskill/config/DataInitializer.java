@@ -6,21 +6,26 @@ import com.epam.upskill.entity.Training;
 import com.epam.upskill.storage.TraineeStorage;
 import com.epam.upskill.storage.TrainerStorage;
 import com.epam.upskill.storage.TrainingStorage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
 import java.util.List;
 
-
+@Slf4j
 @Component
 public class DataInitializer {
-  private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
+
+  @Value("${data.traineePathFile}")
+  private String traineePathFile;
+
+  @Value("${data.trainerPathFile}")
+  private String trainerPathFile;
+
+  @Value("${data.trainingPathFile}")
+  private String trainingPathFile;
 
   private TraineeStorage traineeStorage;
 
@@ -28,7 +33,7 @@ public class DataInitializer {
 
   private TrainingStorage trainingStorage;
 
-  private final Mapper mapper;
+  private Mapper mapper;
 
   @Autowired
   public void setTraineeStorage(TraineeStorage traineeStorage) {
@@ -45,37 +50,32 @@ public class DataInitializer {
     this.trainingStorage = trainingStorage;
   }
 
-  public DataInitializer(Mapper mapper) {
+  @Autowired
+  public void setMapper(Mapper mapper) {
     this.mapper = mapper;
   }
 
   @PostConstruct
   public void initializeData() {
-    Logger logger = LoggerFactory.getLogger(getClass());
 
-    logger.info("PostConstruct method was started");
-    Resource traineePathFile = new ClassPathResource("data/trainee.json");
-    Resource trainerPathFile = new ClassPathResource("data/trainer.json");
-    Resource trainingPathFile = new ClassPathResource("data/training.json");
-    try {
-      List<Trainee> traineeData = mapper.mapJsonToListTrainee(traineePathFile.getFile().getAbsolutePath());
-      List<Trainer> trainerData = mapper.mapJsonToListTrainer(trainerPathFile.getFile().getAbsolutePath());
-      List<Training> trainingData = mapper.mapJsonToListTraining(trainingPathFile.getFile().getAbsolutePath());
-      for (Trainee trainee : traineeData) {
-        traineeStorage.save(trainee);
-      }
-      for (Trainer trainer : trainerData) {
-        trainerStorage.save(trainer);
-      }
-      for (Training training : trainingData) {
-        trainingStorage.save(training);
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
+
+    log.info("PostConstruct method was started");
+    List<Trainee> traineeData = mapper.mapJsonToListTrainee(traineePathFile);
+    List<Trainer> trainerData = mapper.mapJsonToListTrainer(trainerPathFile);
+    List<Training> trainingData = mapper.mapJsonToListTraining(trainingPathFile);
+    for (Trainee trainee : traineeData) {
+      traineeStorage.save(trainee);
     }
-    logger.info("Map1: " + traineeStorage.getTraineeMap());
-    logger.info("Map2: " + trainerStorage.getTrainerMap());
-    logger.info("Map3: " + trainingStorage.getTrainingMap());
-    logger.info("PostConstruct method was finished successfully");
+    for (Trainer trainer : trainerData) {
+      trainerStorage.save(trainer);
+    }
+    for (Training training : trainingData) {
+      trainingStorage.save(training);
+    }
+
+    log.info("Map1: " + traineeStorage.getTraineeMap());
+    log.info("Map2: " + trainerStorage.getTrainerMap());
+    log.info("Map3: " + trainingStorage.getTrainingMap());
+    log.info("PostConstruct method was finished successfully");
   }
 }

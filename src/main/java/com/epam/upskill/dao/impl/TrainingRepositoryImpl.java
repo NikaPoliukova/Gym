@@ -3,38 +3,37 @@ package com.epam.upskill.dao.impl;
 import com.epam.upskill.dao.TrainingRepository;
 import com.epam.upskill.entity.Training;
 import com.epam.upskill.storage.TrainingStorage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.util.Map;
 
-@Component
+@Slf4j
+@Repository
 public class TrainingRepositoryImpl implements TrainingRepository {
-  private static final Logger logger = LoggerFactory.getLogger(TrainingRepositoryImpl.class);
   private TrainingStorage trainingStorage;
 
   @Autowired
-  public void setTrainingStorage(TrainingStorage trainingStorage) {
+  public TrainingRepositoryImpl(TrainingStorage trainingStorage) {
     this.trainingStorage = trainingStorage;
   }
 
   @Override
   public void create(Training training) {
-    logger.debug("Creating Training: " + training);
+    log.debug("Creating Training: " + training);
     trainingStorage.save(training);
   }
 
   @Override
   public Training findById(long id) {
-    logger.debug("Finding Training by ID: " + id);
+    log.debug("Finding Training by ID: " + id);
     return trainingStorage.findById(id);
   }
 
   @Override
   public Map<Long, Training> findAll() {
-    logger.debug("Fetching all Trainings");
+    log.debug("Fetching all Trainings");
     return trainingStorage.getTrainingMap();
   }
 }

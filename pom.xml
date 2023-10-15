@@ -99,7 +99,6 @@
                         <exclude>com/epam/upskill/entity/**</exclude>
                         <exclude>com/epam/upskill/dto/**</exclude>
                         <exclude>com/epam/upskill/facade/GymFacade.class</exclude>
-                        <exclude>com/epam/upskill/GymApplication.class</exclude>
                     </excludes>
                 </configuration>
             </plugin>

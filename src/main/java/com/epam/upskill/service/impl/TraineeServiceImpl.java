@@ -7,28 +7,42 @@ import com.epam.upskill.dto.TraineeRegistration;
 import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.service.TraineeService;
 import com.epam.upskill.service.UserUtils;
-import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@RequiredArgsConstructor
+import java.util.Collections;
+import java.util.Map;
+
+@Slf4j
 @Service
 public class TraineeServiceImpl implements TraineeService {
-  private static final Logger logger = LoggerFactory.getLogger(TraineeServiceImpl.class);
 
   private final TraineeRepository traineeRepository;
   private final TrainerRepository trainerRepository;
 
+  @Autowired
+  public TraineeServiceImpl(TraineeRepository traineeRepository, TrainerRepository trainerRepository) {
+    this.traineeRepository = traineeRepository;
+    this.trainerRepository = trainerRepository;
+  }
+
   @Override
   public Trainee getTraineeById(long traineeId) {
-    logger.debug("Fetching Trainee by ID: " + traineeId);
+    log.debug("Fetching Trainee by ID: " + traineeId);
     return traineeRepository.findById(traineeId);
   }
 
   @Override
+  public Map<Long, Trainee> findAll() {
+    log.debug("Fetching all Trainees");
+    Map<Long, Trainee> trainees = traineeRepository.findAll();
+    return trainees != null ? trainees : Collections.emptyMap();
+  }
+
+  @Override
   public void createTrainee(TraineeRegistration traineeDto) {
-    logger.info("Creating Trainee from TraineeRegistration: " + traineeDto);
+    log.info("Creating Trainee from TraineeRegistration: " + traineeDto);
     Trainee trainee = new Trainee();
     String username = UserUtils.createUsername(traineeDto.firstName(), traineeDto.lastName(),
         traineeRepository.findAll(), trainerRepository.findAll());
@@ -43,7 +57,7 @@ public class TraineeServiceImpl implements TraineeService {
 
   @Override
   public void updateTrainee(TraineeDto traineeDto) {
-    logger.info("Updating Trainee with TraineeDto: " + traineeDto);
+    log.info("Updating Trainee with TraineeDto: " + traineeDto);
     Trainee trainee = traineeRepository.findById(traineeDto.id());
     if (traineeDto.password() != null) {
       trainee.setPassword(traineeDto.password());
@@ -56,7 +70,7 @@ public class TraineeServiceImpl implements TraineeService {
 
   @Override
   public void deleteTraineeById(long traineeId) {
-    logger.info("Deleting Trainee by ID: " + traineeId);
+    log.info("Deleting Trainee by ID: " + traineeId);
     traineeRepository.deleteTraineeById(traineeId);
   }
 }

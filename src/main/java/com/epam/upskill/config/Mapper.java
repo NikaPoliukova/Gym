@@ -4,8 +4,7 @@ import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.Training;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -13,9 +12,9 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+@Slf4j
 @Component
 public class Mapper {
-  private static final Logger logger = LoggerFactory.getLogger(Mapper.class);
 
   public List<Trainee> mapJsonToListTrainee(String jsonFilePath) {
     ObjectMapper objectMapper = new ObjectMapper();
@@ -23,10 +22,10 @@ public class Mapper {
       File jsonFile = new File(jsonFilePath);
       List<Trainee> trainees = objectMapper.readValue(jsonFile, objectMapper.getTypeFactory()
           .constructCollectionType(List.class, Trainee.class));
-      logger.debug("Mapped JSON to List<Trainee>: " + trainees);
+      log.debug("Mapped JSON to List<Trainee>: " + trainees);
       return trainees;
     } catch (IOException e) {
-      logger.error("Error mapping JSON to List<Trainee>: " + e.getMessage(), e);
+      log.error("Error mapping JSON to List<Trainee>: " + e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
     }
   }
@@ -37,10 +36,10 @@ public class Mapper {
       File jsonFile = new File(jsonFilePath);
       List<Trainer> trainers = objectMapper.readValue(jsonFile, objectMapper.getTypeFactory()
           .constructCollectionType(List.class, Trainer.class));
-      logger.debug("Mapped JSON to List<Trainer>: " + trainers);
+      log.debug("Mapped JSON to List<Trainer>: " + trainers);
       return trainers;
     } catch (IOException e) {
-      logger.error("Error mapping JSON to List<Trainer>: " + e.getMessage(), e);
+      log.error("Error mapping JSON to List<Trainer>: " + e.getMessage(), e);
       return Collections.emptyList();
     }
   }
@@ -51,10 +50,10 @@ public class Mapper {
       File jsonFile = new File(jsonFilePath);
       List<Training> trainings = objectMapper.readValue(jsonFile, objectMapper.getTypeFactory()
           .constructCollectionType(List.class, Training.class));
-      logger.debug("Mapped JSON to List<Training>: " + trainings);
+      log.debug("Mapped JSON to List<Training>: " + trainings);
       return trainings;
     } catch (IOException e) {
-      logger.error("Error mapping JSON to List<Training>: " + e.getMessage(), e);
+      log.error("Error mapping JSON to List<Training>: " + e.getMessage(), e);
       return Collections.emptyList();
     }
   }

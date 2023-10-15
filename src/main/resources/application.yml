@@ -1,2 +1,7 @@
 server:
   port: 8084
+
+data:
+  traineePathFile: src/main/resources/data/trainee.json
+  trainerPathFile: src/main/resources/data/trainer.json
+  trainingPathFile: src/main/resources/data/training.json

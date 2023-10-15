@@ -61,7 +61,8 @@ public class TrainerServiceImplTest {
   @Test
   public void testCreateTrainer() {
     // Arrange
-    TrainerRegistration trainerRegistration = new TrainerRegistration("Doe", "John", "Specialization");
+    TrainerRegistration trainerRegistration = new TrainerRegistration("Doe", "John",
+        "Specialization");
 
     // Act and Assert
     assertDoesNotThrow(() -> trainerService.createTrainer(trainerRegistration));
@@ -77,8 +78,6 @@ public class TrainerServiceImplTest {
 
     // Act
     trainerService.updateTrainer(trainerDto);
-
-    // No need for an explicit Assert in this case
   }
 
   @Test
