@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.Map;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -29,6 +32,12 @@ public class TrainerServiceImpl implements TrainerService {
       log.warn("Trainer not found for ID: " + trainerId);
     }
     return trainer;
+  }
+  @Override
+  public Map<Long, Trainer> findAll() {
+    log.debug("Fetching all Trainers");
+    Map<Long, Trainer> trainerMap= trainerRepository.findAll();
+    return trainerMap != null ? trainerMap : Collections.emptyMap();
   }
 
   @Override
