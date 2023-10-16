@@ -57,8 +57,6 @@ public class DataInitializer {
 
   @PostConstruct
   public void initializeData() {
-
-
     log.info("PostConstruct method was started");
     List<Trainee> traineeData = mapper.mapJsonToListTrainee(traineePathFile);
     List<Trainer> trainerData = mapper.mapJsonToListTrainer(trainerPathFile);

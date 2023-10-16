@@ -5,6 +5,7 @@ import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.Training;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -15,9 +16,10 @@ import java.util.List;
 @Slf4j
 @Component
 public class Mapper {
+  @Autowired
+  private ObjectMapper objectMapper;
 
   public List<Trainee> mapJsonToListTrainee(String jsonFilePath) {
-    ObjectMapper objectMapper = new ObjectMapper();
     try {
       File jsonFile = new File(jsonFilePath);
       List<Trainee> trainees = objectMapper.readValue(jsonFile, objectMapper.getTypeFactory()
@@ -31,7 +33,6 @@ public class Mapper {
   }
 
   public List<Trainer> mapJsonToListTrainer(String jsonFilePath) {
-    ObjectMapper objectMapper = new ObjectMapper();
     try {
       File jsonFile = new File(jsonFilePath);
       List<Trainer> trainers = objectMapper.readValue(jsonFile, objectMapper.getTypeFactory()
@@ -45,7 +46,6 @@ public class Mapper {
   }
 
   public List<Training> mapJsonToListTraining(String jsonFilePath) {
-    ObjectMapper objectMapper = new ObjectMapper();
     try {
       File jsonFile = new File(jsonFilePath);
       List<Training> trainings = objectMapper.readValue(jsonFile, objectMapper.getTypeFactory()
