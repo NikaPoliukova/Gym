@@ -18,7 +18,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class TraineeServiceImplTest {
+class TraineeServiceImplTest {
   @InjectMocks
   private TraineeServiceImpl traineeService;
 
@@ -36,7 +36,7 @@ public class TraineeServiceImplTest {
   }
 
   @Test
-  public void testGetTraineeById() {
+   void testGetTraineeById() {
     // Arrange
     long traineeId = 1;
     Trainee expectedTrainee = new Trainee();
@@ -49,7 +49,30 @@ public class TraineeServiceImplTest {
   }
 
   @Test
-  public void testCreateTrainee() {
+  void testFindAllTrainees() {
+    // Arrange
+    Map<Long, Trainee> traineeMap = new HashMap<>();
+    traineeMap.put(1L, new Trainee(1L, "John", "Doe", "John.Doe", "password",
+        true, 1L, new Date(), "123 Main Street"));
+    traineeMap.put(2L, new Trainee(3L, "John", "Doe", "John.Doe2", "password",
+        true, 1L, new Date(), "123 Main Street"));
+    var trainee1 = Trainee.builder()
+        .id(1L)
+        .address("123 Main Street")
+        .date(new Date())
+        .build();
+    traineeMap.put(3L, trainee1);
+
+    when(traineeRepository.findAll()).thenReturn(traineeMap);
+    // Act
+    Map<Long, Trainee> result = traineeService.findAll();
+    // Assert
+    assertNotNull(result);
+    assertEquals(2, result.size());
+  }
+
+  @Test
+  void testCreateTrainee() {
     // Arrange
     TraineeRegistration traineeRegistration = new TraineeRegistration(
         "Jimnov", "Liin", "Street22", new Date());
@@ -64,7 +87,7 @@ public class TraineeServiceImplTest {
 
 
   @Test
-  public void testUpdateTrainee() {
+  void testUpdateTrainee() {
     // Arrange
     TraineeDto traineeDto = new TraineeDto(1, "newPassword", "newAddress");
     Trainee existingTrainee = new Trainee();
@@ -79,7 +102,7 @@ public class TraineeServiceImplTest {
   }
 
   @Test
-  public void testDeleteTraineeById() {
+  void testDeleteTraineeById() {
     // Arrange
     long traineeId = 1;
     // Act
@@ -89,7 +112,7 @@ public class TraineeServiceImplTest {
   }
 
   @Test
-  public void testGetNonExistentTrainee() {
+  void testGetNonExistentTrainee() {
     // Arrange
     long nonExistentTraineeId = 999;
     when(traineeRepository.findById(nonExistentTraineeId)).thenReturn(null);
@@ -100,23 +123,7 @@ public class TraineeServiceImplTest {
   }
 
   @Test
-  public void testFindAllTrainees() {
-    // Arrange
-    Map<Long, Trainee> traineeMap = new HashMap<>();
-    traineeMap.put(1L, new Trainee(1L, "John", "Doe", "John.Doe", "password",
-        true, 1L, new Date(), "123 Main Street"));
-    traineeMap.put(2L, new Trainee(3L,"John", "Doe", "John.Doe2", "password",
-        true, 1L, new Date(), "123 Main Street"));
-    when(traineeRepository.findAll()).thenReturn(traineeMap);
-    // Act
-    Map<Long, Trainee> result = traineeService.findAll();
-    // Assert
-    assertNotNull(result);
-    assertEquals(2, result.size());
-  }
-
-  @Test
-  public void testCreateTraineeWithDuplicateUsername() {
+  void testCreateTraineeWithDuplicateUsername() {
     // Arrange
     TraineeRegistration traineeRegistration = new TraineeRegistration("Jimnov", "Liin",
         "Street22", new Date());
@@ -129,7 +136,7 @@ public class TraineeServiceImplTest {
   }
 
   @Test
-  public void testUpdateNonExistentTrainee() {
+  void testUpdateNonExistentTrainee() {
     // Arrange
     TraineeDto traineeDto = new TraineeDto(999, "newPassword", "newAddress");
     when(traineeRepository.findById(traineeDto.id())).thenReturn(null);
@@ -138,7 +145,7 @@ public class TraineeServiceImplTest {
   }
 
   @Test
-  public void testDeleteTraineeWithFailure() {
+  void testDeleteTraineeWithFailure() {
     // Arrange
     long traineeId = 1;
     doThrow(new RuntimeException("Failed to delete Trainee")).when(traineeRepository).deleteTraineeById(traineeId);

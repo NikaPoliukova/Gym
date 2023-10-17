@@ -4,6 +4,7 @@ import com.epam.upskill.entity.Trainee;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,10 +12,10 @@ import java.util.Map;
 @Component
 public class TraineeStorage {
 
-  private Map<Long, Trainee> traineeMap = new HashMap<>();
+  private static final Map<Long, Trainee> traineeMap = new HashMap<>();
 
   public Map<Long, Trainee> getTraineeMap() {
-    return traineeMap;
+    return Collections.unmodifiableMap(traineeMap);
   }
 
 

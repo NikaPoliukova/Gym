@@ -55,6 +55,7 @@ public class DataInitializer {
     this.mapper = mapper;
   }
 
+
   @PostConstruct
   public void initializeData() {
     log.info("PostConstruct method was started");
