@@ -6,7 +6,7 @@ import com.epam.upskill.dto.TrainerDto;
 import com.epam.upskill.dto.TrainerRegistration;
 import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.service.TrainerService;
-import com.epam.upskill.service.UserUtils;
+import com.epam.upskill.util.UserUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,17 +33,18 @@ public class TrainerServiceImpl implements TrainerService {
     }
     return trainer;
   }
+
   @Override
   public Map<Long, Trainer> findAll() {
     log.debug("Fetching all Trainers");
-    Map<Long, Trainer> trainerMap= trainerRepository.findAll();
+    Map<Long, Trainer> trainerMap = trainerRepository.findAll();
     return trainerMap != null ? trainerMap : Collections.emptyMap();
   }
 
   @Override
   public void createTrainer(TrainerRegistration trainerDto) {
     log.info("Creating Trainer from TrainerRegistration: " + trainerDto);
-    Trainer trainer = new Trainer();
+    Trainer trainer = Trainer.builder().build();
     String username = UserUtils.createUsername(trainerDto.firstName(), trainerDto.lastName(),
         traineeRepository.findAll(), trainerRepository.findAll());
     trainer.setUsername(username);

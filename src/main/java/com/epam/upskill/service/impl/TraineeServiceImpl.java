@@ -6,7 +6,7 @@ import com.epam.upskill.dto.TraineeDto;
 import com.epam.upskill.dto.TraineeRegistration;
 import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.service.TraineeService;
-import com.epam.upskill.service.UserUtils;
+import com.epam.upskill.util.UserUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

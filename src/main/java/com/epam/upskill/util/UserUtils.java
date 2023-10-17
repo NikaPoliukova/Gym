@@ -1,4 +1,4 @@
-package com.epam.upskill.service;
+package com.epam.upskill.util;
 
 import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.entity.Trainer;

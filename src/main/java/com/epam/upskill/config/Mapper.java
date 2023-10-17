@@ -3,6 +3,7 @@ package com.epam.upskill.config;
 import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.Training;
+import com.epam.upskill.exception.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +28,9 @@ public class Mapper {
       log.debug("Mapped JSON to List<Trainee>: " + trainees);
       return trainees;
     } catch (IOException e) {
-      log.error("Error mapping JSON to List<Trainee>: " + e.getMessage(), e);
-      throw new RuntimeException(e.getMessage(), e);
+      String errorMessage = "Error mapping JSON to List<Trainee>";
+      log.error(errorMessage + ": " + e.getMessage(), e);
+      throw new JsonMappingException(errorMessage, e);
     }
   }
 

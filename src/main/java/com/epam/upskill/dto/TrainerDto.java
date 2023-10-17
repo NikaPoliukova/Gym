@@ -5,18 +5,4 @@ public record TrainerDto(
     String password,
     String specialization
 ) {
-  @Override
-  public long id() {
-    return id;
-  }
-
-  @Override
-  public String password() {
-    return password;
-  }
-
-  @Override
-  public String specialization() {
-    return specialization;
-  }
 }

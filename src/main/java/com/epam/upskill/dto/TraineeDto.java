@@ -6,19 +6,5 @@ public record TraineeDto(
     String password,
     String address
 ) {
-  @Override
-  public long id() {
-    return id;
-  }
-
-  @Override
-  public String password() {
-    return password;
-  }
-
-  @Override
-  public String address() {
-    return address;
-  }
 }
 

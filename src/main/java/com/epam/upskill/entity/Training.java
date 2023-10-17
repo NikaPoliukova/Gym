@@ -3,11 +3,11 @@ package com.epam.upskill.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Date;
 
-@AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 @Data
 public class Training {
   private long id;
