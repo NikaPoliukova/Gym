@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 @Getter
 @Setter
-
+@Entity
 @Table(name = "training")
 public class Training {
   @Id

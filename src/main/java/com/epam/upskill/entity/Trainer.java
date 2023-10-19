@@ -12,6 +12,7 @@ import java.util.Set;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "trainer")
+@Entity
 public class Trainer extends User {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

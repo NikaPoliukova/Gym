@@ -14,13 +14,12 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Getter
 @Setter
-
-@EqualsAndHashCode(callSuper = true)
+@Entity
 @Table(name = "trainee")
 public class Trainee extends User {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "trainee_id")
   private long id;
 
   @Column(name = "date_of_birth")
