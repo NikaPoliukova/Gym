@@ -44,12 +44,12 @@ public class TrainerServiceImpl implements TrainerService {
   @Override
   public void createTrainer(TrainerRegistration trainerDto) {
     log.info("Creating Trainer from TrainerRegistration: " + trainerDto);
-    Trainer trainer = Trainer.builder().build();
+   var trainer = Trainer.builder().build();
     String username = UserUtils.createUsername(trainerDto.firstName(), trainerDto.lastName(),
         traineeRepository.findAll(), trainerRepository.findAll());
     trainer.setUsername(username);
     trainer.setPassword(UserUtils.generateRandomPassword());
-    trainerRepository.create(trainer);
+    trainerRepository.create((Trainer) trainer);
     log.debug("Trainer created: " + trainer);
   }
 

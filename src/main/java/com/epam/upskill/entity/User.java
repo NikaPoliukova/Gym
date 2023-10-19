@@ -1,23 +1,36 @@
 package com.epam.upskill.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+import javax.persistence.*;
+
+
 @SuperBuilder
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "users")
 public class User {
-  private long userId;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "user_id")
+  private long id;
+
+  @Column(name = "first_name")
   private String firstName;
+
+  @Column(name = "last_name")
   private String lastName;
+
   private String username;
+
   private String password;
-  @JsonProperty("isActive")
+
+  @Column(name = "is_active")
   private boolean isActive;
 }

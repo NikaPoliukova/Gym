@@ -33,7 +33,7 @@ public class TrainingServiceImpl implements TrainingService {
     training.setTrainingName(trainingDto.trainingName());
     training.setTrainingDate(trainingDto.trainingDate());
     training.setTrainingDuration(trainingDto.trainingDuration());
-    training.setTrainingTypeId(trainingDto.trainingTypeId());
+    //training.setTrainingType(trainingDto.trainingTypeId()); ДОбавить тип
     trainingRepository.create(training);
     log.debug("Training created: " + training);
   }

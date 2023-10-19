@@ -4,6 +4,7 @@ import com.epam.upskill.entity.Trainer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,7 +14,7 @@ public class TrainerStorage {
   private Map<Long, Trainer> trainerMap = new HashMap<>();
 
   public Map<Long, Trainer> getTrainerMap() {
-    return trainerMap;
+    return Collections.unmodifiableMap(trainerMap);
   }
 
   public void save(Trainer trainer) {

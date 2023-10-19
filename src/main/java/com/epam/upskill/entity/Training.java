@@ -1,20 +1,40 @@
 package com.epam.upskill.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
-import java.util.Date;
+import javax.persistence.*;
+import java.time.LocalDate;
 
 @RequiredArgsConstructor
-@Data
+@Getter
+@Setter
+
+@Table(name = "training")
 public class Training {
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
+
+  @Column(name = "training_name")
   private String trainingName;
-  private Date trainingDate;
+
+  @Column(name = "training_date")
+  private LocalDate trainingDate;
+
+  @Column(name = "training_duration")
   private int trainingDuration;
-  private long trainerId;
-  private long traineeId;
-  private int trainingTypeId;
+
+  @ManyToOne
+  @JoinColumn(name = "trainee_id")
+  private Trainee trainee;
+
+  @ManyToOne
+  @JoinColumn(name = "trainer_id")
+  private Trainer trainer;
+
+  @ManyToOne
+  @JoinColumn(name = "training_type_id")
+  private TrainingType trainingType;
 }

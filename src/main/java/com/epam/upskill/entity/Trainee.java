@@ -1,22 +1,37 @@
 package com.epam.upskill.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
-import java.util.Date;
+import javax.persistence.*;
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
-@EqualsAndHashCode(callSuper = false)
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@SuperBuilder
+
+@RequiredArgsConstructor
+@Getter
+@Setter
+
+@EqualsAndHashCode(callSuper = true)
+@Table(name = "trainee")
 public class Trainee extends User {
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "trainee_id")
   private long id;
-  @JsonProperty("date")
-  private Date date;
+
+  @Column(name = "date_of_birth")
+  private LocalDate dateOfBirth;
+
   private String address;
+
+  @OneToOne
+  @JoinColumn(name = "user_id")
+  private User user;
+
+  @OneToMany(mappedBy = "trainee")
+  private Set<Training> trainings = new HashSet<>();
 }
