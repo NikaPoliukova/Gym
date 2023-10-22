@@ -11,5 +11,5 @@ public interface TrainerRepository extends AbstractRepository<Trainer> {
 
   void delete(long trainerId);
 
-  List<Trainer> findByIsActive(boolean isActive);
+  List<Trainer> findByIsActive();
 }

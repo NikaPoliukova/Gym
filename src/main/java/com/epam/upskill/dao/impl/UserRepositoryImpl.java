@@ -31,7 +31,7 @@ public class UserRepositoryImpl implements UserRepository {
   @Override
   public List<User> findAll() {
     log.debug("Fetching all Trainings");
-    return entityManager.createQuery("SELECT e FROM user e", User.class).getResultList();
+    return entityManager.createQuery("SELECT e FROM users e", User.class).getResultList();
   }
 
   @Override
@@ -42,7 +42,7 @@ public class UserRepositoryImpl implements UserRepository {
 
   @Override
   public void delete(long userId) {
-    log.debug("Deleting User by ID: " + userId);
+    log.debug("Deleting user by ID: " + userId);
     User entity = findById(userId);
     if (entity != null) {
       entityManager.remove(entity);

@@ -24,10 +24,10 @@ public class TrainerRepositoryImpl implements TrainerRepository {
 
   }
 @Override
-  public List<Trainer> findByIsActive(boolean isActive) {
+  public List<Trainer> findByIsActive() {
     String hql = "FROM Trainer t WHERE t.isActive = :isActive";
     TypedQuery<Trainer> query = entityManager.createQuery(hql, Trainer.class);
-    query.setParameter("isActive", isActive);
+    query.setParameter("isActive", true);
     return query.getResultList();
   }
 

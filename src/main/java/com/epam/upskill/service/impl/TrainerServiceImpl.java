@@ -52,7 +52,7 @@ public class TrainerServiceImpl implements TrainerService {
   }
 
   public List<Trainer> findActiveTrainers() {
-    return trainerRepository.findByIsActive(true);
+    return trainerRepository.findByIsActive();
   }
 
   @Override
@@ -125,7 +125,7 @@ public class TrainerServiceImpl implements TrainerService {
 
   @Override
   public List<Trainer> findByIsActive() {
-    List<Trainer> activeTrainers = trainerRepository.findByIsActive(true);
+    List<Trainer> activeTrainers = trainerRepository.findByIsActive();
     if (activeTrainers.isEmpty()) {
       return Collections.emptyList();
     }

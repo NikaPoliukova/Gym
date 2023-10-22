@@ -66,7 +66,7 @@ public class TrainingServiceImpl implements TrainingService {
   public List<Trainer> getNotAssignedActiveTrainersToTrainee(long traineeId) {
     Trainee trainee = traineeService.getTraineeById(traineeId);
     if (trainee != null) {
-      List<Trainer> activeTrainers = trainerService.findByIsActive(true);
+      List<Trainer> activeTrainers = trainerService.findByIsActive();
       List<Trainer> notAssignedTrainers = new ArrayList<>();
       for (Trainer trainer : activeTrainers) {
         boolean isAssigned = false;

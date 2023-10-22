@@ -1,6 +1,5 @@
 package com.epam.upskill.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -29,6 +28,7 @@ public class User {
   @Column(name = "last_name")
   private String lastName;
 
+  @Column(name = "username")
   private String username;
 
   @NotBlank
