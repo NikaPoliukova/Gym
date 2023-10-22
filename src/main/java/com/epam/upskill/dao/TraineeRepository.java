@@ -4,7 +4,10 @@ import com.epam.upskill.entity.Trainee;
 
 public interface TraineeRepository extends AbstractRepository<Trainee> {
 
-  void updateTrainee(Trainee trainee);
+  Trainee findByUsername(String username);
 
-  void deleteTraineeById(long traineeId);
+  void update(Trainee trainee);
+
+  void delete(long traineeId);
+
 }

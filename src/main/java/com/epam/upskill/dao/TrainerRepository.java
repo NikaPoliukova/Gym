@@ -2,8 +2,14 @@ package com.epam.upskill.dao;
 
 import com.epam.upskill.entity.Trainer;
 
-public interface TrainerRepository extends AbstractRepository<Trainer> {
-  void updateTrainer(Trainer trainer);
+import java.util.List;
 
-  void deleteTrainerById(long trainerId);
+public interface TrainerRepository extends AbstractRepository<Trainer> {
+  Trainer findByUsername(String username);
+
+  void update(Trainer trainer);
+
+  void delete(long trainerId);
+
+  List<Trainer> findByIsActive(boolean isActive);
 }

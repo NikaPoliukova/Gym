@@ -1,11 +1,11 @@
 package com.epam.upskill.dao;
 
-import java.util.Map;
+import java.util.List;
 
 public interface AbstractRepository<T> {
-  void create(T t);
+  void save(T t);
 
   T findById(long id);
 
-  Map<Long, T> findAll();
+  List<T> findAll();
 }

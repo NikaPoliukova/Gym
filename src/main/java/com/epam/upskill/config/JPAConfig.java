@@ -33,7 +33,7 @@ public class JPAConfig {
   @Value("${hibernate.dialect}")
   private String hibernateDialect;
   @Value("${hibernate.hbm2ddl.auto}")
-   private String hbm2ddlAuto;
+  private String hbm2ddlAuto;
 
   @Bean
   public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
@@ -54,6 +54,7 @@ public class JPAConfig {
     properties.setProperty("hibernate.default_schema", "gym_schema");
     return properties;
   }
+
   @Bean
   public DataSource dataSource() {
     var dataSource = new DriverManagerDataSource();

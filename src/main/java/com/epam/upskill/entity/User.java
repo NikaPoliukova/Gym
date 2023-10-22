@@ -1,15 +1,17 @@
 package com.epam.upskill.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 
 @SuperBuilder
-@NoArgsConstructor
+@RequiredArgsConstructor
 @Getter
 @Setter
 @Entity
@@ -20,16 +22,18 @@ public class User {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
 
+  @NotBlank
   @Column(name = "first_name")
   private String firstName;
-
+  @NotBlank
   @Column(name = "last_name")
   private String lastName;
 
   private String username;
 
+  @NotBlank
   private String password;
 
-  @Column(name = "is_active")
+  @Column(name = "is_active", columnDefinition = "boolean default true")
   private boolean isActive;
 }
