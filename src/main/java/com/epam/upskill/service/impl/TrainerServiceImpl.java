@@ -131,5 +131,5 @@ public class TrainerServiceImpl implements TrainerService {
     }
     return activeTrainers;
   }
-}
+ }
 

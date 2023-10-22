@@ -21,5 +21,5 @@ public interface TrainerService {
 
   void deleteTrainerById(long trainerId);
 
-  List<Trainer> findByIsActive(boolean isActive);
+  List<Trainer> findByIsActive();
 }
