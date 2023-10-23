@@ -23,10 +23,11 @@ public class TrainerRepositoryImpl implements TrainerRepository {
     entityManager.persist(trainer);
 
   }
-@Override
+
+  @Override
   public List<Trainer> findByIsActive() {
-    String hql = "FROM Trainer t WHERE t.isActive = :isActive";
-    TypedQuery<Trainer> query = entityManager.createQuery(hql, Trainer.class);
+    String jpql = "SELECT t FROM Trainer t INNER JOIN t.user u WHERE u.isActive = :isActive";
+    TypedQuery<Trainer> query = entityManager.createQuery(jpql, Trainer.class);
     query.setParameter("isActive", true);
     return query.getResultList();
   }

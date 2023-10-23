@@ -1,18 +1,19 @@
 package com.epam.upskill.entity;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 
+@ToString
 @RequiredArgsConstructor
 @Getter
+@Builder
 @Setter
 @Entity
 @Table(name = "training")
+@AllArgsConstructor
 public class Training {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

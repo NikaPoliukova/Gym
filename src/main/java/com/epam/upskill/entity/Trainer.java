@@ -1,18 +1,13 @@
 package com.epam.upskill.entity;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-
+@ToString
 @RequiredArgsConstructor
 @Getter
 @Setter
@@ -22,15 +17,20 @@ import java.util.Set;
 public class Trainer extends User {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "trainer_id")
   private long id;
   @NotBlank
   private String specialization;
 
-  @OneToOne(cascade = CascadeType.ALL)
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "user_id")
   private User user;
 
-  @OneToMany(mappedBy = "trainer", cascade = CascadeType.REMOVE)
+  @OneToMany(mappedBy = "trainer", cascade = CascadeType.REMOVE, orphanRemoval = true)
   private List<Training> trainings = new ArrayList<>();
+
+  public Trainer(String specialization, User user, List<Training> trainings) {
+    this.specialization = specialization;
+    this.user = user;
+    this.trainings = trainings;
+  }
 }

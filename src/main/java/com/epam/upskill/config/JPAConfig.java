@@ -3,6 +3,7 @@ package com.epam.upskill.config;
 
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -15,6 +16,7 @@ import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
+@EntityScan(basePackages = "com.epam.upskill.entity")
 @EnableTransactionManagement
 public class JPAConfig {
 

@@ -4,6 +4,7 @@ import com.epam.upskill.dao.UserRepository;
 import com.epam.upskill.dto.PrepareUserDto;
 import com.epam.upskill.dto.UserDto;
 import com.epam.upskill.entity.User;
+import com.epam.upskill.exception.UserNotFoundException;
 import com.epam.upskill.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,11 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public User findByUsername(String username) {
-    return userRepository.findByUsername(username);
+    User user = userRepository.findByUsername(username);
+    if (user == null) {
+      throw new UserNotFoundException(username);
+    }
+    return user;
   }
 
   @Override
@@ -46,7 +51,15 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void updateUser(UserDto userDto) {
+  public void updatePassword(@Valid UserDto userDto) {
+    log.info("Updating Trainee's password: ");
+    var user = userRepository.getUserById(userDto.id());
+    user.setPassword(userDto.password());
+    updateUser(new UserDto(userDto.id(), userDto.password()));
+  }
+
+  @Override
+  public void updateUser(@Valid UserDto userDto) {
     User user = userRepository.findById(userDto.id());
     user.setPassword(userDto.password());
     userRepository.update(user);

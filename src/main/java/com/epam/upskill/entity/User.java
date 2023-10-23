@@ -3,12 +3,13 @@ package com.epam.upskill.entity;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
-
+@ToString
 @SuperBuilder
 @RequiredArgsConstructor
 @Getter
@@ -20,7 +21,6 @@ public class User {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
-
   @NotBlank
   @Column(name = "first_name")
   private String firstName;
@@ -34,6 +34,6 @@ public class User {
   @NotBlank
   private String password;
 
-  @Column(name = "is_active", columnDefinition = "boolean default true")
+  @Column(name = "is_active")
   private boolean isActive;
 }

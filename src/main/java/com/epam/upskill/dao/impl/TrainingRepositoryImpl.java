@@ -2,6 +2,7 @@ package com.epam.upskill.dao.impl;
 
 import com.epam.upskill.dao.TrainingRepository;
 import com.epam.upskill.entity.Training;
+import com.epam.upskill.entity.TrainingType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
@@ -51,6 +52,11 @@ public class TrainingRepositoryImpl implements TrainingRepository {
       query.setParameter("address", "%" + criteria + "%");
     }
     return query.getResultList();
+  }
+  @Override
+  public TrainingType findTrainingTypeById(long id) {
+    log.debug("Finding Training Type by ID: " + id);
+    return entityManager.find(TrainingType.class, id);
   }
 }
 

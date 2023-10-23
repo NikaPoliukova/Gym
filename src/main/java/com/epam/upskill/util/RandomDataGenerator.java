@@ -7,19 +7,26 @@ import com.epam.upskill.security.Principal;
 import java.util.Random;
 
 public class RandomDataGenerator {
-  private Random random = new Random();
-
+  private final Random random = new Random();
+  private int currentIndex = 0;
   // Массивы с возможными значениями для генерации случайных данных
-  private final String[] usernames = {"user1", "user2", "user3"};
-  private final String[] passwords = {"password1", "password2", "password3"};
-  private final String[] operations = {"get", "updatePassword", "update", "toggleActivation", "delete", "getTrainings",
-      "getNotAssignedTrainers"};
-  private final String[] criteriaArray = {"criteria_one", "criteria_two", "criteria_three"};
+  private final String[] usernames = {"John.Doe", "Alice.Smith", "Bob.Johnson", "Eve.Wilson", "Michael.Brown",
+      "Emma.Davis", "David.Lee", "Sarah.Evans", "Matthew.Lopez", "Olivia.Clark", "William.Hall",
+      "Sophia.Turner", "James.White", "Lily.Harris", "Benjamin.Scott", "Christopher.Nelson", "Ava.Thomas",
+      "Joseph.Mitchell", "Mia.Perez", "Charles.Sanchez"};
 
-  public Principal generateRandomPrincipal() {
-    int randomIndex = random.nextInt(usernames.length);
-    String username = usernames[randomIndex];
-    String password = passwords[randomIndex];
+  private final String[] passwords = {"password1", "password2", "password3", "password4", "password5", "password6",
+      "password7", "password8", "password9","password10","password11", "password12", "password13", "password14",
+      "password15", "password16","password17", "password18", "password19","password20"};
+
+  private final String[] operations = {"get", "updatePassword", "update", "toggleActivation", "delete", "getTrainings"};
+  private final String[] criteriaArray = {"specialization", "address", "trainingName"};
+
+  public Principal generatePrincipal() {
+    String username = usernames[currentIndex];
+    String password = passwords[currentIndex];
+    currentIndex = (currentIndex + 1) % Math.min(usernames.length, passwords.length);
+
     return new Principal(username, password);
   }
 
@@ -32,6 +39,7 @@ public class RandomDataGenerator {
     int randomIndex = random.nextInt(criteriaArray.length);
     return criteriaArray[randomIndex];
   }
+
   public TraineeDto generateRandomTraineeDto() {
     int id = random.nextInt(10); // Пример случайной генерации id
     String password = passwords[random.nextInt(passwords.length)];

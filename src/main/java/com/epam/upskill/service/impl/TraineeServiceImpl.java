@@ -7,6 +7,8 @@ import com.epam.upskill.dto.TraineeDto;
 import com.epam.upskill.dto.TraineeRegistration;
 import com.epam.upskill.dto.UserDto;
 import com.epam.upskill.entity.Trainee;
+import com.epam.upskill.entity.Training;
+import com.epam.upskill.entity.User;
 import com.epam.upskill.service.TraineeService;
 import com.epam.upskill.service.UserService;
 import com.epam.upskill.util.UserUtils;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -37,7 +40,7 @@ public class TraineeServiceImpl implements TraineeService {
 
   @Override
   public Trainee getTraineeByUsername(String username) {
-    return traineeRepository.findByUsername(username);
+    return (Trainee) userService.findByUsername(username);
   }
 
   @Override
@@ -54,47 +57,26 @@ public class TraineeServiceImpl implements TraineeService {
     log.info("Creating Trainee from TraineeRegistration: " + traineeDto);
     var username = UserUtils.createUsername(traineeDto.firstName(), traineeDto.lastName(), userRepository.findAll());
     var password = UserUtils.generateRandomPassword();
-    var trainee = Trainee.builder()
-        .username(username)
-        .password(password)
-        .firstName(traineeDto.firstName())
-        .lastName(traineeDto.lastName())//НЕ МОГУ ДОБАВИТЬ ПОЛЯ TRAINEE
-        .build();
     userService.save(new PrepareUserDto(traineeDto.firstName(), traineeDto.lastName(), username, password));
-    traineeRepository.save((Trainee) trainee);
-    //добавить сохранение в таблицу user,если данные были сохранены в таблицу trainee
-    //настройка транзакции
-  }
-
-  public void toggleTraineeActivation(long traineeId) {
-    Trainee trainee = getTraineeById(traineeId);
-    long userId = trainee.getUser().getId();
-    userService.toggleProfileActivation(userId);
+    User user = userService.findByUsername(username);
+    List<Training> trainings = new ArrayList<>();
+    traineeRepository.save(new Trainee(traineeDto.dateOfBirth(), traineeDto.address(), user, trainings));
   }
 
   @Override
-  public void updateTrainee(TraineeDto traineeDto) {
+  public void updateTrainee(@Valid TraineeDto traineeDto) {
     log.info("Updating Trainee with TraineeDto: " + traineeDto);
     var trainee = getTraineeById(traineeDto.id());
-    if (traineeDto.password() != null) {
-      trainee.setPassword(traineeDto.password());
-    }
     if (traineeDto.address() != null) {
       trainee.setAddress(traineeDto.address());
     }
-    userService.updateUser(new UserDto(traineeDto.id(), traineeDto.password()));
     traineeRepository.update(trainee);
   }
 
   @Override
-  public void updateTraineePassword(TraineeDto traineeDto) {
-    log.info("Updating Trainee with TraineeDto: " + traineeDto);
-    var trainee = getTraineeById(traineeDto.id());
-    if (traineeDto.password() != null) {
-      trainee.setPassword(traineeDto.password());
-    }
-    traineeRepository.update(trainee);
-    userService.updateUser(new UserDto(traineeDto.id(), traineeDto.password()));
+  public void updateTraineePassword(@Valid TraineeDto traineeDto) {
+    log.info("Updating Trainee's password: ");
+    userService.updatePassword(new UserDto(traineeDto.id(), traineeDto.password()));
   }
 
   @Override

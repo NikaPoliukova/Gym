@@ -45,11 +45,15 @@ public class TrainingServiceImpl implements TrainingService {
   @Override
   public void createTraining(TrainingDto trainingDto) {
     log.info("Creating Training: " + trainingDto);
-    Training training = new Training();
-    training.setTrainingName(trainingDto.trainingName());
-    training.setTrainingDate(trainingDto.trainingDate());
-    training.setTrainingDuration(trainingDto.trainingDuration());
-    //training.setTrainingType(trainingDto.trainingTypeId()); ДОбавить тип
+    var trainee = traineeService.getTraineeById(trainingDto.traineeId());
+    var trainer = trainerService.getTrainerById(trainingDto.trainerId());
+    var trainingType = trainingRepository.findTrainingTypeById(trainingDto.trainingTypeId());
+    var training = Training.builder().trainingName(trainingDto.trainingName())
+        .trainingDate(trainingDto.trainingDate())
+        .trainingDuration(trainingDto.trainingDuration()).trainingType(trainingType)
+        .trainee(trainee)
+        .trainer(trainer)
+        .build();
     trainingRepository.save(training);
     log.debug("Training created: " + training);
   }

@@ -4,7 +4,6 @@ import com.epam.upskill.dto.PrepareUserDto;
 import com.epam.upskill.dto.UserDto;
 import com.epam.upskill.entity.User;
 
-import javax.persistence.TypedQuery;
 import java.util.List;
 
 public interface UserService {
@@ -15,9 +14,13 @@ public interface UserService {
 
   void save(PrepareUserDto prepareUserDto);
 
+  void updatePassword(UserDto userDto);
+
   void updateUser(UserDto userDto);
 
-   User findByUsername(String username);
-   void delete(long userId);
+  User findByUsername(String username);
+
+  void delete(long userId);
+
   void toggleProfileActivation(long userId);
 }

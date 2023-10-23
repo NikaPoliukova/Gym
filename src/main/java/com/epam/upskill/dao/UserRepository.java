@@ -10,4 +10,6 @@ public interface UserRepository extends AbstractRepository<User> {
   User findByUsername(String username);
 
   void toggleProfileActivation(User user);
+
+  User getUserById(long id);
 }

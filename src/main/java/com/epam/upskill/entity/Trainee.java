@@ -1,10 +1,6 @@
 package com.epam.upskill.entity;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.Cascade;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -12,8 +8,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@ToString
 @RequiredArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
@@ -29,10 +26,17 @@ public class Trainee extends User {
   @NotBlank
   private String address;
 
-  @OneToOne(cascade = CascadeType.ALL)
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "user_id")
   private User user;
 
-  @OneToMany(mappedBy = "trainee", cascade = CascadeType.REMOVE)
+  @OneToMany(mappedBy = "trainee", cascade = CascadeType.REMOVE, orphanRemoval = true)
   private List<Training> trainings = new ArrayList<>();
+
+  public Trainee(LocalDate dateOfBirth, String address, User user, List<Training> trainings) {
+    this.dateOfBirth = dateOfBirth;
+    this.address = address;
+    this.user = user;
+    this.trainings = trainings;
+  }
 }

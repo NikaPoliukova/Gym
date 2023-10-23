@@ -2,10 +2,12 @@ package com.epam.upskill.dao.impl;
 
 import com.epam.upskill.dao.UserRepository;
 import com.epam.upskill.entity.User;
+import com.epam.upskill.exception.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.util.List;
@@ -31,7 +33,7 @@ public class UserRepositoryImpl implements UserRepository {
   @Override
   public List<User> findAll() {
     log.debug("Fetching all Trainings");
-    return entityManager.createQuery("SELECT e FROM users e", User.class).getResultList();
+    return entityManager.createQuery("SELECT u FROM User u", User.class).getResultList();
   }
 
   @Override
@@ -54,10 +56,23 @@ public class UserRepositoryImpl implements UserRepository {
     TypedQuery<User> query = entityManager
         .createQuery("SELECT u FROM User u WHERE u.username = :username", User.class);
     query.setParameter("username", username);
-    return query.getSingleResult();
+
+    try {
+      return query.getSingleResult();
+    } catch (NoResultException e) {
+      throw new UserNotFoundException("User named '" + username + "' was not found.");
+    }
   }
 
   public void toggleProfileActivation(User user) {
     entityManager.merge(user);
+  }
+
+  @Override
+  public User getUserById(long id) {
+    String jpql = "SELECT u FROM User u WHERE u.id = :id";
+    TypedQuery<User> query = entityManager.createQuery(jpql, User.class);
+    query.setParameter("userId", id);
+    return query.getSingleResult();
   }
 }

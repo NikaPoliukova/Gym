@@ -7,14 +7,18 @@ import com.epam.upskill.dto.TrainerDto;
 import com.epam.upskill.dto.TrainerRegistration;
 import com.epam.upskill.dto.UserDto;
 import com.epam.upskill.entity.Trainer;
+import com.epam.upskill.entity.Training;
+import com.epam.upskill.entity.User;
 import com.epam.upskill.service.TrainerService;
 import com.epam.upskill.service.UserService;
 import com.epam.upskill.util.UserUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,7 +45,7 @@ public class TrainerServiceImpl implements TrainerService {
 
   @Override
   public Trainer getTrainerByUsername(String username) {
-    return trainerRepository.findByUsername(username);
+    return (Trainer) userService.findByUsername(username);
   }
 
   @Override
@@ -51,66 +55,38 @@ public class TrainerServiceImpl implements TrainerService {
     return trainerMap != null ? trainerMap : Collections.emptyList();
   }
 
-  public List<Trainer> findActiveTrainers() {
+  public List<Trainer> findActiveTrainersForTrainee() {
     return trainerRepository.findByIsActive();
   }
 
+  @Transactional
   @Override
   public void createTrainer(@Valid TrainerRegistration trainerDto) {
     log.info("Creating Trainer from TrainerRegistration: " + trainerDto);
-    String username = UserUtils.createUsername(trainerDto.firstName(), trainerDto.lastName(), userRepository.findAll());
-    String password = UserUtils.generateRandomPassword();
-    var trainer = Trainer.builder()
-        .username(username)
-        .password(password)
-        .build();
+    var username = UserUtils.createUsername(trainerDto.firstName(), trainerDto.lastName(), userRepository.findAll());
+    var password = UserUtils.generateRandomPassword();
     userService.save(new PrepareUserDto(trainerDto.firstName(), trainerDto.lastName(), username, password));
-    trainerRepository.save((Trainer) trainer);
-    log.debug("Trainer created: " + trainer);
-    //добавить сохранение в таблицу user,если данные были сохранены в таблицу trainee
-
-    //настройка транзакции
+    User user = userService.findByUsername(username);
+    List<Training> trainings = new ArrayList<>();
+    trainerRepository.save(new Trainer(trainerDto.specialization(), user, trainings));
   }
 
-  public void updateTrainer(TrainerDto trainerDto) {
+  @Transactional
+  public void updateTrainer(@Valid TrainerDto trainerDto) {
     log.info("Updating Trainer with TrainerDto: " + trainerDto);
     var trainer = trainerRepository.findById(trainerDto.id());
-    if (trainer != null) {
-      if (trainerDto.password() != null) {
-        trainer.setPassword(trainerDto.password());
-      }
-      if (trainerDto.specialization() != null) {
-        trainer.setSpecialization(trainerDto.specialization());
-      }
-      trainerRepository.update(trainer);
-      userService.updateUser(new UserDto(trainerDto.id(), trainerDto.password()));
-      log.debug("Trainer updated: " + trainer);
-    } else {
-      log.warn("Trainer not found for update: ID " + trainerDto.id());
-    }
+    trainer.setSpecialization(trainerDto.specialization());
+    trainerRepository.update(trainer);
+    userService.updateUser(new UserDto(trainerDto.id(), trainerDto.password()));
+    log.debug("Trainer updated: " + trainer);
   }
 
   @Override
-  public void updateTrainerPassword(TrainerDto trainerDto) {
+  public void updateTrainerPassword(@Valid TrainerDto trainerDto) {
     log.info("Updating Trainer with TrainerDto: " + trainerDto);
-    var trainer = getTrainerById(trainerDto.id());
-    if (trainer != null) {
-      if (trainerDto.password() != null) {
-        trainer.setPassword(trainerDto.password());
-      }
-      trainerRepository.update(trainer);
-      userService.updateUser(new UserDto(trainerDto.id(), trainerDto.password()));
-      log.debug("Trainer updated: " + trainer);
-    } else {
-      log.warn("Trainer not found for update: ID " + trainerDto.id());
-    }
+    userService.updatePassword(new UserDto(trainerDto.id(), trainerDto.password()));
   }
 
-  public void toggleTrainerActivation(long trainerId) {
-    var trainer = getTrainerById(trainerId);
-    long userId = trainer.getUser().getId();
-    userService.toggleProfileActivation(userId);
-  }
 
   @Override
   public void deleteTrainerById(long trainerId) {
@@ -125,11 +101,7 @@ public class TrainerServiceImpl implements TrainerService {
 
   @Override
   public List<Trainer> findByIsActive() {
-    List<Trainer> activeTrainers = trainerRepository.findByIsActive();
-    if (activeTrainers.isEmpty()) {
-      return Collections.emptyList();
-    }
-    return activeTrainers;
+    return trainerRepository.findByIsActive();
   }
- }
+}
 

@@ -8,6 +8,8 @@ public record TrainingDto(
     String trainingName,
     LocalDate trainingDate,
     int trainingDuration,
-    int trainingTypeId
+    int trainingTypeId,
+    long traineeId,
+    long trainerId
 ) {
 }

@@ -27,7 +27,7 @@ public class TraineeRepositoryImpl implements TraineeRepository {
 
   @Override
   public Trainee findByUsername(String username) {
-    return entityManager.createQuery("SELECT e FROM trainee e WHERE e.username = :username", Trainee.class)
+    return entityManager.createQuery("SELECT e FROM Trainee e WHERE e.username = :username", Trainee.class)
         .setParameter("username", username)
         .getSingleResult();
   }
