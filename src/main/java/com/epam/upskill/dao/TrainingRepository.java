@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface TrainingRepository extends AbstractRepository<Training> {
   TrainingType findTrainingTypeById(long id);
+
   List<Training> findTrainingsByUsernameAndCriteria(String trainerUsername, String trainingName);
 }

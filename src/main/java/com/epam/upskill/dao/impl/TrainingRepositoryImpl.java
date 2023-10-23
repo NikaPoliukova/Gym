@@ -53,6 +53,7 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     }
     return query.getResultList();
   }
+
   @Override
   public TrainingType findTrainingTypeById(long id) {
     log.debug("Finding Training Type by ID: " + id);

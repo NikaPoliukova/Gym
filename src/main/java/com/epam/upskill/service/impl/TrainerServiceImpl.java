@@ -15,6 +15,7 @@ import com.epam.upskill.util.UserUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
@@ -32,6 +33,7 @@ public class TrainerServiceImpl implements TrainerService {
   private final UserRepository userRepository;
 
   @Override
+  @Transactional(readOnly = true)
   public Trainer getTrainerById(long trainerId) {
     log.info("Fetching Trainer by ID: " + trainerId);
     var trainer = trainerRepository.findById(trainerId);
@@ -44,23 +46,21 @@ public class TrainerServiceImpl implements TrainerService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Trainer getTrainerByUsername(String username) {
     return (Trainer) userService.findByUsername(username);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<Trainer> findAll() {
     log.debug("Fetching all Trainers");
     List<Trainer> trainerMap = trainerRepository.findAll();
     return trainerMap != null ? trainerMap : Collections.emptyList();
   }
 
-  public List<Trainer> findActiveTrainersForTrainee() {
-    return trainerRepository.findByIsActive();
-  }
-
-  @Transactional
   @Override
+  @Transactional(propagation = Propagation.REQUIRED)
   public void createTrainer(@Valid TrainerRegistration trainerDto) {
     log.info("Creating Trainer from TrainerRegistration: " + trainerDto);
     var username = UserUtils.createUsername(trainerDto.firstName(), trainerDto.lastName(), userRepository.findAll());
@@ -71,7 +71,8 @@ public class TrainerServiceImpl implements TrainerService {
     trainerRepository.save(new Trainer(trainerDto.specialization(), user, trainings));
   }
 
-  @Transactional
+  @Override
+  @Transactional(propagation = Propagation.REQUIRED)
   public void updateTrainer(@Valid TrainerDto trainerDto) {
     log.info("Updating Trainer with TrainerDto: " + trainerDto);
     var trainer = trainerRepository.findById(trainerDto.id());
@@ -82,6 +83,7 @@ public class TrainerServiceImpl implements TrainerService {
   }
 
   @Override
+  @Transactional
   public void updateTrainerPassword(@Valid TrainerDto trainerDto) {
     log.info("Updating Trainer with TrainerDto: " + trainerDto);
     userService.updatePassword(new UserDto(trainerDto.id(), trainerDto.password()));
@@ -89,6 +91,7 @@ public class TrainerServiceImpl implements TrainerService {
 
 
   @Override
+  @Transactional(propagation = Propagation.REQUIRED)
   public void deleteTrainerById(long trainerId) {
     log.info("Deleting Trainer by ID: " + trainerId);
     try {

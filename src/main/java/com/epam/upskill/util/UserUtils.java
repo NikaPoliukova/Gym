@@ -10,13 +10,11 @@ import java.util.List;
 @UtilityClass
 public class UserUtils {
 
-
   public static String generateRandomPassword() {
     return RandomStringUtils.randomAlphanumeric(10);
   }
 
-  public static String createUsername(String firstName, String lastName, List<User> users
-  ) {
+  public static String createUsername(String firstName, String lastName, List<User> users) {
     if (StringUtils.isAnyBlank(firstName, lastName)) {
       throw new IllegalArgumentException("First name or last name must not be null or empty");
     }
@@ -25,7 +23,6 @@ public class UserUtils {
     if (!isUsernameUnique(users, username)) {
       username += calculateUsernameCounter(users, username);
     }
-
     return username;
   }
 

@@ -5,7 +5,6 @@ import com.epam.upskill.dto.TrainingDto;
 import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.Training;
-import com.epam.upskill.entity.User;
 import com.epam.upskill.service.TraineeService;
 import com.epam.upskill.service.TrainerService;
 import com.epam.upskill.service.TrainingService;
@@ -13,10 +12,12 @@ import com.epam.upskill.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -31,6 +32,7 @@ public class TrainingServiceImpl implements TrainingService {
 
 
   @Override
+  @Transactional(readOnly = true)
   public Training getTrainingById(long trainingId) {
     log.debug("Fetching Training by ID: " + trainingId);
     Training training = trainingRepository.findById(trainingId);
@@ -43,6 +45,7 @@ public class TrainingServiceImpl implements TrainingService {
   }
 
   @Override
+  @Transactional(propagation = Propagation.REQUIRED)
   public void createTraining(TrainingDto trainingDto) {
     log.info("Creating Training: " + trainingDto);
     var trainee = traineeService.getTraineeById(trainingDto.traineeId());
@@ -59,33 +62,21 @@ public class TrainingServiceImpl implements TrainingService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<Training> getTrainingsByUsernameAndCriteria(String username, String criteria) {
-    User user = userService.findByUsername(username);
-    if (user != null) {
-      return trainingRepository.findTrainingsByUsernameAndCriteria(username, criteria);
-    }
-    return Collections.emptyList();
+    return Optional.ofNullable(userService.findByUsername(username))
+        .map(user -> trainingRepository.findTrainingsByUsernameAndCriteria(username, criteria))
+        .orElse(Collections.emptyList());
   }
 
   public List<Trainer> getNotAssignedActiveTrainersToTrainee(long traineeId) {
-    Trainee trainee = traineeService.getTraineeById(traineeId);
-    if (trainee != null) {
-      List<Trainer> activeTrainers = trainerService.findByIsActive();
-      List<Trainer> notAssignedTrainers = new ArrayList<>();
-      for (Trainer trainer : activeTrainers) {
-        boolean isAssigned = false;
-        for (Training training : trainer.getTrainings()) {
-          if (training.getTrainee().equals(trainee)) {
-            isAssigned = true;
-            break;
-          }
-        }
-        if (!isAssigned) {
-          notAssignedTrainers.add(trainer);
-        }
-      }
-      return notAssignedTrainers;
+    var trainee = traineeService.getTraineeById(traineeId);
+    if (trainee == null) {
+      return Collections.emptyList();
     }
-    return Collections.emptyList();
+    List<Trainer> activeTrainers = trainerService.findByIsActive();
+    return activeTrainers.stream()
+        .filter(trainer -> trainer.getTrainings().stream()
+            .noneMatch(training -> training.getTrainee().equals(trainee))).toList();
   }
 }

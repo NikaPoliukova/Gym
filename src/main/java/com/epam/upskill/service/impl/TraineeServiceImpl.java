@@ -15,6 +15,7 @@ import com.epam.upskill.util.UserUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
@@ -32,13 +33,14 @@ public class TraineeServiceImpl implements TraineeService {
   private final UserService userService;
 
   @Override
-
+  @Transactional(readOnly = true)
   public Trainee getTraineeById(long traineeId) {
     log.debug("Fetching Trainee by ID: " + traineeId);
     return traineeRepository.findById(traineeId);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Trainee getTraineeByUsername(String username) {
     return (Trainee) userService.findByUsername(username);
   }
@@ -52,7 +54,7 @@ public class TraineeServiceImpl implements TraineeService {
   }
 
   @Override
-  @Transactional
+  @Transactional(propagation = Propagation.REQUIRED)
   public void createTrainee(@Valid TraineeRegistration traineeDto) {
     log.info("Creating Trainee from TraineeRegistration: " + traineeDto);
     var username = UserUtils.createUsername(traineeDto.firstName(), traineeDto.lastName(), userRepository.findAll());
@@ -64,6 +66,7 @@ public class TraineeServiceImpl implements TraineeService {
   }
 
   @Override
+  @Transactional(propagation = Propagation.REQUIRED)
   public void updateTrainee(@Valid TraineeDto traineeDto) {
     log.info("Updating Trainee with TraineeDto: " + traineeDto);
     var trainee = getTraineeById(traineeDto.id());
@@ -74,23 +77,17 @@ public class TraineeServiceImpl implements TraineeService {
   }
 
   @Override
+  @Transactional(propagation = Propagation.REQUIRED)
   public void updateTraineePassword(@Valid TraineeDto traineeDto) {
     log.info("Updating Trainee's password: ");
     userService.updatePassword(new UserDto(traineeDto.id(), traineeDto.password()));
   }
 
   @Override
+  @Transactional(propagation = Propagation.REQUIRED)
   public void deleteTraineeById(long traineeId) {
     log.info("Deleting Trainee by ID: " + traineeId);
     traineeRepository.delete(traineeId);
-    deleteTraineeWithTrainings(traineeId);
-  }
-
-  public void deleteTraineeWithTrainings(long traineeId) {
-    Trainee trainee = traineeRepository.findById(traineeId);
-    if (trainee != null) {
-      traineeRepository.delete(trainee.getId());
-    }
   }
 }
 

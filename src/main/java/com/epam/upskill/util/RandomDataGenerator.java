@@ -9,15 +9,15 @@ import java.util.Random;
 public class RandomDataGenerator {
   private final Random random = new Random();
   private int currentIndex = 0;
-  // Массивы с возможными значениями для генерации случайных данных
+
   private final String[] usernames = {"John.Doe", "Alice.Smith", "Bob.Johnson", "Eve.Wilson", "Michael.Brown",
       "Emma.Davis", "David.Lee", "Sarah.Evans", "Matthew.Lopez", "Olivia.Clark", "William.Hall",
       "Sophia.Turner", "James.White", "Lily.Harris", "Benjamin.Scott", "Christopher.Nelson", "Ava.Thomas",
       "Joseph.Mitchell", "Mia.Perez", "Charles.Sanchez"};
 
   private final String[] passwords = {"password1", "password2", "password3", "password4", "password5", "password6",
-      "password7", "password8", "password9","password10","password11", "password12", "password13", "password14",
-      "password15", "password16","password17", "password18", "password19","password20"};
+      "password7", "password8", "password9", "password10", "password11", "password12", "password13", "password14",
+      "password15", "password16", "password17", "password18", "password19", "password20"};
 
   private final String[] operations = {"get", "updatePassword", "update", "toggleActivation", "delete", "getTrainings"};
   private final String[] criteriaArray = {"specialization", "address", "trainingName"};
@@ -26,7 +26,6 @@ public class RandomDataGenerator {
     String username = usernames[currentIndex];
     String password = passwords[currentIndex];
     currentIndex = (currentIndex + 1) % Math.min(usernames.length, passwords.length);
-
     return new Principal(username, password);
   }
 
@@ -41,16 +40,16 @@ public class RandomDataGenerator {
   }
 
   public TraineeDto generateRandomTraineeDto() {
-    int id = random.nextInt(10); // Пример случайной генерации id
+    int id = random.nextInt(10);
     String password = passwords[random.nextInt(passwords.length)];
-    String address = "Address" + (id + 1); // Пример случайной генерации адреса
+    String address = "Address" + (id + 1);
     return new TraineeDto(id, password, address);
   }
 
   public TrainerDto generateRandomTrainerDto() {
-    int id = random.nextInt(10); // Пример случайной генерации id
+    int id = random.nextInt(10);
     String password = passwords[random.nextInt(passwords.length)];
-    String specialization = "Specialization" + (id + 1); // Пример случайной генерации специализации
+    String specialization = "Specialization" + (id + 1);
     return new TrainerDto(id, password, specialization);
   }
 }
