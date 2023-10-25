@@ -1,5 +1,6 @@
 package com.epam.upskill.service.impl;
 
+
 import com.epam.upskill.dao.UserRepository;
 import com.epam.upskill.dto.PrepareUserDto;
 import com.epam.upskill.dto.UserDto;
@@ -14,9 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
 import java.util.List;
-
-import static com.epam.upskill.util.UserUtils.createUsername;
-import static com.epam.upskill.util.UserUtils.generateRandomPassword;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -48,20 +46,9 @@ public class UserServiceImpl implements UserService {
   @Override
   @Transactional(propagation = Propagation.REQUIRED)
   public void save(@Valid PrepareUserDto prepareUserDto) {
-    userRepository.save(User.builder()
-        .firstName(prepareUserDto.firstName())
-        .lastName(prepareUserDto.lastName())
-        .username(createUsername(prepareUserDto.firstName(), prepareUserDto.lastName(), findAll()))
-        .password(generateRandomPassword()).build());
-  }
-
-  @Override
-  @Transactional
-  public void updatePassword(@Valid UserDto userDto) {
-    log.info("Updating Trainee's password: ");
-    var user = userRepository.getUserById(userDto.id());
-    user.setPassword(userDto.password());
-    updateUser(new UserDto(userDto.id(), userDto.password()));
+    User user = new User(prepareUserDto.firstName(), prepareUserDto.lastName(), prepareUserDto.username(),
+        prepareUserDto.password());
+    userRepository.save(user);
   }
 
   @Override
@@ -78,12 +65,5 @@ public class UserServiceImpl implements UserService {
     userRepository.delete(userId);
   }
 
-  public void toggleProfileActivation(long userId) {
-    var user = getUserById(userId);
-    if (user != null) {
-      boolean currentStatus = user.isActive();
-      user.setActive(!currentStatus);
-      userRepository.toggleProfileActivation(user);
-    }
-  }
+
 }

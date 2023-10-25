@@ -14,13 +14,11 @@ public interface UserService {
 
   void save(PrepareUserDto prepareUserDto);
 
-  void updatePassword(UserDto userDto);
-
   void updateUser(UserDto userDto);
 
   User findByUsername(String username);
 
   void delete(long userId);
 
-  void toggleProfileActivation(long userId);
+
 }

@@ -21,7 +21,7 @@ public class UserUtils {
     String username = String.format("%s.%s", firstName, lastName);
 
     if (!isUsernameUnique(users, username)) {
-      username += calculateUsernameCounter(users, username);
+      username += calculateUsernameCounter(users, username)+1;
     }
     return username;
   }

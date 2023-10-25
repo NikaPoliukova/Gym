@@ -2,7 +2,6 @@ package com.epam.upskill.service.impl;
 
 import com.epam.upskill.dao.TrainingRepository;
 import com.epam.upskill.dto.TrainingDto;
-import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.Training;
 import com.epam.upskill.service.TraineeService;
@@ -48,8 +47,8 @@ public class TrainingServiceImpl implements TrainingService {
   @Transactional(propagation = Propagation.REQUIRED)
   public void createTraining(TrainingDto trainingDto) {
     log.info("Creating Training: " + trainingDto);
-    var trainee = traineeService.getTraineeById(trainingDto.traineeId());
-    var trainer = trainerService.getTrainerById(trainingDto.trainerId());
+    var trainee = traineeService.findById(trainingDto.traineeId());
+    var trainer = trainerService.findById(trainingDto.trainerId());
     var trainingType = trainingRepository.findTrainingTypeById(trainingDto.trainingTypeId());
     var training = Training.builder().trainingName(trainingDto.trainingName())
         .trainingDate(trainingDto.trainingDate())
@@ -70,7 +69,7 @@ public class TrainingServiceImpl implements TrainingService {
   }
 
   public List<Trainer> getNotAssignedActiveTrainersToTrainee(long traineeId) {
-    var trainee = traineeService.getTraineeById(traineeId);
+    var trainee = traineeService.findById(traineeId);
     if (trainee == null) {
       return Collections.emptyList();
     }

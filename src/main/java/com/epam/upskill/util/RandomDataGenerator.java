@@ -26,7 +26,7 @@ public class RandomDataGenerator {
     String username = usernames[currentIndex];
     String password = passwords[currentIndex];
     currentIndex = (currentIndex + 1) % Math.min(usernames.length, passwords.length);
-    return new Principal(username, password);
+    return new Principal(username, password, "User");
   }
 
   public String generateRandomOperation() {

@@ -6,8 +6,11 @@ public interface TraineeRepository extends AbstractRepository<Trainee> {
 
   Trainee findByUsername(String username);
 
-  void update(Trainee trainee);
+  void toggleProfileActivation(Trainee trainee);
+
+  Trainee update(Trainee trainee);
 
   void delete(long traineeId);
+
 
 }

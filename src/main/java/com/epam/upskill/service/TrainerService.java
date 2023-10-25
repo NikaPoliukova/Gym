@@ -7,19 +7,21 @@ import com.epam.upskill.entity.Trainer;
 import java.util.List;
 
 public interface TrainerService {
-  Trainer getTrainerById(long trainerId);
+  Trainer findById(long trainerId);
 
-  Trainer getTrainerByUsername(String username);
+  Trainer findByUsername(String username);
 
   List<Trainer> findAll();
 
-  void updateTrainerPassword(TrainerDto trainerDto);
+  Trainer updateTrainerPassword(TrainerDto trainerDto);
 
   void createTrainer(TrainerRegistration trainerDto);
 
-  void updateTrainer(TrainerDto trainerDto);
+  Trainer updateTrainer(TrainerDto trainerDto);
 
   void deleteTrainerById(long trainerId);
 
   List<Trainer> findByIsActive();
+
+  void toggleProfileActivation(long userId);
 }

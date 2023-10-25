@@ -7,17 +7,18 @@ import com.epam.upskill.entity.Trainee;
 import java.util.List;
 
 public interface TraineeService {
-  Trainee getTraineeById(long traineeId);
+  Trainee findById(long traineeId);
 
   Trainee getTraineeByUsername(String username);
 
-  void updateTraineePassword(TraineeDto traineeDto);
+  Trainee updateTraineePassword(TraineeDto traineeDto);
 
   void createTrainee(TraineeRegistration trainee);
 
   List<Trainee> findAll();
 
-  void updateTrainee(TraineeDto trainee);
+  Trainee updateTrainee(TraineeDto trainee);
 
   void deleteTraineeById(long traineeId);
+  void toggleProfileActivation(long userId);
 }

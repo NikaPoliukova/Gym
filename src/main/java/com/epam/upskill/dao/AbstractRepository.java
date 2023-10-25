@@ -1,5 +1,7 @@
 package com.epam.upskill.dao;
 
+import com.epam.upskill.entity.Trainee;
+
 import java.util.List;
 
 public interface AbstractRepository<T> {
@@ -8,4 +10,6 @@ public interface AbstractRepository<T> {
   T findById(long id);
 
   List<T> findAll();
+
+
 }

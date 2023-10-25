@@ -7,9 +7,9 @@ import java.util.List;
 public interface TrainerRepository extends AbstractRepository<Trainer> {
   Trainer findByUsername(String username);
 
-  void update(Trainer trainer);
+  Trainer update(Trainer trainer);
 
   void delete(long trainerId);
-
+  void toggleProfileActivation(Trainer trainer);
   List<Trainer> findByIsActive();
 }

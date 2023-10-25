@@ -4,13 +4,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 
 @ToString
-@SuperBuilder
 @RequiredArgsConstructor
 @Getter
 @Setter
@@ -19,21 +16,29 @@ import javax.validation.constraints.NotBlank;
 @Table(name = "users")
 public class User {
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private long id;
-  @NotBlank
+
   @Column(name = "first_name")
   private String firstName;
-  @NotBlank
+
   @Column(name = "last_name")
   private String lastName;
 
   @Column(name = "username")
   private String username;
 
-  @NotBlank
   private String password;
 
   @Column(name = "is_active")
   private boolean isActive;
+
+  private String role;
+
+  public User(String firstName, String lastName, String username, String password) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.username = username;
+    this.password = password;
+  }
 }

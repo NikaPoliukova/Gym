@@ -21,12 +21,11 @@ public class TrainerRepositoryImpl implements TrainerRepository {
   public void save(Trainer trainer) {
     log.debug("Creating Trainer: " + trainer);
     entityManager.persist(trainer);
-
-  }
+ }
 
   @Override
   public List<Trainer> findByIsActive() {
-    String jpql = "SELECT t FROM Trainer t INNER JOIN t.user u WHERE u.isActive = :isActive";
+    String jpql = "SELECT t FROM Trainer t  WHERE t.isActive = :isActive";
     TypedQuery<Trainer> query = entityManager.createQuery(jpql, Trainer.class);
     query.setParameter("isActive", true);
     return query.getResultList();
@@ -41,20 +40,27 @@ public class TrainerRepositoryImpl implements TrainerRepository {
   @Override
   public List<Trainer> findAll() {
     log.debug("Fetching all Trainers");
-    return entityManager.createQuery("SELECT e FROM trainer e", Trainer.class).getResultList();
+    return entityManager.createQuery("SELECT e FROM Trainer e", Trainer.class).getResultList();
+  }
+
+  @Override
+  public void toggleProfileActivation(Trainer trainer) {
+    log.debug("Toggling profile activation for Trainer: " + trainer);
+    entityManager.merge(trainer);
   }
 
   @Override
   public Trainer findByUsername(String username) {
-    return entityManager.createQuery("SELECT e FROM trainer e WHERE e.username = :username", Trainer.class)
+    return entityManager.createQuery("SELECT t FROM Trainer t  WHERE t.username = :username",
+            Trainer.class)
         .setParameter("username", username)
         .getSingleResult();
   }
 
   @Override
-  public void update(Trainer trainer) {
+  public Trainer update(Trainer trainer) {
     log.debug("Updating Trainer: " + trainer);
-    entityManager.merge(trainer);
+    return entityManager.merge(trainer);
   }
 
   @Override

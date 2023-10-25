@@ -1,14 +1,11 @@
 package com.epam.upskill.service.impl;
 
+import com.epam.upskill.converter.TraineeConverter;
 import com.epam.upskill.dao.TraineeRepository;
-import com.epam.upskill.dao.impl.UserRepositoryImpl;
-import com.epam.upskill.dto.PrepareUserDto;
 import com.epam.upskill.dto.TraineeDto;
 import com.epam.upskill.dto.TraineeRegistration;
-import com.epam.upskill.dto.UserDto;
 import com.epam.upskill.entity.Trainee;
-import com.epam.upskill.entity.Training;
-import com.epam.upskill.entity.User;
+import com.epam.upskill.exception.TraineeNotFoundException;
 import com.epam.upskill.service.TraineeService;
 import com.epam.upskill.service.UserService;
 import com.epam.upskill.util.UserUtils;
@@ -19,7 +16,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,23 +25,35 @@ import java.util.List;
 public class TraineeServiceImpl implements TraineeService {
 
   private final TraineeRepository traineeRepository;
-  private final UserRepositoryImpl userRepository;
   private final UserService userService;
+  private final TraineeConverter traineeConverter;
 
-  @Override
+  @Override//работает
   @Transactional(readOnly = true)
-  public Trainee getTraineeById(long traineeId) {
+  public Trainee findById(long traineeId) {
     log.debug("Fetching Trainee by ID: " + traineeId);
-    return traineeRepository.findById(traineeId);
+    var trainee = traineeRepository.findById(traineeId);
+    if (trainee == null) {
+      log.error("Trainee not found with id: {}", traineeId);
+      throw new TraineeNotFoundException("Trainee not found with id: " + traineeId);
+    }
+    log.info("Trainee found with id: {}", traineeId);
+    return trainee;
   }
 
-  @Override
+  @Override// работает
   @Transactional(readOnly = true)
   public Trainee getTraineeByUsername(String username) {
-    return (Trainee) userService.findByUsername(username);
+    var trainee = traineeRepository.findByUsername(username);
+    if (trainee == null) {
+      log.error("Trainee not found with username: {}", username);
+      throw new TraineeNotFoundException("Trainee not found with username: " + username);
+    }
+    log.info("Trainee found with username: {}", username);
+    return trainee;
   }
 
-  @Override
+  @Override//работает
   @Transactional(readOnly = true)
   public List<Trainee> findAll() {
     log.debug("Fetching all Trainees");
@@ -53,41 +61,56 @@ public class TraineeServiceImpl implements TraineeService {
     return trainees != null ? trainees : Collections.emptyList();
   }
 
-  @Override
-  @Transactional(propagation = Propagation.REQUIRED)
+  @Override//работает
+  @Transactional
   public void createTrainee(@Valid TraineeRegistration traineeDto) {
     log.info("Creating Trainee from TraineeRegistration: " + traineeDto);
-    var username = UserUtils.createUsername(traineeDto.firstName(), traineeDto.lastName(), userRepository.findAll());
+    var username = UserUtils.createUsername(traineeDto.firstName(), traineeDto.lastName(), userService.findAll());
     var password = UserUtils.generateRandomPassword();
-    userService.save(new PrepareUserDto(traineeDto.firstName(), traineeDto.lastName(), username, password));
-    User user = userService.findByUsername(username);
-    List<Training> trainings = new ArrayList<>();
-    traineeRepository.save(new Trainee(traineeDto.dateOfBirth(), traineeDto.address(), user, trainings));
+    var trainee = traineeConverter.toTrainee(traineeDto);
+    trainee.setPassword(password);
+    trainee.setUsername(username);
+    trainee.setActive(true);
+    traineeRepository.save(trainee);
   }
 
-  @Override
+  @Override//работает
   @Transactional(propagation = Propagation.REQUIRED)
-  public void updateTrainee(@Valid TraineeDto traineeDto) {
+  public Trainee updateTrainee(@Valid TraineeDto traineeDto) {
     log.info("Updating Trainee with TraineeDto: " + traineeDto);
-    var trainee = getTraineeById(traineeDto.id());
+    var trainee = findById(traineeDto.id());
     if (traineeDto.address() != null) {
       trainee.setAddress(traineeDto.address());
     }
-    traineeRepository.update(trainee);
+    return traineeRepository.update(trainee);
   }
 
-  @Override
+  @Override //работает
   @Transactional(propagation = Propagation.REQUIRED)
-  public void updateTraineePassword(@Valid TraineeDto traineeDto) {
+  public Trainee updateTraineePassword(@Valid TraineeDto traineeDto) {
     log.info("Updating Trainee's password: ");
-    userService.updatePassword(new UserDto(traineeDto.id(), traineeDto.password()));
+    var trainee = findById(traineeDto.id());
+    if (traineeDto.password() != null && !traineeDto.password().isEmpty()) {
+      trainee.setPassword(traineeDto.password());
+    }
+    return traineeRepository.update(trainee);
   }
 
-  @Override
+  @Override//работает
   @Transactional(propagation = Propagation.REQUIRED)
   public void deleteTraineeById(long traineeId) {
     log.info("Deleting Trainee by ID: " + traineeId);
     traineeRepository.delete(traineeId);
   }
+
+  @Override
+  @Transactional
+  public void toggleProfileActivation(long traineeId) {
+    var trainee = findById(traineeId);
+    var currentStatus = trainee.isActive();
+    trainee.setActive(!currentStatus);
+    traineeRepository.toggleProfileActivation(trainee);
+  }
 }
+
 

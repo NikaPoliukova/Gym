@@ -56,7 +56,6 @@ public class UserRepositoryImpl implements UserRepository {
     TypedQuery<User> query = entityManager
         .createQuery("SELECT u FROM User u WHERE u.username = :username", User.class);
     query.setParameter("username", username);
-
     try {
       return query.getSingleResult();
     } catch (NoResultException e) {

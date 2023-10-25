@@ -27,15 +27,16 @@ public class TraineeRepositoryImpl implements TraineeRepository {
 
   @Override
   public Trainee findByUsername(String username) {
-    return entityManager.createQuery("SELECT e FROM Trainee e WHERE e.username = :username", Trainee.class)
+    return entityManager.createQuery("SELECT t FROM Trainee t  WHERE t.username = :username",
+            Trainee.class)
         .setParameter("username", username)
         .getSingleResult();
   }
 
   @Override
-  public void update(Trainee trainee) {
+  public Trainee update(Trainee trainee) {
     log.debug("Updating Trainee: " + trainee);
-    entityManager.merge(trainee);
+    return entityManager.merge(trainee);
   }
 
   @Override
@@ -47,7 +48,13 @@ public class TraineeRepositoryImpl implements TraineeRepository {
   @Override
   public List<Trainee> findAll() {
     log.debug("Fetching all Trainees");
-    return entityManager.createQuery("SELECT e FROM trainee e", Trainee.class).getResultList();
+    return entityManager.createQuery("SELECT t FROM Trainee t", Trainee.class).getResultList();
+  }
+
+  @Override
+  public void toggleProfileActivation(Trainee trainee) {
+    log.debug("Toggling Trainee profile activation: " + trainee);
+    entityManager.merge(trainee);
   }
 
 
