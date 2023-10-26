@@ -5,6 +5,7 @@ import com.epam.upskill.dao.TraineeRepository;
 import com.epam.upskill.dto.TraineeDto;
 import com.epam.upskill.dto.TraineeRegistration;
 import com.epam.upskill.entity.Trainee;
+import com.epam.upskill.entity.Training;
 import com.epam.upskill.exception.TraineeNotFoundException;
 import com.epam.upskill.service.TraineeService;
 import com.epam.upskill.service.UserService;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -30,10 +32,10 @@ public class TraineeServiceImpl implements TraineeService {
 
   @Override//работает
   @Transactional(readOnly = true)
-  public Trainee findById(long traineeId) {
+  public Optional<Trainee> findById(long traineeId) {
     log.debug("Fetching Trainee by ID: " + traineeId);
     var trainee = traineeRepository.findById(traineeId);
-    if (trainee == null) {
+    if (trainee.isEmpty()) {
       log.error("Trainee not found with id: {}", traineeId);
       throw new TraineeNotFoundException("Trainee not found with id: " + traineeId);
     }
@@ -43,7 +45,7 @@ public class TraineeServiceImpl implements TraineeService {
 
   @Override// работает
   @Transactional(readOnly = true)
-  public Trainee getTraineeByUsername(String username) {
+  public Trainee findByUsername(String username) {
     var trainee = traineeRepository.findByUsername(username);
     if (trainee == null) {
       log.error("Trainee not found with username: {}", username);
@@ -80,9 +82,9 @@ public class TraineeServiceImpl implements TraineeService {
     log.info("Updating Trainee with TraineeDto: " + traineeDto);
     var trainee = findById(traineeDto.id());
     if (traineeDto.address() != null) {
-      trainee.setAddress(traineeDto.address());
+      trainee.get().setAddress(traineeDto.address());
     }
-    return traineeRepository.update(trainee);
+    return traineeRepository.update(trainee.get());
   }
 
   @Override //работает
@@ -91,9 +93,9 @@ public class TraineeServiceImpl implements TraineeService {
     log.info("Updating Trainee's password: ");
     var trainee = findById(traineeDto.id());
     if (traineeDto.password() != null && !traineeDto.password().isEmpty()) {
-      trainee.setPassword(traineeDto.password());
+      trainee.get().setPassword(traineeDto.password());
     }
-    return traineeRepository.update(trainee);
+    return traineeRepository.update(trainee.get());
   }
 
   @Override//работает
@@ -103,14 +105,14 @@ public class TraineeServiceImpl implements TraineeService {
     traineeRepository.delete(traineeId);
   }
 
-  @Override
+  @Override//работает
   @Transactional
   public void toggleProfileActivation(long traineeId) {
     var trainee = findById(traineeId);
-    var currentStatus = trainee.isActive();
-    trainee.setActive(!currentStatus);
-    traineeRepository.toggleProfileActivation(trainee);
+    var currentStatus = trainee.get().isActive();
+    trainee.get().setActive(!currentStatus);
+    traineeRepository.toggleProfileActivation(trainee.get());
   }
-}
+ }
 
 

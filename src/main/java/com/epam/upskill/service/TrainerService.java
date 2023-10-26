@@ -5,9 +5,10 @@ import com.epam.upskill.dto.TrainerRegistration;
 import com.epam.upskill.entity.Trainer;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TrainerService {
-  Trainer findById(long trainerId);
+  Optional<Trainer> findById(long trainerId);
 
   Trainer findByUsername(String username);
 

@@ -1,9 +1,12 @@
 package com.epam.upskill.service.impl;
 
+import com.epam.upskill.converter.TrainerConverter;
 import com.epam.upskill.dao.TrainerRepository;
 import com.epam.upskill.dto.TrainerDto;
 import com.epam.upskill.dto.TrainerRegistration;
 import com.epam.upskill.entity.Trainer;
+import com.epam.upskill.exception.TraineeNotFoundException;
+import com.epam.upskill.exception.TrainerNotFoundException;
 import com.epam.upskill.service.TrainerService;
 import com.epam.upskill.service.UserService;
 import com.epam.upskill.util.UserUtils;
@@ -15,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -23,25 +27,31 @@ public class TrainerServiceImpl implements TrainerService {
 
   private final TrainerRepository trainerRepository;
   private final UserService userService;
+  private final TrainerConverter trainerConverter;
 
   @Override //работает
   @Transactional
-  public Trainer findById(long trainerId) {
+  public Optional<Trainer> findById(long trainerId) {
     log.info("Fetching Trainer by ID: " + trainerId);
     var trainer = trainerRepository.findById(trainerId);
-    if (trainer != null) {
-      log.debug("Fetched Trainer details: " + trainer);
-
-    } else {
+    if (trainer.isEmpty()) {
       log.warn("Trainer not found for ID: " + trainerId);
+      throw new TraineeNotFoundException("Trainee not found with id: " + trainerId);
     }
+    log.info("Trainee found with id: {}", trainerId);
     return trainer;
   }
 
   @Override//работает
   @Transactional(readOnly = true)
   public Trainer findByUsername(String username) {
-    return trainerRepository.findByUsername(username);
+    var trainer = trainerRepository.findByUsername(username);
+    if (trainer == null) {
+      log.error("Trainer not found with username: {}", username);
+      throw new TrainerNotFoundException("Trainer not found with username: " + username);
+    }
+    log.info("Trainer found with username: {}", username);
+    return trainer;
   }
 
   @Override//работает
@@ -57,12 +67,9 @@ public class TrainerServiceImpl implements TrainerService {
     log.info("Creating Trainer from TrainerRegistration: " + trainerDto);
     var username = UserUtils.createUsername(trainerDto.firstName(), trainerDto.lastName(), userService.findAll());
     var password = UserUtils.generateRandomPassword();
-    Trainer trainer = new Trainer();
-    trainer.setFirstName(trainerDto.firstName());
-    trainer.setLastName(trainerDto.lastName());
+    Trainer trainer = trainerConverter.toTrainer(trainerDto);
     trainer.setUsername(username);
     trainer.setPassword(password);
-    trainer.setSpecialization(trainerDto.specialization());
     trainer.setActive(true);
     trainerRepository.save(trainer);
   }
@@ -72,8 +79,8 @@ public class TrainerServiceImpl implements TrainerService {
   public Trainer updateTrainer(@Valid TrainerDto trainerDto) {
     log.info("Updating Trainer with TrainerDto: " + trainerDto);
     var trainer = trainerRepository.findById(trainerDto.id());
-    trainer.setSpecialization(trainerDto.specialization());
-    return trainerRepository.update(trainer);
+    trainer.get().setSpecialization(trainerDto.specialization());
+    return trainerRepository.update(trainer.get());
   }
 
   @Override//работает
@@ -82,9 +89,9 @@ public class TrainerServiceImpl implements TrainerService {
     log.info("Updating Trainer with TrainerDto: " + trainerDto);
     var trainer = findById(trainerDto.id());
     if (trainerDto.password() != null && !trainerDto.password().isEmpty()) {
-      trainer.setPassword(trainerDto.password());
+      trainer.get().setPassword(trainerDto.password());
     }
-    return trainerRepository.update(trainer);
+    return trainerRepository.update(trainer.get());
   }
 
   @Override//работает
@@ -103,13 +110,14 @@ public class TrainerServiceImpl implements TrainerService {
   public List<Trainer> findByIsActive() {
     return trainerRepository.findByIsActive();
   }
+
   @Override//работает
   @Transactional
   public void toggleProfileActivation(long trainerId) {
     var trainer = findById(trainerId);
-    var currentStatus = trainer.isActive();
-    trainer.setActive(!currentStatus);
-    trainerRepository.toggleProfileActivation(trainer);
+    var currentStatus = trainer.get().isActive();
+    trainer.get().setActive(!currentStatus);
+    trainerRepository.toggleProfileActivation(trainer.get());
   }
 }
 

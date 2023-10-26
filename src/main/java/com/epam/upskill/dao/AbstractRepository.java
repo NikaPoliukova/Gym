@@ -1,13 +1,12 @@
 package com.epam.upskill.dao;
 
-import com.epam.upskill.entity.Trainee;
-
 import java.util.List;
+import java.util.Optional;
 
 public interface AbstractRepository<T> {
-  void save(T t);
+  T save(T t);
 
-  T findById(long id);
+  Optional<T> findById(long id);
 
   List<T> findAll();
 

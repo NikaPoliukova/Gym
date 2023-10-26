@@ -5,10 +5,11 @@ import com.epam.upskill.dto.UserDto;
 import com.epam.upskill.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserService {
 
-  User getUserById(long userId);
+  Optional<User> findById(long userId);
 
   List<User> findAll();
 
@@ -16,7 +17,7 @@ public interface UserService {
 
   void updateUser(UserDto userDto);
 
-  User findByUsername(String username);
+  Optional<User> findByUsername(String username);
 
   void delete(long userId);
 

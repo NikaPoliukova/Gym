@@ -10,7 +10,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import java.awt.font.OpenType;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Repository
@@ -19,15 +21,16 @@ public class UserRepositoryImpl implements UserRepository {
   private EntityManager entityManager;
 
   @Override
-  public void save(User user) {
+  public User save(User user) {
     log.debug("Creating User: " + user);
     entityManager.persist(user);
+    return user;
   }
 
   @Override
-  public User findById(long id) {
+  public Optional<User> findById(long id) {
     log.debug("Finding User by ID: " + id);
-    return entityManager.find(User.class, id);
+    return Optional.ofNullable(entityManager.find(User.class, id));
   }
 
   @Override
@@ -45,19 +48,19 @@ public class UserRepositoryImpl implements UserRepository {
   @Override
   public void delete(long userId) {
     log.debug("Deleting user by ID: " + userId);
-    User entity = findById(userId);
-    if (entity != null) {
+    Optional<User> entity = findById(userId);
+    if (entity.isPresent()) {
       entityManager.remove(entity);
     }
   }
 
   @Override
-  public User findByUsername(String username) {
+  public Optional<User> findByUsername(String username) {
     TypedQuery<User> query = entityManager
         .createQuery("SELECT u FROM User u WHERE u.username = :username", User.class);
     query.setParameter("username", username);
     try {
-      return query.getSingleResult();
+      return Optional.ofNullable(query.getSingleResult());
     } catch (NoResultException e) {
       throw new UserNotFoundException("User named '" + username + "' was not found.");
     }

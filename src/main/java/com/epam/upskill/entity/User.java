@@ -3,11 +3,11 @@ package com.epam.upskill.entity;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 
-@ToString
+
 @RequiredArgsConstructor
 @Getter
 @Setter

@@ -6,7 +6,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 
-@ToString
+
 @RequiredArgsConstructor
 @Getter
 @Builder
@@ -18,13 +18,13 @@ public class Training {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
-  @NotBlank
+
   @Column(name = "training_name")
   private String trainingName;
-  @NotBlank
+
   @Column(name = "training_date")
   private LocalDate trainingDate;
-  @NotBlank
+
   @Column(name = "training_duration")
   private int trainingDuration;
 

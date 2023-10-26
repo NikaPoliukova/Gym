@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -23,7 +24,7 @@ public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
 
   @Override
-  public User getUserById(long userId) {
+  public Optional<User> findById(long userId) {
     return userRepository.findById(userId);
   }
 
@@ -35,7 +36,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional(readOnly = true)
-  public User findByUsername(String username) {
+  public Optional<User> findByUsername(String username) {
     var user = userRepository.findByUsername(username);
     if (user == null) {
       throw new UserNotFoundException(username);
@@ -55,8 +56,8 @@ public class UserServiceImpl implements UserService {
   @Transactional(propagation = Propagation.REQUIRED)
   public void updateUser(@Valid UserDto userDto) {
     var user = userRepository.findById(userDto.id());
-    user.setPassword(userDto.password());
-    userRepository.update(user);
+    user.get().setPassword(userDto.password());
+    userRepository.update(user.get());
   }
 
   @Override

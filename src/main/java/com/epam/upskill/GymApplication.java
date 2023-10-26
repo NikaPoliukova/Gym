@@ -1,18 +1,16 @@
 package com.epam.upskill;
 
 
-import com.epam.upskill.dto.TraineeRegistration;
+import com.epam.upskill.entity.Training;
 import com.epam.upskill.facade.RegistrationFacade;
-import com.epam.upskill.facade.UserFacade;
-import com.epam.upskill.service.TraineeService;
-import com.epam.upskill.service.TrainerService;
+import com.epam.upskill.service.TrainingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.time.LocalDate;
+import java.util.List;
 
 
 @Slf4j
@@ -20,10 +18,9 @@ import java.time.LocalDate;
 @SpringBootApplication
 public class GymApplication implements CommandLineRunner {
 
-  private final UserFacade userFacade;
+
   private final RegistrationFacade registrationFacade;
-  private final TrainerService trainerService;
-  private final TraineeService traineeService;
+  private final TrainingService trainingService;
 
 
   public static void main(String[] args) {
@@ -32,11 +29,14 @@ public class GymApplication implements CommandLineRunner {
 
   @Override
   public void run(String... args) throws Exception {
-
-    traineeService.createTrainee(
-        new TraineeRegistration("Ola", "Gec", "stretching", LocalDate.now()));
-
-    //trainerService.createTrainer(new TrainerRegistration("Nika", "Nika", "SPEC"));
+    //TrainingDto trainingDto =new TrainingDto("Training 3", LocalDate.now(),
+    // 60, 1, 36L, 34L);
+    List<Training> trainings = trainingService.getTrainingsByUsernameAndCriteria("Pi.Vova1", "");
+    for(var training : trainings){
+      log.info("training date = " + training.getTrainingDate() +
+          " Длительность= " + training.getTrainingDuration() +
+          " TrainingName = " + training.getTrainingName());
+    }
 
    /* RandomDataGenerator randomDataGenerator = new RandomDataGenerator();
     for (int i = 0; i < 10; i++) {

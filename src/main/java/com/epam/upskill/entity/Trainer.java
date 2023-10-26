@@ -1,12 +1,15 @@
 package com.epam.upskill.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@ToString
+@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
@@ -19,5 +22,5 @@ public class Trainer extends User {
 
   @OneToMany(mappedBy = "trainer", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
   private List<Training> trainings = new ArrayList<>();
-
 }
+

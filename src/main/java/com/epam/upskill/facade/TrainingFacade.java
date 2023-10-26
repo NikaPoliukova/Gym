@@ -6,12 +6,14 @@ import com.epam.upskill.service.TrainingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Service
 public class TrainingFacade {
   private final TrainingService trainingService;
 
-  public Training getTrainingById(long trainingId) {
+  public Optional<Training> getTrainingById(long trainingId) {
     return trainingService.getTrainingById(trainingId);
   }
 

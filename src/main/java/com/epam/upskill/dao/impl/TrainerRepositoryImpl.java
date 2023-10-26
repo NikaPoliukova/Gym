@@ -9,6 +9,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Repository
@@ -18,10 +19,11 @@ public class TrainerRepositoryImpl implements TrainerRepository {
 
 
   @Override
-  public void save(Trainer trainer) {
+  public Trainer save(Trainer trainer) {
     log.debug("Creating Trainer: " + trainer);
     entityManager.persist(trainer);
- }
+    return trainer;
+  }
 
   @Override
   public List<Trainer> findByIsActive() {
@@ -32,9 +34,9 @@ public class TrainerRepositoryImpl implements TrainerRepository {
   }
 
   @Override
-  public Trainer findById(long id) {
+  public Optional<Trainer> findById(long id) {
     log.debug("Finding Trainer by ID: " + id);
-    return entityManager.find(Trainer.class, id);
+    return Optional.ofNullable(entityManager.find(Trainer.class, id));
   }
 
   @Override
@@ -66,8 +68,8 @@ public class TrainerRepositoryImpl implements TrainerRepository {
   @Override
   public void delete(long trainerId) {
     log.debug("Deleting Trainer by ID: " + trainerId);
-    Trainer entity = findById(trainerId);
-    if (entity != null) {
+    Optional<Trainer> entity = findById(trainerId);
+    if (entity.isPresent()) {
       entityManager.remove(entity);
     }
   }

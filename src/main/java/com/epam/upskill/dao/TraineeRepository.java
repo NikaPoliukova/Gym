@@ -1,6 +1,9 @@
 package com.epam.upskill.dao;
 
 import com.epam.upskill.entity.Trainee;
+import com.epam.upskill.entity.Training;
+
+import java.util.List;
 
 public interface TraineeRepository extends AbstractRepository<Trainee> {
 
@@ -11,6 +14,4 @@ public interface TraineeRepository extends AbstractRepository<Trainee> {
   Trainee update(Trainee trainee);
 
   void delete(long traineeId);
-
-
 }

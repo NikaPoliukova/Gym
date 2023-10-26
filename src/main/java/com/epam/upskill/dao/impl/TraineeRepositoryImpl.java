@@ -2,13 +2,16 @@ package com.epam.upskill.dao.impl;
 
 import com.epam.upskill.dao.TraineeRepository;
 import com.epam.upskill.entity.Trainee;
+import com.epam.upskill.entity.Training;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @NoArgsConstructor
@@ -20,9 +23,10 @@ public class TraineeRepositoryImpl implements TraineeRepository {
 
 
   @Override
-  public void save(Trainee trainee) {
+  public Trainee save(Trainee trainee) {
     log.debug("Creating Trainee: " + trainee);
     entityManager.persist(trainee);
+    return trainee;
   }
 
   @Override
@@ -40,9 +44,9 @@ public class TraineeRepositoryImpl implements TraineeRepository {
   }
 
   @Override
-  public Trainee findById(long id) {
+  public Optional<Trainee> findById(long id) {
     log.debug("Finding Trainee by ID: " + id);
-    return entityManager.find(Trainee.class, id);
+    return Optional.ofNullable(entityManager.find(Trainee.class, id));
   }
 
   @Override
@@ -61,8 +65,8 @@ public class TraineeRepositoryImpl implements TraineeRepository {
   @Override
   public void delete(long traineeId) {
     log.debug("Deleting Trainee by ID: " + traineeId);
-    Trainee entity = findById(traineeId);
-    if (entity != null) {
+    Optional<Trainee> entity = findById(traineeId);
+    if (entity.isPresent()) {
       entityManager.remove(entity);
     }
   }

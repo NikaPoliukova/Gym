@@ -7,13 +7,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-@ToString
-@RequiredArgsConstructor
+
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 @PrimaryKeyJoinColumn(name = "trainee_id")
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "trainee")
 public class Trainee extends User {

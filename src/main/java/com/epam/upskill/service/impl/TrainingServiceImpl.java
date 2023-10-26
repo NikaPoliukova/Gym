@@ -29,48 +29,50 @@ public class TrainingServiceImpl implements TrainingService {
   private final TraineeService traineeService;
   private final TrainerService trainerService;
 
-
+  //работает
   @Override
   @Transactional(readOnly = true)
-  public Training getTrainingById(long trainingId) {
+  public Optional<Training> getTrainingById(long trainingId) {
     log.debug("Fetching Training by ID: " + trainingId);
-    Training training = trainingRepository.findById(trainingId);
-    if (training != null) {
-      log.debug("Fetched Training details: " + training);
-    } else {
-      log.warn("Training not found for ID: " + trainingId);
-    }
+    Optional<Training> training = trainingRepository.findById(trainingId);
+    training.ifPresent(t -> log.debug("Fetched Training details: " + t));
     return training;
   }
 
-  @Override
+  @Override//работает
   @Transactional(propagation = Propagation.REQUIRED)
   public void createTraining(TrainingDto trainingDto) {
     log.info("Creating Training: " + trainingDto);
     var trainee = traineeService.findById(trainingDto.traineeId());
     var trainer = trainerService.findById(trainingDto.trainerId());
     var trainingType = trainingRepository.findTrainingTypeById(trainingDto.trainingTypeId());
-    var training = Training.builder().trainingName(trainingDto.trainingName())
+    var training = Training.builder()
+        .trainingName(trainingDto.trainingName())
         .trainingDate(trainingDto.trainingDate())
-        .trainingDuration(trainingDto.trainingDuration()).trainingType(trainingType)
-        .trainee(trainee)
-        .trainer(trainer)
+        .trainingDuration(trainingDto.trainingDuration())
+        .trainingType(trainingType)
+        .trainee(trainee.get())
+        .trainer(trainer.get())
         .build();
     trainingRepository.save(training);
     log.debug("Training created: " + training);
   }
 
-  @Override
+  @Override//работает
   @Transactional(readOnly = true)
   public List<Training> getTrainingsByUsernameAndCriteria(String username, String criteria) {
-    return Optional.ofNullable(userService.findByUsername(username))
-        .map(user -> trainingRepository.findTrainingsByUsernameAndCriteria(username, criteria))
-        .orElse(Collections.emptyList());
+    log.debug("Fetching Trainings by username: " + username + " and criteria: " + criteria);
+    var user = userService.findByUsername(username);
+    if (user.isEmpty()) {
+      return Collections.emptyList();
+    } else {
+      return trainingRepository.findTrainingsByUsernameAndCriteria(username, criteria);
+    }
   }
 
   public List<Trainer> getNotAssignedActiveTrainersToTrainee(long traineeId) {
     var trainee = traineeService.findById(traineeId);
-    if (trainee == null) {
+    if (trainee.isEmpty()) {
       return Collections.emptyList();
     }
     List<Trainer> activeTrainers = trainerService.findByIsActive();

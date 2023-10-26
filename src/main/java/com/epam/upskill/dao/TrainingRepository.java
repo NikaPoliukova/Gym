@@ -6,7 +6,7 @@ import com.epam.upskill.entity.TrainingType;
 import java.util.List;
 
 public interface TrainingRepository extends AbstractRepository<Training> {
-  TrainingType findTrainingTypeById(long id);
 
+  TrainingType findTrainingTypeById(int id);
   List<Training> findTrainingsByUsernameAndCriteria(String trainerUsername, String trainingName);
 }

@@ -6,10 +6,9 @@ import com.epam.upskill.entity.TrainingType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
+import javax.persistence.*;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Repository
@@ -19,15 +18,16 @@ public class TrainingRepositoryImpl implements TrainingRepository {
 
 
   @Override
-  public void save(Training training) {
+  public Training save(Training training) {
     log.debug("Creating Training: " + training);
     entityManager.persist(training);
+    return training;
   }
 
   @Override
-  public Training findById(long id) {
+  public Optional<Training> findById(long id) {
     log.debug("Finding Training by ID: " + id);
-    return entityManager.find(Training.class, id);
+    return Optional.ofNullable(entityManager.find(Training.class, id));
   }
 
   @Override
@@ -35,29 +35,31 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     log.debug("Fetching all Trainings");
     return entityManager.createQuery("SELECT e FROM training e", Training.class).getResultList();
   }
-
-  public List<Training> findTrainingsByUsernameAndCriteria(String username, String criteria) {
-    String sql = "SELECT t FROM Training t WHERE (t.trainee.user.username = :username OR t.trainer.username = :username) ";
-    if (!criteria.isEmpty()) {
-      sql += "AND (t.trainingName LIKE :trainingName OR t.trainer.specialization " +
-          "LIKE :specialization OR t.trainee.address LIKE :address)";
+  @Override
+  public List<Training> findTrainingsByUsernameAndCriteria(String username, String trainingName) {
+    String sql = "SELECT t FROM Training t WHERE t.trainee.username = :username OR t.trainer.username = :username";
+    if (!trainingName.isEmpty()) {
+      sql += " AND t.trainingName LIKE :trainingName";
     }
-
     TypedQuery<Training> query = entityManager.createQuery(sql, Training.class);
     query.setParameter("username", username);
-
-    if (!criteria.isEmpty()) {
-      query.setParameter("trainingName", "%" + criteria + "%");
-      query.setParameter("specialization", "%" + criteria + "%");
-      query.setParameter("address", "%" + criteria + "%");
+    if (!trainingName.isEmpty()) {
+      query.setParameter("trainingName", "%" + trainingName + "%");
     }
     return query.getResultList();
   }
 
   @Override
-  public TrainingType findTrainingTypeById(long id) {
-    log.debug("Finding Training Type by ID: " + id);
-    return entityManager.find(TrainingType.class, id);
+  public TrainingType findTrainingTypeById(int id) {
+    TypedQuery<TrainingType> query = entityManager.createQuery(
+        "SELECT tt FROM TrainingType tt WHERE tt.id = :id", TrainingType.class);
+    query.setParameter("id", id);
+
+    try {
+      return query.getSingleResult();
+    } catch (NoResultException e) {
+      throw new EntityNotFoundException("TrainingType not found with id: " + id);
+    }
   }
 }
 
