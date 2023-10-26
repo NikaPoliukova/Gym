@@ -32,7 +32,7 @@ public class TrainingServiceImpl implements TrainingService {
   //работает
   @Override
   @Transactional(readOnly = true)
-  public Optional<Training> getTrainingById(long trainingId) {
+  public Optional<Training> findTrainingById(long trainingId) {
     log.debug("Fetching Training by ID: " + trainingId);
     Optional<Training> training = trainingRepository.findById(trainingId);
     training.ifPresent(t -> log.debug("Fetched Training details: " + t));
@@ -41,7 +41,7 @@ public class TrainingServiceImpl implements TrainingService {
 
   @Override//работает
   @Transactional(propagation = Propagation.REQUIRED)
-  public void createTraining(TrainingDto trainingDto) {
+  public Training saveTraining(TrainingDto trainingDto) {
     log.info("Creating Training: " + trainingDto);
     var trainee = traineeService.findById(trainingDto.traineeId());
     var trainer = trainerService.findById(trainingDto.trainerId());
@@ -54,13 +54,12 @@ public class TrainingServiceImpl implements TrainingService {
         .trainee(trainee.get())
         .trainer(trainer.get())
         .build();
-    trainingRepository.save(training);
-    log.debug("Training created: " + training);
+    return trainingRepository.save(training);
   }
 
   @Override//работает
   @Transactional(readOnly = true)
-  public List<Training> getTrainingsByUsernameAndCriteria(String username, String criteria) {
+  public List<Training> findTrainingsByUsernameAndCriteria(String username, String criteria) {
     log.debug("Fetching Trainings by username: " + username + " and criteria: " + criteria);
     var user = userService.findByUsername(username);
     if (user.isEmpty()) {
@@ -72,7 +71,7 @@ public class TrainingServiceImpl implements TrainingService {
 
   @Override//работает
   @Transactional
-  public List<Trainer> getNotAssignedActiveTrainersToTrainee(long traineeId) {
+  public List<Trainer> findNotAssignedActiveTrainersToTrainee(long traineeId) {
     if (traineeService.findById(traineeId).isEmpty()) {
       return Collections.emptyList();
     }

@@ -1,16 +1,12 @@
 package com.epam.upskill;
 
 
-import com.epam.upskill.dto.TrainingDto;
-import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.service.TrainingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.util.List;
 
 
 @Slf4j
@@ -26,11 +22,7 @@ public class GymApplication implements CommandLineRunner {
 
   @Override
   public void run(String... args) throws Exception {
-     List<Trainer> trainerList =trainingService.getNotAssignedActiveTrainersToTrainee(38L);
-     for (Trainer trainer: trainerList){
-  log.info("trainerID = " + trainer.getId() + "nameTrainer =" + trainer.getUsername());
-     }
-     }
+
 
    /* RandomDataGenerator randomDataGenerator = new RandomDataGenerator();
     for (int i = 0; i < 10; i++) {
@@ -46,6 +38,6 @@ public class GymApplication implements CommandLineRunner {
     }
     }
   }*/
-
+  }
 }
 

@@ -14,7 +14,7 @@ public interface TraineeService {
 
   Trainee updateTraineePassword(TraineeDto traineeDto);
 
-  void createTrainee(TraineeRegistration trainee);
+  void saveTrainee(TraineeRegistration trainee);
 
   List<Trainee> findAll();
 

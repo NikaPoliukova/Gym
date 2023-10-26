@@ -16,7 +16,7 @@ public interface TrainerService {
 
   Trainer updateTrainerPassword(TrainerDto trainerDto);
 
-  void createTrainer(TrainerRegistration trainerDto);
+  void saveTrainer(TrainerRegistration trainerDto);
 
   Trainer updateTrainer(TrainerDto trainerDto);
 

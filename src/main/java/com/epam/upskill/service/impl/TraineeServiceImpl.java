@@ -70,7 +70,7 @@ public class TraineeServiceImpl implements TraineeService {
 
   @Override//работает
   @Transactional
-  public void createTrainee(@Valid TraineeRegistration traineeDto) {
+  public void saveTrainee(@Valid TraineeRegistration traineeDto) {
     log.info("Creating Trainee from TraineeRegistration: " + traineeDto);
     var username = UserUtils.createUsername(traineeDto.firstName(), traineeDto.lastName(), userService.findAll());
     var password = UserUtils.generateRandomPassword();

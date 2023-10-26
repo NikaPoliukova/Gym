@@ -63,7 +63,7 @@ public class TrainerServiceImpl implements TrainerService {
 
   @Override//работает
   @Transactional
-  public void createTrainer(@Valid TrainerRegistration trainerDto) {
+  public void saveTrainer(@Valid TrainerRegistration trainerDto) {
     log.info("Creating Trainer from TrainerRegistration: " + trainerDto);
     var username = UserUtils.createUsername(trainerDto.firstName(), trainerDto.lastName(), userService.findAll());
     var password = UserUtils.generateRandomPassword();
