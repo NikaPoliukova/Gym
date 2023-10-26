@@ -3,7 +3,6 @@ package com.epam.upskill.service;
 import com.epam.upskill.dto.TraineeDto;
 import com.epam.upskill.dto.TraineeRegistration;
 import com.epam.upskill.entity.Trainee;
-import com.epam.upskill.entity.Training;
 
 import java.util.List;
 import java.util.Optional;

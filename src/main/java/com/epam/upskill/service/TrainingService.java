@@ -6,6 +6,7 @@ import com.epam.upskill.entity.Training;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface TrainingService {
   Optional<Training> getTrainingById(long trainingId);
@@ -15,5 +16,4 @@ public interface TrainingService {
   List<Training> getTrainingsByUsernameAndCriteria(String username, String criteria);
 
   List<Trainer> getNotAssignedActiveTrainersToTrainee(long traineeId);
-
 }

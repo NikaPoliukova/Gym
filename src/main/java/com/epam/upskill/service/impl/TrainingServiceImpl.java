@@ -70,14 +70,12 @@ public class TrainingServiceImpl implements TrainingService {
     }
   }
 
+  @Override//работает
+  @Transactional
   public List<Trainer> getNotAssignedActiveTrainersToTrainee(long traineeId) {
-    var trainee = traineeService.findById(traineeId);
-    if (trainee.isEmpty()) {
+    if (traineeService.findById(traineeId).isEmpty()) {
       return Collections.emptyList();
     }
-    List<Trainer> activeTrainers = trainerService.findByIsActive();
-    return activeTrainers.stream()
-        .filter(trainer -> trainer.getTrainings().stream()
-            .noneMatch(training -> training.getTrainee().equals(trainee))).toList();
+    return trainingRepository.getNotAssignedActiveTrainersToTrainee(traineeId);
   }
 }

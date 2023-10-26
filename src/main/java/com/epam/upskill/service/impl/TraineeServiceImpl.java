@@ -5,9 +5,12 @@ import com.epam.upskill.dao.TraineeRepository;
 import com.epam.upskill.dto.TraineeDto;
 import com.epam.upskill.dto.TraineeRegistration;
 import com.epam.upskill.entity.Trainee;
+import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.Training;
 import com.epam.upskill.exception.TraineeNotFoundException;
 import com.epam.upskill.service.TraineeService;
+import com.epam.upskill.service.TrainerService;
+import com.epam.upskill.service.TrainingService;
 import com.epam.upskill.service.UserService;
 import com.epam.upskill.util.UserUtils;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +23,7 @@ import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -29,6 +33,7 @@ public class TraineeServiceImpl implements TraineeService {
   private final TraineeRepository traineeRepository;
   private final UserService userService;
   private final TraineeConverter traineeConverter;
+
 
   @Override//работает
   @Transactional(readOnly = true)
@@ -113,6 +118,6 @@ public class TraineeServiceImpl implements TraineeService {
     trainee.get().setActive(!currentStatus);
     traineeRepository.toggleProfileActivation(trainee.get());
   }
- }
+}
 
 

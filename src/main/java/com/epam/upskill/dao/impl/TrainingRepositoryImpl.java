@@ -1,6 +1,7 @@
 package com.epam.upskill.dao.impl;
 
 import com.epam.upskill.dao.TrainingRepository;
+import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.Training;
 import com.epam.upskill.entity.TrainingType;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.*;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Repository
@@ -35,6 +37,7 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     log.debug("Fetching all Trainings");
     return entityManager.createQuery("SELECT e FROM training e", Training.class).getResultList();
   }
+
   @Override
   public List<Training> findTrainingsByUsernameAndCriteria(String username, String trainingName) {
     String sql = "SELECT t FROM Training t WHERE t.trainee.username = :username OR t.trainer.username = :username";
@@ -60,6 +63,14 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     } catch (NoResultException e) {
       throw new EntityNotFoundException("TrainingType not found with id: " + id);
     }
+  }
+
+  public List<Trainer> getNotAssignedActiveTrainersToTrainee(long traineeId) {
+    TypedQuery<Trainer> query = entityManager.createQuery(
+        "SELECT DISTINCT t.trainer FROM Training t  WHERE t.trainee.id = :traineeId " +
+            "AND t.trainer.isActive = false ", Trainer.class);
+    query.setParameter("traineeId", traineeId);
+    return query.getResultList();
   }
 }
 

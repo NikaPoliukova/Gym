@@ -1,8 +1,8 @@
 package com.epam.upskill;
 
 
-import com.epam.upskill.entity.Training;
-import com.epam.upskill.facade.RegistrationFacade;
+import com.epam.upskill.dto.TrainingDto;
+import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.service.TrainingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,10 +18,7 @@ import java.util.List;
 @SpringBootApplication
 public class GymApplication implements CommandLineRunner {
 
-
-  private final RegistrationFacade registrationFacade;
   private final TrainingService trainingService;
-
 
   public static void main(String[] args) {
     SpringApplication.run(GymApplication.class, args);
@@ -29,14 +26,11 @@ public class GymApplication implements CommandLineRunner {
 
   @Override
   public void run(String... args) throws Exception {
-    //TrainingDto trainingDto =new TrainingDto("Training 3", LocalDate.now(),
-    // 60, 1, 36L, 34L);
-    List<Training> trainings = trainingService.getTrainingsByUsernameAndCriteria("Pi.Vova1", "");
-    for(var training : trainings){
-      log.info("training date = " + training.getTrainingDate() +
-          " Длительность= " + training.getTrainingDuration() +
-          " TrainingName = " + training.getTrainingName());
-    }
+     List<Trainer> trainerList =trainingService.getNotAssignedActiveTrainersToTrainee(38L);
+     for (Trainer trainer: trainerList){
+  log.info("trainerID = " + trainer.getId() + "nameTrainer =" + trainer.getUsername());
+     }
+     }
 
    /* RandomDataGenerator randomDataGenerator = new RandomDataGenerator();
     for (int i = 0; i < 10; i++) {
@@ -52,6 +46,6 @@ public class GymApplication implements CommandLineRunner {
     }
     }
   }*/
-  }
+
 }
 
