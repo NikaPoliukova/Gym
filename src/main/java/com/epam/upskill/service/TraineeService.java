@@ -12,15 +12,11 @@ public interface TraineeService {
 
   Trainee findByUsername(String username);
 
-  Trainee updateTraineePassword(TraineeDto traineeDto);
-
   void saveTrainee(TraineeRegistration trainee);
 
   List<Trainee> findAll();
 
-  Trainee updateTrainee(TraineeDto trainee);
-
-  void deleteTraineeById(long traineeId);
+  Optional<Trainee> updateTrainee(TraineeDto trainee);
 
   void toggleProfileActivation(long userId);
 }

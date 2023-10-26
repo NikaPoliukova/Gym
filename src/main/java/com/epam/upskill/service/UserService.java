@@ -1,6 +1,5 @@
 package com.epam.upskill.service;
 
-import com.epam.upskill.dto.PrepareUserDto;
 import com.epam.upskill.dto.UserDto;
 import com.epam.upskill.entity.User;
 
@@ -13,9 +12,7 @@ public interface UserService {
 
   List<User> findAll();
 
-  void save(PrepareUserDto prepareUserDto);
-
-  void updateUser(UserDto userDto);
+  void updateUserPassword(UserDto userDto);
 
   Optional<User> findByUsername(String username);
 

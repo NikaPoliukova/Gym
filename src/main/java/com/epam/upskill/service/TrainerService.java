@@ -10,17 +10,13 @@ import java.util.Optional;
 public interface TrainerService {
   Optional<Trainer> findById(long trainerId);
 
-  Trainer findByUsername(String username);
+  Optional<Trainer> findByUsername(String username);
 
   List<Trainer> findAll();
 
-  Trainer updateTrainerPassword(TrainerDto trainerDto);
+  Optional<Trainer> saveTrainer(TrainerRegistration trainerDto);
 
-  void saveTrainer(TrainerRegistration trainerDto);
-
-  Trainer updateTrainer(TrainerDto trainerDto);
-
-  void deleteTrainerById(long trainerId);
+  Optional<Trainer> updateTrainer(TrainerDto trainerDto);
 
   List<Trainer> findByIsActive();
 

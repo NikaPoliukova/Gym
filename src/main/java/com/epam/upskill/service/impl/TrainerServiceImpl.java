@@ -29,7 +29,7 @@ public class TrainerServiceImpl implements TrainerService {
   private final UserService userService;
   private final TrainerConverter trainerConverter;
 
-  @Override //работает
+  @Override
   @Transactional
   public Optional<Trainer> findById(long trainerId) {
     log.info("Fetching Trainer by ID: " + trainerId);
@@ -42,11 +42,11 @@ public class TrainerServiceImpl implements TrainerService {
     return trainer;
   }
 
-  @Override//работает
+  @Override
   @Transactional(readOnly = true)
-  public Trainer findByUsername(String username) {
+  public Optional<Trainer> findByUsername(String username) {
     var trainer = trainerRepository.findByUsername(username);
-    if (trainer == null) {
+    if (trainer.isEmpty()) {
       log.error("Trainer not found with username: {}", username);
       throw new TrainerNotFoundException("Trainer not found with username: " + username);
     }
@@ -54,16 +54,16 @@ public class TrainerServiceImpl implements TrainerService {
     return trainer;
   }
 
-  @Override//работает
+  @Override
   public List<Trainer> findAll() {
     log.debug("Fetching all Trainers");
     List<Trainer> trainerMap = trainerRepository.findAll();
     return trainerMap != null ? trainerMap : Collections.emptyList();
   }
 
-  @Override//работает
+  @Override
   @Transactional
-  public void saveTrainer(@Valid TrainerRegistration trainerDto) {
+  public Optional<Trainer> saveTrainer(@Valid TrainerRegistration trainerDto) {
     log.info("Creating Trainer from TrainerRegistration: " + trainerDto);
     var username = UserUtils.createUsername(trainerDto.firstName(), trainerDto.lastName(), userService.findAll());
     var password = UserUtils.generateRandomPassword();
@@ -71,47 +71,28 @@ public class TrainerServiceImpl implements TrainerService {
     trainer.setUsername(username);
     trainer.setPassword(password);
     trainer.setActive(true);
-    trainerRepository.save(trainer);
+    return Optional.ofNullable(trainerRepository.save(trainer));
   }
 
-  @Override//работает
+  @Override
   @Transactional
-  public Trainer updateTrainer(@Valid TrainerDto trainerDto) {
+  public Optional<Trainer> updateTrainer(@Valid TrainerDto trainerDto) {
     log.info("Updating Trainer with TrainerDto: " + trainerDto);
     var trainer = trainerRepository.findById(trainerDto.id());
     trainer.get().setSpecialization(trainerDto.specialization());
-    return trainerRepository.update(trainer.get());
+    return Optional.ofNullable(trainerRepository.update(trainer.get()));
   }
 
-  @Override//работает
-  @Transactional
-  public Trainer updateTrainerPassword(@Valid TrainerDto trainerDto) {
-    log.info("Updating Trainer with TrainerDto: " + trainerDto);
-    var trainer = findById(trainerDto.id());
-    if (trainerDto.password() != null && !trainerDto.password().isEmpty()) {
-      trainer.get().setPassword(trainerDto.password());
-    }
-    return trainerRepository.update(trainer.get());
-  }
-
-  @Override//работает
-  @Transactional
-  public void deleteTrainerById(long trainerId) {
-    log.info("Deleting Trainer by ID: " + trainerId);
-    try {
-      trainerRepository.delete(trainerId);
-      log.debug("Trainer deleted successfully.");
-    } catch (Exception e) {
-      log.error("Failed to delete Trainer by ID: " + trainerId, e);
-    }
-  }
-
-  @Override//работает
+  @Override
   public List<Trainer> findByIsActive() {
-    return trainerRepository.findByIsActive();
+    List<Trainer> activeTrainers = trainerRepository.findByIsActive();
+    if (activeTrainers.isEmpty()) {
+      return Collections.emptyList();
+    }
+    return activeTrainers;
   }
 
-  @Override//работает
+  @Override
   @Transactional
   public void toggleProfileActivation(long trainerId) {
     var trainer = findById(trainerId);

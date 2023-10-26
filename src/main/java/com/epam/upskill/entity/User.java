@@ -7,10 +7,10 @@ import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 
-
 @RequiredArgsConstructor
 @Getter
 @Setter
+@SuperBuilder
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "users")
@@ -34,11 +34,4 @@ public class User {
   private boolean isActive;
 
   private String role;
-
-  public User(String firstName, String lastName, String username, String password) {
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.username = username;
-    this.password = password;
-  }
 }

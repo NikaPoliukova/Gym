@@ -13,5 +13,6 @@ public interface UserRepository extends AbstractRepository<User> {
 
   void toggleProfileActivation(User user);
 
-  User getUserById(long id);
+  Optional<User> findUserById(long id);
 }
+

@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Builder(builderMethodName = "traineeBuilder")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -24,12 +24,4 @@ public class Trainee extends User {
 
   @OneToMany(mappedBy = "trainee", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
   private List<Training> trainings = new ArrayList<>();
-
-  public Trainee(String firstName, String lastName, String username, String password, LocalDate dateOfBirth,
-                 String address, List<Training> trainings) {
-    super(firstName, lastName, username, password);
-    this.dateOfBirth = dateOfBirth;
-    this.address = address;
-    this.trainings = trainings;
-  }
 }

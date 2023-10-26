@@ -5,12 +5,11 @@ import com.epam.upskill.dto.TrainingTypeEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.List;
 
-@ToString
+
 @Getter
 @Setter
 @NoArgsConstructor

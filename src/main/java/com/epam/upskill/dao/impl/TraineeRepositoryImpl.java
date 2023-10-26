@@ -2,14 +2,12 @@ package com.epam.upskill.dao.impl;
 
 import com.epam.upskill.dao.TraineeRepository;
 import com.epam.upskill.entity.Trainee;
-import com.epam.upskill.entity.Training;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,17 +28,17 @@ public class TraineeRepositoryImpl implements TraineeRepository {
   }
 
   @Override
-  public Trainee findByUsername(String username) {
-    return entityManager.createQuery("SELECT t FROM Trainee t  WHERE t.username = :username",
+  public Optional<Trainee> findByUsername(String username) {
+    return Optional.of(entityManager.createQuery("SELECT t FROM Trainee t  WHERE t.username = :username",
             Trainee.class)
         .setParameter("username", username)
-        .getSingleResult();
+        .getSingleResult());
   }
 
   @Override
-  public Trainee update(Trainee trainee) {
+  public Optional<Trainee> update(Trainee trainee) {
     log.debug("Updating Trainee: " + trainee);
-    return entityManager.merge(trainee);
+    return Optional.of(entityManager.merge(trainee));
   }
 
   @Override
@@ -59,16 +57,6 @@ public class TraineeRepositoryImpl implements TraineeRepository {
   public void toggleProfileActivation(Trainee trainee) {
     log.debug("Toggling Trainee profile activation: " + trainee);
     entityManager.merge(trainee);
-  }
-
-
-  @Override
-  public void delete(long traineeId) {
-    log.debug("Deleting Trainee by ID: " + traineeId);
-    Optional<Trainee> entity = findById(traineeId);
-    if (entity.isPresent()) {
-      entityManager.remove(entity);
-    }
   }
 }
 

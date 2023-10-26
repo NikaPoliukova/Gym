@@ -5,7 +5,6 @@ import com.epam.upskill.entity.Training;
 import com.epam.upskill.entity.TrainingType;
 
 import java.util.List;
-import java.util.Set;
 
 public interface TrainingRepository extends AbstractRepository<Training> {
 

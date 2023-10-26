@@ -1,5 +1,6 @@
 package com.epam.upskill.service.impl;
 
+import com.epam.upskill.converter.TrainingConverter;
 import com.epam.upskill.dao.TrainingRepository;
 import com.epam.upskill.dto.TrainingDto;
 import com.epam.upskill.entity.Trainer;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -28,36 +30,30 @@ public class TrainingServiceImpl implements TrainingService {
   private final UserService userService;
   private final TraineeService traineeService;
   private final TrainerService trainerService;
+  private final TrainingConverter trainingConverter;
 
-  //работает
   @Override
   @Transactional(readOnly = true)
   public Optional<Training> findTrainingById(long trainingId) {
     log.debug("Fetching Training by ID: " + trainingId);
-    Optional<Training> training = trainingRepository.findById(trainingId);
-    training.ifPresent(t -> log.debug("Fetched Training details: " + t));
-    return training;
+    return Optional.ofNullable(trainingRepository.findById(trainingId).orElse(null));
   }
 
-  @Override//работает
+  @Override
   @Transactional(propagation = Propagation.REQUIRED)
-  public Training saveTraining(TrainingDto trainingDto) {
+  public Training saveTraining(@Valid TrainingDto trainingDto) {
     log.info("Creating Training: " + trainingDto);
     var trainee = traineeService.findById(trainingDto.traineeId());
     var trainer = trainerService.findById(trainingDto.trainerId());
     var trainingType = trainingRepository.findTrainingTypeById(trainingDto.trainingTypeId());
-    var training = Training.builder()
-        .trainingName(trainingDto.trainingName())
-        .trainingDate(trainingDto.trainingDate())
-        .trainingDuration(trainingDto.trainingDuration())
-        .trainingType(trainingType)
-        .trainee(trainee.get())
-        .trainer(trainer.get())
-        .build();
+    var training = trainingConverter.toTraining(trainingDto, new Training());
+    training.setTrainee(trainee.get());
+    training.setTrainer(trainer.get());
+    training.setTrainingType(trainingType);
     return trainingRepository.save(training);
   }
 
-  @Override//работает
+  @Override
   @Transactional(readOnly = true)
   public List<Training> findTrainingsByUsernameAndCriteria(String username, String criteria) {
     log.debug("Fetching Trainings by username: " + username + " and criteria: " + criteria);
@@ -69,7 +65,7 @@ public class TrainingServiceImpl implements TrainingService {
     }
   }
 
-  @Override//работает
+  @Override
   @Transactional
   public List<Trainer> findNotAssignedActiveTrainersToTrainee(long traineeId) {
     if (traineeService.findById(traineeId).isEmpty()) {

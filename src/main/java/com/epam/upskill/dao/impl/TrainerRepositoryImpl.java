@@ -52,26 +52,17 @@ public class TrainerRepositoryImpl implements TrainerRepository {
   }
 
   @Override
-  public Trainer findByUsername(String username) {
-    return entityManager.createQuery("SELECT t FROM Trainer t  WHERE t.username = :username",
+  public  Optional<Trainer> findByUsername(String username) {
+    return Optional.ofNullable(entityManager.createQuery("SELECT t FROM Trainer t  WHERE t.username = :username",
             Trainer.class)
         .setParameter("username", username)
-        .getSingleResult();
+        .getSingleResult());
   }
 
   @Override
   public Trainer update(Trainer trainer) {
     log.debug("Updating Trainer: " + trainer);
     return entityManager.merge(trainer);
-  }
-
-  @Override
-  public void delete(long trainerId) {
-    log.debug("Deleting Trainer by ID: " + trainerId);
-    Optional<Trainer> entity = findById(trainerId);
-    if (entity.isPresent()) {
-      entityManager.remove(entity);
-    }
   }
 }
 

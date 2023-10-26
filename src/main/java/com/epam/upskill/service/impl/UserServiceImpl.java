@@ -2,7 +2,6 @@ package com.epam.upskill.service.impl;
 
 
 import com.epam.upskill.dao.UserRepository;
-import com.epam.upskill.dto.PrepareUserDto;
 import com.epam.upskill.dto.UserDto;
 import com.epam.upskill.entity.User;
 import com.epam.upskill.exception.UserNotFoundException;
@@ -14,6 +13,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,14 +31,19 @@ public class UserServiceImpl implements UserService {
   @Override
   @Transactional(readOnly = true)
   public List<User> findAll() {
-    return userRepository.findAll();
+    List<User> users = userRepository.findAll();
+    if (users != null) {
+      return users;
+    } else {
+      return Collections.emptyList();
+    }
   }
 
   @Override
   @Transactional(readOnly = true)
   public Optional<User> findByUsername(String username) {
     var user = userRepository.findByUsername(username);
-    if (user == null) {
+    if (user.isEmpty()) {
       throw new UserNotFoundException(username);
     }
     return user;
@@ -46,15 +51,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED)
-  public void save(@Valid PrepareUserDto prepareUserDto) {
-    User user = new User(prepareUserDto.firstName(), prepareUserDto.lastName(), prepareUserDto.username(),
-        prepareUserDto.password());
-    userRepository.save(user);
-  }
-
-  @Override
-  @Transactional(propagation = Propagation.REQUIRED)
-  public void updateUser(@Valid UserDto userDto) {
+  public void updateUserPassword(@Valid UserDto userDto) {
     var user = userRepository.findById(userDto.id());
     user.get().setPassword(userDto.password());
     userRepository.update(user.get());

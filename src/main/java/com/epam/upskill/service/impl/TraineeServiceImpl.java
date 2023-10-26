@@ -5,12 +5,8 @@ import com.epam.upskill.dao.TraineeRepository;
 import com.epam.upskill.dto.TraineeDto;
 import com.epam.upskill.dto.TraineeRegistration;
 import com.epam.upskill.entity.Trainee;
-import com.epam.upskill.entity.Trainer;
-import com.epam.upskill.entity.Training;
 import com.epam.upskill.exception.TraineeNotFoundException;
 import com.epam.upskill.service.TraineeService;
-import com.epam.upskill.service.TrainerService;
-import com.epam.upskill.service.TrainingService;
 import com.epam.upskill.service.UserService;
 import com.epam.upskill.util.UserUtils;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +19,6 @@ import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -35,7 +30,7 @@ public class TraineeServiceImpl implements TraineeService {
   private final TraineeConverter traineeConverter;
 
 
-  @Override//работает
+  @Override
   @Transactional(readOnly = true)
   public Optional<Trainee> findById(long traineeId) {
     log.debug("Fetching Trainee by ID: " + traineeId);
@@ -48,19 +43,19 @@ public class TraineeServiceImpl implements TraineeService {
     return trainee;
   }
 
-  @Override// работает
+  @Override
   @Transactional(readOnly = true)
   public Trainee findByUsername(String username) {
     var trainee = traineeRepository.findByUsername(username);
-    if (trainee == null) {
+    if (trainee.isEmpty()) {
       log.error("Trainee not found with username: {}", username);
       throw new TraineeNotFoundException("Trainee not found with username: " + username);
     }
     log.info("Trainee found with username: {}", username);
-    return trainee;
+    return trainee.get();
   }
 
-  @Override//работает
+  @Override
   @Transactional(readOnly = true)
   public List<Trainee> findAll() {
     log.debug("Fetching all Trainees");
@@ -68,7 +63,7 @@ public class TraineeServiceImpl implements TraineeService {
     return trainees != null ? trainees : Collections.emptyList();
   }
 
-  @Override//работает
+  @Override
   @Transactional
   public void saveTrainee(@Valid TraineeRegistration traineeDto) {
     log.info("Creating Trainee from TraineeRegistration: " + traineeDto);
@@ -81,36 +76,19 @@ public class TraineeServiceImpl implements TraineeService {
     traineeRepository.save(trainee);
   }
 
-  @Override//работает
+  @Override
   @Transactional(propagation = Propagation.REQUIRED)
-  public Trainee updateTrainee(@Valid TraineeDto traineeDto) {
+  public Optional<Trainee> updateTrainee(@Valid TraineeDto traineeDto) {
     log.info("Updating Trainee with TraineeDto: " + traineeDto);
     var trainee = findById(traineeDto.id());
-    if (traineeDto.address() != null) {
-      trainee.get().setAddress(traineeDto.address());
+    if (traineeDto.address() == null || traineeDto.address().isEmpty()) {
+      throw new IllegalArgumentException("Address cannot be null or empty");
     }
-    return traineeRepository.update(trainee.get());
+    trainee.ifPresent(t -> t.setAddress(traineeDto.address()));
+    return traineeRepository.update(trainee.orElse(null));
   }
 
-  @Override //работает
-  @Transactional(propagation = Propagation.REQUIRED)
-  public Trainee updateTraineePassword(@Valid TraineeDto traineeDto) {
-    log.info("Updating Trainee's password: ");
-    var trainee = findById(traineeDto.id());
-    if (traineeDto.password() != null && !traineeDto.password().isEmpty()) {
-      trainee.get().setPassword(traineeDto.password());
-    }
-    return traineeRepository.update(trainee.get());
-  }
-
-  @Override//работает
-  @Transactional(propagation = Propagation.REQUIRED)
-  public void deleteTraineeById(long traineeId) {
-    log.info("Deleting Trainee by ID: " + traineeId);
-    traineeRepository.delete(traineeId);
-  }
-
-  @Override//работает
+  @Override
   @Transactional
   public void toggleProfileActivation(long traineeId) {
     var trainee = findById(traineeId);

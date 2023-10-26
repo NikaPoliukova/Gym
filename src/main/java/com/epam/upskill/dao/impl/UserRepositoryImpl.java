@@ -10,7 +10,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
-import java.awt.font.OpenType;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,10 +70,10 @@ public class UserRepositoryImpl implements UserRepository {
   }
 
   @Override
-  public User getUserById(long id) {
+  public Optional<User> findUserById(long id) {
     String jpql = "SELECT u FROM User u WHERE u.id = :id";
     TypedQuery<User> query = entityManager.createQuery(jpql, User.class);
     query.setParameter("userId", id);
-    return query.getSingleResult();
+    return Optional.ofNullable(query.getSingleResult());
   }
 }

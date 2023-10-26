@@ -1,20 +1,16 @@
 package com.epam.upskill.converter;
 
 import com.epam.upskill.dto.TrainingDto;
-import com.epam.upskill.entity.Trainee;
-import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.Training;
-import com.epam.upskill.service.TraineeService;
-import com.epam.upskill.service.TrainerService;
 import org.mapstruct.Mapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 @Mapper
 public interface TrainingConverter {
-
-
-  TrainingDto toDto(Training training);
-
-  Training toEntity(TrainingDto trainingDto);
+  @Mapping(target = "trainingType", ignore = true)
+  @Mapping(target = "trainee", ignore = true)
+  @Mapping(target = "trainer", ignore = true)
+  Training toTraining(TrainingDto dto, @MappingTarget Training entity);
 
 }
