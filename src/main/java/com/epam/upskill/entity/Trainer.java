@@ -20,5 +20,11 @@ public class Trainer extends User {
 
   @OneToMany(mappedBy = "trainer", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
   private List<Training> trainings = new ArrayList<>();
+
+  public Trainer(UserBuilder<?, ?> b, String specialization, List<Training> trainings) {
+    super(b);
+    this.specialization = specialization;
+    this.trainings = trainings;
+  }
 }
 

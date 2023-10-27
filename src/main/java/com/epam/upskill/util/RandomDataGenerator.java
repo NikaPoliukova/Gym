@@ -1,7 +1,6 @@
 package com.epam.upskill.util;
 
-import com.epam.upskill.dto.TraineeDto;
-import com.epam.upskill.dto.TrainerDto;
+import com.epam.upskill.dto.PrepareUserDto;
 import com.epam.upskill.security.Principal;
 
 import java.util.Random;
@@ -9,24 +8,52 @@ import java.util.Random;
 public class RandomDataGenerator {
   private final Random random = new Random();
   private int currentIndex = 0;
+///for Trainer
+  private final String[] usernames = {"Pi.Vova1"/*, "Li.Dima1", "Nika.Nika1", "Gec.Ola1", "Gec.Ola2", "Popova.Daria1"*/};
+  private final String[] passwords = {"n02GYZWQaK"/*, "8wCIYBzpUa", , "kUZ9P8HPem", "7iZEeidpnG", "8oM8DVuDLf"*/};
+  private final long[] ids = {34L};
 
-  private final String[] usernames = {"John.Doe", "Alice.Smith", "Bob.Johnson", "Eve.Wilson", "Michael.Brown",
-      "Emma.Davis", "David.Lee", "Sarah.Evans", "Matthew.Lopez", "Olivia.Clark", "William.Hall",
-      "Sophia.Turner", "James.White", "Lily.Harris", "Benjamin.Scott", "Christopher.Nelson", "Ava.Thomas",
-      "Joseph.Mitchell", "Mia.Perez", "Charles.Sanchez"};
+  ///for Trainee
+  private final String[] usernames2 = {"Nika.Nika1"/*, "Gec.Ola1", "Gec.Ola2"*/};
+  private final String[] passwords2 = {"nhMlJHUOiF"/*, "8wCIYBzpUa", "nhMlJHUOiF", "kUZ9P8HPem", "7iZEeidpnG", "8oM8DVuDLf"*/};
+  private final long[] ids2 = {36L};
 
-  private final String[] passwords = {"password1", "password2", "password3", "password4", "password5", "password6",
-      "password7", "password8", "password9", "password10", "password11", "password12", "password13", "password14",
-      "password15", "password16", "password17", "password18", "password19", "password20"};
+  private final String[] operations = {"get", "updatePassword", "update", "toggleActivation",  "getTrainings"};
+  private final String[] criteriaArray = {"Training 1", "Training 2", "Training 3"};
+  private final String[] specializations = {"SPEC", "Yoga"};
 
-  private final String[] operations = {"get", "updatePassword", "update", "toggleActivation", "delete", "getTrainings"};
-  private final String[] criteriaArray = {"specialization", "address", "trainingName"};
+
+  public PrepareUserDto generateRandomPrepareUserDtoForTrainer() {
+    long id = ids[random.nextInt(ids.length)];
+    String username = generatePrincipal().username();
+    String password = generatePrincipal().password();
+    String address = "address" + random.nextInt(1000);
+    String specialization = generateSpecialization();
+    String criteria = generateRandomCriteria();
+    String operation = generateRandomOperation();
+    return new PrepareUserDto(id, username, password, address, specialization, criteria, operation);
+  }
+  public PrepareUserDto generateRandomPrepareUserDtoForTrainee() {
+    long id = ids2[random.nextInt(ids.length)];
+    String username2 = generatePrincipal().username();
+    String password2 = generatePrincipal().password();
+    String address = "address" + random.nextInt(1000);
+    String specialization = generateSpecialization();
+    String criteria = generateRandomCriteria();
+    String operation = generateRandomOperation();
+    return new PrepareUserDto(id, username2, password2, address, specialization, criteria, operation);
+  }
+
+  public String generateSpecialization() {
+    int randomIndex = random.nextInt(specializations.length);
+    return specializations[randomIndex];
+  }
 
   public Principal generatePrincipal() {
     String username = usernames[currentIndex];
     String password = passwords[currentIndex];
     currentIndex = (currentIndex + 1) % Math.min(usernames.length, passwords.length);
-    return new Principal(username, password, "User");
+    return new Principal(username, password);
   }
 
   public String generateRandomOperation() {
@@ -39,17 +66,17 @@ public class RandomDataGenerator {
     return criteriaArray[randomIndex];
   }
 
-  public TraineeDto generateRandomTraineeDto() {
-    int id = random.nextInt(10);
-    String password = passwords[random.nextInt(passwords.length)];
-    String address = "Address" + (id + 1);
-    return new TraineeDto(id, password, address);
-  }
-
-  public TrainerDto generateRandomTrainerDto() {
-    int id = random.nextInt(10);
-    String password = passwords[random.nextInt(passwords.length)];
-    String specialization = "Specialization" + (id + 1);
-    return new TrainerDto(id, password, specialization);
-  }
+//  public TraineeDto generateRandomTraineeDto() {
+//    int id = random.nextInt(10);
+//    String password = passwords[random.nextInt(passwords.length)];
+//    String address = "Address" + (id + 1);
+//    return new TraineeDto(id, password, address);
+//  }
+//
+//  public TrainerDto generateRandomTrainerDto() {
+//    int id = random.nextInt(10);
+//    String password = passwords[random.nextInt(passwords.length)];
+//    String specialization = "Specialization" + (id + 1);
+//    return new TrainerDto(id, password, specialization);
+//  }
 }

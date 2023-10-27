@@ -63,15 +63,17 @@ public class TrainerServiceImpl implements TrainerService {
 
   @Override
   @Transactional
-  public Optional<Trainer> saveTrainer(@Valid TrainerRegistration trainerDto) {
+  public Trainer saveTrainer(@Valid TrainerRegistration trainerDto) {
     log.info("Creating Trainer from TrainerRegistration: " + trainerDto);
     var username = UserUtils.createUsername(trainerDto.firstName(), trainerDto.lastName(), userService.findAll());
     var password = UserUtils.generateRandomPassword();
     Trainer trainer = trainerConverter.toTrainer(trainerDto);
+    trainer.setFirstName(trainerDto.firstName());
+    trainer.setLastName(trainerDto.lastName());
     trainer.setUsername(username);
     trainer.setPassword(password);
     trainer.setActive(true);
-    return Optional.ofNullable(trainerRepository.save(trainer));
+    return trainerRepository.save(trainer);
   }
 
   @Override

@@ -7,6 +7,5 @@ import org.mapstruct.Mapper;
 
 @Mapper
 public interface TraineeConverter {
-
   Trainee toTrainee(TraineeRegistration traineeDto);
 }

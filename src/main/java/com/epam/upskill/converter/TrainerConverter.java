@@ -6,6 +6,6 @@ import org.mapstruct.Mapper;
 
 @Mapper
 public interface TrainerConverter {
-
   Trainer toTrainer(TrainerRegistration trainerRegistration);
+
 }

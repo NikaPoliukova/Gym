@@ -19,16 +19,17 @@ public class UserUtils {
       throw new IllegalArgumentException("First name or last name must not be null or empty");
     }
     String username = String.format("%s.%s", firstName, lastName);
-
-    if (!isUsernameUnique(users, username)) {
-      username += calculateUsernameCounter(users, username)+1;
-    }
-    return username;
+    if (isUsernameUnique(users, username)) {
+      return username;
+    } else {
+      username += calculateUsernameCounter(users, username) + 1;
+    }return username;
   }
+
 
   public static boolean isUsernameUnique(List<User> userList, String usernameToCheck) {
     return userList.stream()
-        .anyMatch(user -> user.getUsername().equals(usernameToCheck));
+        .noneMatch(user -> user.getUsername().equals(usernameToCheck));
   }
 
   public static int calculateUsernameCounter(List<User> users, String username) {

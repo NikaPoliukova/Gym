@@ -1,9 +1,12 @@
 package com.epam.upskill.dto;
 
 public record PrepareUserDto(
-    String firstName,
-    String lastName,
+    long id,
     String username,
-    String password
+    String password,
+    String address,
+    String specialization,
+    String criteria,
+    String operation
 ) {
 }

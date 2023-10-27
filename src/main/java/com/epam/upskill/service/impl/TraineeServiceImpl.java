@@ -65,7 +65,7 @@ public class TraineeServiceImpl implements TraineeService {
 
   @Override
   @Transactional
-  public void saveTrainee(@Valid TraineeRegistration traineeDto) {
+  public Trainee saveTrainee(@Valid TraineeRegistration traineeDto) {
     log.info("Creating Trainee from TraineeRegistration: " + traineeDto);
     var username = UserUtils.createUsername(traineeDto.firstName(), traineeDto.lastName(), userService.findAll());
     var password = UserUtils.generateRandomPassword();
@@ -73,7 +73,7 @@ public class TraineeServiceImpl implements TraineeService {
     trainee.setPassword(password);
     trainee.setUsername(username);
     trainee.setActive(true);
-    traineeRepository.save(trainee);
+    return traineeRepository.save(trainee);
   }
 
   @Override

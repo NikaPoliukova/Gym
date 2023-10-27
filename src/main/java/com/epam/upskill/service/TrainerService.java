@@ -14,7 +14,7 @@ public interface TrainerService {
 
   List<Trainer> findAll();
 
-  Optional<Trainer> saveTrainer(TrainerRegistration trainerDto);
+  Trainer saveTrainer(TrainerRegistration trainerDto);
 
   Optional<Trainer> updateTrainer(TrainerDto trainerDto);
 

@@ -12,7 +12,7 @@ public interface TraineeService {
 
   Trainee findByUsername(String username);
 
-  void saveTrainee(TraineeRegistration trainee);
+  Trainee saveTrainee(TraineeRegistration trainee);
 
   List<Trainee> findAll();
 
