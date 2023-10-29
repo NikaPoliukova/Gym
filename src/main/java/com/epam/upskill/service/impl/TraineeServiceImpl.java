@@ -70,6 +70,8 @@ public class TraineeServiceImpl implements TraineeService {
     var username = UserUtils.createUsername(traineeDto.firstName(), traineeDto.lastName(), userService.findAll());
     var password = UserUtils.generateRandomPassword();
     var trainee = traineeConverter.toTrainee(traineeDto);
+    trainee.setFirstName(traineeDto.firstName());
+    trainee.setLastName(traineeDto.lastName());
     trainee.setPassword(password);
     trainee.setUsername(username);
     trainee.setActive(true);

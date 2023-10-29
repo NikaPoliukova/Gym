@@ -1,138 +1,132 @@
 package com.epam.upskill.service.impl;
 
+import com.epam.upskill.converter.TraineeConverter;
+import com.epam.upskill.dao.TraineeRepository;
+import com.epam.upskill.dto.TraineeRegistration;
+import com.epam.upskill.entity.Trainee;
+import com.epam.upskill.entity.User;
+import com.epam.upskill.exception.TraineeNotFoundException;
+import com.epam.upskill.service.UserService;
+import com.epam.upskill.util.UserUtils;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
 class TraineeServiceImplTest {
- /* @InjectMocks
+  @InjectMocks
   private TraineeServiceImpl traineeService;
 
   @Mock
   private TraineeRepository traineeRepository;
 
   @Mock
-  private TrainerRepository trainerRepository;
+  private UserService userService;
 
-  @BeforeEach
-  public void setUp() {
-    traineeRepository = mock(TraineeRepository.class);
-    trainerRepository = mock(TrainerRepository.class);
-    traineeService = new TraineeServiceImpl(traineeRepository, trainerRepository);
+  @Mock
+  private TraineeConverter traineeConverter;
+
+//  @BeforeEach
+//  public void setUp() {
+//    MockitoAnnotations.openMocks(this);
+//  }
+
+  @Test
+  void testFindById() {
+    long traineeId = 1L;
+    Trainee trainee = new Trainee();
+    trainee.setId(traineeId);
+    when(traineeRepository.findById(traineeId)).thenReturn(Optional.of(trainee));
+    Optional<Trainee> result = traineeService.findById(traineeId);
+    assertEquals(trainee, result.orElse(null));
   }
 
   @Test
-   void testGetTraineeById() {
-    // Arrange
-    long traineeId = 1;
-    Trainee expectedTrainee = new Trainee();
-    expectedTrainee.setId(traineeId);
-    when(traineeRepository.findById(traineeId)).thenReturn(expectedTrainee);
-    // Act
-    Trainee resultTrainee = traineeService.getTraineeById(traineeId);
-    // Assert
-    assertEquals(expectedTrainee, resultTrainee);
+   void testFindByIdNotFound() {
+    long traineeId = 1L;
+    when(traineeRepository.findById(traineeId)).thenReturn(Optional.empty());
+
+    assertThrows(TraineeNotFoundException.class, () -> traineeService.findById(traineeId));
   }
 
   @Test
-  void testFindAllTrainees() {
-    // Arrange
-    Map<Long, Trainee> traineeMap = new HashMap<>();
-    traineeMap.put(1L, new Trainee(1L, "John", "Doe", "John.Doe", "password",
-        true, 1L, new Date(), "123 Main Street"));
-    traineeMap.put(2L, new Trainee(3L, "John", "Doe", "John.Doe2", "password",
-        true, 1L, new Date(), "123 Main Street"));
-    var trainee1 = Trainee.builder()
-        .id(1L)
-        .address("123 Main Street")
-        .date(new Date())
-        .build();
-    traineeMap.put(3L, trainee1);
+   void testFindByUsername() {
+    String username = "testUser";
+    Trainee trainee = new Trainee();
+    trainee.setUsername(username);
 
-    when(traineeRepository.findAll()).thenReturn(traineeMap);
-    // Act
-    Map<Long, Trainee> result = traineeService.findAll();
-    // Assert
-    assertNotNull(result);
-    assertEquals(2, result.size());
+    when(traineeRepository.findByUsername(username)).thenReturn(Optional.of(trainee));
+
+    Trainee result = traineeService.findByUsername(username);
+
+    assertEquals(trainee, result);
   }
 
   @Test
-  void testCreateTrainee() {
-    // Arrange
-    TraineeRegistration traineeRegistration = new TraineeRegistration(
-        "Jimnov", "Liin", "Street22", new LocalDate());
-    Map<Long, Trainee> emptyTraineeList = new HashMap<>();
-    when(traineeRepository.findAll()).thenAnswer(invocation -> emptyTraineeList);
-    when(trainerRepository.findAll()).thenAnswer(invocation -> emptyTraineeList);
-    // Act
-    traineeService.createTrainee(traineeRegistration);
-    // Assert
-    verify(traineeRepository, times(1)).create(any(Trainee.class));
-  }
+  void testFindByUsernameNotFound() {
+    String username = "nonExistentUser";
 
+    when(traineeRepository.findByUsername(username)).thenReturn(Optional.empty());
 
-  @Test
-  void testUpdateTrainee() {
-    // Arrange
-    TraineeDto traineeDto = new TraineeDto(1, "newPassword", "newAddress");
-    Trainee existingTrainee = new Trainee();
-    existingTrainee.setId(1);
-    when(traineeRepository.findById(traineeDto.id())).thenReturn(existingTrainee);
-
-    // Act
-    traineeService.updateTrainee(traineeDto);
-
-    // Assert
-    verify(traineeRepository, times(1)).update(existingTrainee);
+    assertThrows(TraineeNotFoundException.class, () -> traineeService.findByUsername(username));
   }
 
   @Test
-  void testDeleteTraineeById() {
-    // Arrange
-    long traineeId = 1;
-    // Act
-    traineeService.deleteTraineeById(traineeId);
-    // Assert
-    verify(traineeRepository, times(1)).deleteTraineeById(traineeId);
+   void testFindAll() {
+    List<Trainee> trainees = new ArrayList<>();
+    trainees.add(new Trainee());
+    trainees.add(new Trainee());
+
+    when(traineeRepository.findAll()).thenReturn(trainees);
+
+    List<Trainee> result = traineeService.findAll();
+
+    assertEquals(trainees, result);
   }
 
   @Test
-  void testGetNonExistentTrainee() {
-    // Arrange
-    long nonExistentTraineeId = 999;
-    when(traineeRepository.findById(nonExistentTraineeId)).thenReturn(null);
-    // Act
-    Trainee resultTrainee = traineeService.getTraineeById(nonExistentTraineeId);
-    // Assert
-    assertNull(resultTrainee);
-  }
-/*
-  @Test
-  void testCreateTraineeWithDuplicateUsername() {
-    // Arrange
-    TraineeRegistration traineeRegistration =
-        new TraineeRegistration("Jimnov", "Liin",
-        "Street22", new LocalDate(2020, 1, 1));
-    Map<Long, Trainee> traineeMap = new HashMap<>();
-    traineeMap.put(1L, new Trainee());
-    when(traineeRepository.findAll()).thenReturn(traineeMap);
-    when(trainerRepository.findAll()).thenReturn(Collections.emptyMap());
-    // Act and Assert
-    assertThrows(Exception.class, () -> traineeService.createTrainee(traineeRegistration));
-  }
+  void testSaveTrainee() {
+    TraineeRegistration traineeDto = new TraineeRegistration("John", "Doe",
+        "Address", LocalDate.now());
+    String username = "John.Doe";
+    String password = "randomPassword";
+    Trainee trainee = new Trainee();
+    trainee.setUsername(username);
+    trainee.setFirstName(traineeDto.firstName());
+    trainee.setLastName(traineeDto.lastName());
+    trainee.setAddress(traineeDto.address());
+    trainee.setUsername(username);
+    trainee.setPassword(password);
+    List<User> userList = new ArrayList<>();
+    userList.add(new User(33L, "Jon", "Mo", "Jon.Mo", "randomPassword", true,
+        null));
 
-  @Test
-  void testUpdateNonExistentTrainee() {
-    // Arrange
-    TraineeDto traineeDto = new TraineeDto(999, "newPassword", "newAddress");
-    when(traineeRepository.findById(traineeDto.id())).thenReturn(null);
-    // Act and Assert
-    assertThrows(Exception.class, () -> traineeService.updateTrainee(traineeDto));
+    when(userService.findAll()).thenReturn(userList);
+    when(traineeConverter.toTrainee(traineeDto)).thenReturn(trainee);
+    try (MockedStatic<UserUtils> utilities = Mockito.mockStatic(UserUtils.class)) {
+      utilities.when(() -> UserUtils.createUsername(any(), any(), any())).thenReturn(username);
+      utilities.when(UserUtils::generateRandomPassword).thenReturn(password);
+      when(traineeRepository.save(any(Trainee.class))).thenReturn(trainee);
+      // Act
+      Trainee savedTrainee = traineeService.saveTrainee(traineeDto);
+      // Assert
+      assertNotNull(savedTrainee);
+      assertEquals(username, savedTrainee.getUsername());
+      assertEquals(password, savedTrainee.getPassword());
+      assertTrue(savedTrainee.isActive());
+      verify(traineeRepository, times(1)).save(any(Trainee.class));
+    }
   }
-
-  @Test
-  void testDeleteTraineeWithFailure() {
-    // Arrange
-    long traineeId = 1;
-    doThrow(new RuntimeException("Failed to delete Trainee")).when(traineeRepository).deleteTraineeById(traineeId);
-    // Act and Assert
-    assertThrows(Exception.class, () -> traineeService.deleteTraineeById(traineeId));
-  }*/
 }

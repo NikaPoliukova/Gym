@@ -1,10 +1,10 @@
 package com.epam.upskill;
 
 
-import com.epam.upskill.dto.TraineeRegistration;
-import com.epam.upskill.dto.TrainerRegistration;
-import com.epam.upskill.entity.Trainer;
+import com.epam.upskill.dto.TrainingDto;
+import com.epam.upskill.entity.Training;
 import com.epam.upskill.facade.RegistrationFacade;
+import com.epam.upskill.facade.TrainingFacade;
 import com.epam.upskill.facade.UserFacade;
 import com.epam.upskill.util.RandomDataGenerator;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +14,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 
 @Slf4j
@@ -23,6 +24,7 @@ public class GymApplication implements CommandLineRunner {
 
   private final UserFacade userFacade;
   private final RegistrationFacade registrationFacade;
+  private final TrainingFacade trainingFacade;
 
   public static void main(String[] args) {
     SpringApplication.run(GymApplication.class, args);
@@ -31,11 +33,25 @@ public class GymApplication implements CommandLineRunner {
   @Override
   public void run(String... args) throws Exception {
 
+   /* trainingFacade.saveTraining(TrainingDto.builder()
+        .trainingName("Java")
+        .trainingDate(LocalDate.now())
+        .trainingDuration(10)
+        .trainingTypeId(1)
+        .traineeId(38)
+        .trainerId(34)
+        .build());*/
+    Optional<Training> training = trainingFacade.findTrainingById(4L);
+    log.info("training = " + training.get().getId() + " name = " + training.get().getTrainingName()
+        + " Date = "  + training.get().getTrainingDate()
+        + " Duration =  " + training.get().getTrainingDuration() + " TrainingType = "
+        + training.get().getTrainingType() + " " + training.get().getTrainer() + " "
+        + training.get().getTrainee());
+
 
     /*registrationFacade.registration(new TraineeRegistration("NNN", "DIMA",
         "Minsk", LocalDate.now()));*/
-    registrationFacade.registration(new TrainerRegistration("NNN", "DIMA",
-        "SPEC3"));
+
     RandomDataGenerator randomDataGenerator = new RandomDataGenerator();
     /*for (int i = 0; i < 2; i++) {
       PrepareUserDto prepareUserDto = randomDataGenerator.generateRandomPrepareUserDtoForTrainer();

@@ -38,6 +38,4 @@ public class UserUtils {
         .filter(userUsername -> userUsername != null && userUsername.startsWith(username))
         .count();
   }
-
-
 }

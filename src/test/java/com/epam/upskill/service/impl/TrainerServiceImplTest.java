@@ -1,24 +1,31 @@
 package com.epam.upskill.service.impl;
 
-import com.epam.upskill.dao.TraineeRepository;
+import com.epam.upskill.converter.TrainerConverter;
 import com.epam.upskill.dao.TrainerRepository;
 import com.epam.upskill.dto.TrainerDto;
 import com.epam.upskill.dto.TrainerRegistration;
 import com.epam.upskill.entity.Trainer;
-import org.junit.jupiter.api.BeforeEach;
+import com.epam.upskill.entity.User;
+import com.epam.upskill.exception.TraineeNotFoundException;
+import com.epam.upskill.exception.TrainerNotFoundException;
+import com.epam.upskill.service.UserService;
+import com.epam.upskill.util.UserUtils;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class TrainerServiceImplTest {
+@ExtendWith(MockitoExtension.class)
+class TrainerServiceImplTest {
 
   @InjectMocks
   private TrainerServiceImpl trainerService;
@@ -27,108 +34,155 @@ public class TrainerServiceImplTest {
   private TrainerRepository trainerRepository;
 
   @Mock
-  private TraineeRepository traineeRepository;
+  private UserService userService;
 
-  @BeforeEach
-  public void setUp() {
-    MockitoAnnotations.openMocks(this);
+  @Mock
+  private TrainerConverter trainerConverter;
+
+
+//  @BeforeEach
+//  public void setUp() {
+//    MockitoAnnotations.openMocks(this);
+//  }
+
+  @Test
+  void testFindById() {
+    long trainerId = 1L;
+    Trainer trainer = new Trainer();
+    when(trainerRepository.findById(trainerId)).thenReturn(Optional.of(trainer));
+    Optional<Trainer> result = trainerService.findById(trainerId);
+    assertTrue(result.isPresent());
+    assertEquals(trainer, result.get());
   }
 
   @Test
-  public void testGetTrainerByIdFound() {
-    // Arrange
-    long trainerId = 1;
-    var expectedTrainer = Trainer.builder().build();
-    expectedTrainer.setId(trainerId);
-    when(trainerRepository.findById(trainerId)).thenReturn((Trainer) expectedTrainer);
-    // Act
-    Trainer resultTrainer = trainerService.getTrainerById(trainerId);
-    // Assert
-    assertEquals(expectedTrainer, resultTrainer);
+  void testFindById_TrainerNotFound() {
+    long trainerId = 55555L;
+    when(trainerRepository.findById(trainerId)).thenReturn(Optional.empty());
+    assertThrows(TraineeNotFoundException.class, () -> {
+      trainerService.findById(trainerId);
+    });
   }
 
   @Test
-  public void testGetTrainerByIdNotFound() {
-    // Arrange
-    long trainerId = 1;
-    when(trainerRepository.findById(trainerId)).thenReturn(null);
-    // Act
-    Trainer resultTrainer = trainerService.getTrainerById(trainerId);
-    // Assert
-    assertNull(resultTrainer);
-  }
-/*
-  @Test
-  public void testFindAll() {
-    // Arrange
-    Map<Long, Trainer> trainerMap = new HashMap<>();
-    trainerMap.put(1L,  Trainer.builder().(1L, "John", "Doe", "john.doe",
-        "password", true, 1L, "fitness"));
-    trainerMap.put(2L, new Trainer(2L, "Alice", "Smith", "alice.smith",
-        "password", true, 2L, "yoga"));
-    when(trainerRepository.findAll()).thenReturn(trainerMap);
-    // Act
-    Map<Long, Trainer> result = trainerService.findAll();
-    // Assert
-    assertNotNull(result);
-    assertEquals(2, result.size());
-    assertTrue(result.containsKey(1L));
-    assertTrue(result.containsKey(2L));
-    verify(trainerRepository, times(1)).findAll();
+  void testFindByUsername() {
+    String username = "john_doe";
+    Trainer trainer = new Trainer();
+    when(trainerRepository.findByUsername(username)).thenReturn(Optional.of(trainer));
+
+    Optional<Trainer> result = trainerService.findByUsername(username);
+
+    assertTrue(result.isPresent());
+    assertEquals(trainer, result.get());
   }
 
   @Test
-  public void testFindAllWithEmptyResult() {
+  void testFindByUsername_TrainerNotFound() {
+    String username = "john_doe";
+    when(trainerRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+    assertThrows(TrainerNotFoundException.class, () -> trainerService.findByUsername(username));
+  }
+
+  @Test
+  void testFindAll() {
+    List<Trainer> trainers = new ArrayList<>();
+    trainers.add(new Trainer());
+    when(trainerRepository.findAll()).thenReturn(trainers);
+
+    List<Trainer> result = trainerService.findAll();
+
+    assertFalse(result.isEmpty());
+    assertEquals(trainers, result);
+  }
+
+  @Test
+  void testSaveTrainer() {
     // Arrange
-    when(trainerRepository.findAll()).thenReturn(Collections.emptyMap());
-    // Act
-    Map<Long, Trainer> result = trainerService.findAll();
-    // Assert
-    assertNotNull(result);
+    TrainerRegistration trainerDto = new TrainerRegistration("John", "Doe", "Specialization");
+    String username = "John.Doe";
+    String password = "randomPassword";
+    Trainer trainer = new Trainer();
+    trainer.setFirstName(trainerDto.firstName());
+    trainer.setLastName(trainerDto.lastName());
+    trainer.setSpecialization(trainerDto.specialization());
+    trainer.setUsername(username);
+    trainer.setPassword(password);
+    List<User> userList = new ArrayList<>();
+    userList.add(new User(33L, "Jon", "Mo", "Jon.Mo", "randomPassword", true,
+        null));
+
+    when(userService.findAll()).thenReturn(userList);
+    when(trainerConverter.toTrainer(trainerDto)).thenReturn(trainer);
+    try (MockedStatic<UserUtils> utilities = Mockito.mockStatic(UserUtils.class)) {
+      utilities.when(() -> UserUtils.createUsername(any(), any(), any())).thenReturn(username);
+      utilities.when(UserUtils::generateRandomPassword).thenReturn(password);
+      when(trainerRepository.save(any(Trainer.class))).thenReturn(trainer);
+      // Act
+      Trainer savedTrainer = trainerService.saveTrainer(trainerDto);
+      // Assert
+      assertNotNull(savedTrainer);
+      assertEquals(username, savedTrainer.getUsername());
+      assertEquals(password, savedTrainer.getPassword());
+      assertTrue(savedTrainer.isActive());
+      verify(trainerRepository, times(1)).save(any(Trainer.class));
+    }
+  }
+
+
+  @Test
+  void testUpdateTrainer() {
+    long trainerId = 1L;
+    TrainerDto trainerDto = new TrainerDto(trainerId, "Updated Specialization", "Updatedpassword");
+    Trainer trainer = new Trainer();
+    when(trainerRepository.findById(trainerId)).thenReturn(Optional.of(trainer));
+    when(trainerRepository.update(trainer)).thenReturn(trainer);
+
+    Optional<Trainer> result = trainerService.updateTrainer(trainerDto);
+
+    assertTrue(result.isPresent());
+    assertEquals(trainer, result.get());
+    assertEquals(trainerDto.specialization(), result.get().getSpecialization());
+  }
+
+  @Test
+  void testUpdateTrainer_TrainerNotFound() {
+    long trainerId = 1L;
+    TrainerDto trainerDto = new TrainerDto(trainerId, "Updated Specialization", "Updatedpassword");
+    when(trainerRepository.findById(trainerId)).thenReturn(Optional.empty());
+    assertThrows(NoSuchElementException.class, () -> trainerService.updateTrainer(trainerDto));
+  }
+
+
+  @Test
+  void testFindByIsActive() {
+    List<Trainer> activeTrainers = new ArrayList<>();
+    activeTrainers.add(new Trainer());
+    when(trainerRepository.findByIsActive()).thenReturn(activeTrainers);
+    List<Trainer> result = trainerService.findByIsActive();
+    assertFalse(result.isEmpty());
+    assertEquals(activeTrainers, result);
+  }
+
+  @Test
+  void testFindByIsActive_NoActiveTrainers() {
+    when(trainerRepository.findByIsActive()).thenReturn(Collections.emptyList());
+
+    List<Trainer> result = trainerService.findByIsActive();
+
     assertTrue(result.isEmpty());
-    verify(trainerRepository, times(1)).findAll();
   }
 
   @Test
-  public void testCreateTrainer() {
-    // Arrange
-    TrainerRegistration trainerRegistration = new TrainerRegistration("Doe", "John",
-        "Specialization");
-    // Act and Assert
-    assertDoesNotThrow(() -> trainerService.createTrainer(trainerRegistration));
+  void testToggleProfileActivation() {
+    long trainerId = 1L;
+    Trainer trainer = new Trainer();
+    trainer.setActive(true);
+    when(trainerRepository.findById(trainerId)).thenReturn(Optional.of(trainer));
+
+    trainerService.toggleProfileActivation(trainerId);
+
+    assertFalse(trainer.isActive());
+    verify(trainerRepository).toggleProfileActivation(trainer);
   }
-
-  @Test
-  public void testUpdateTrainerFound() {
-    // Arrange
-    TrainerDto trainerDto = new TrainerDto(1, "newPassword", "newSpecialization");
-    var existingTrainer =Trainer.builder().build();
-    when(trainerRepository.findById(trainerDto.id())).thenReturn((Trainer) existingTrainer);
-    // Act
-    trainerService.updateTrainer(trainerDto);
-  }
-
-  @Test
-  public void testDeleteTrainerWithFailure() {
-    // Arrange
-    long trainerId = 1;
-    doThrow(new RuntimeException("Failed to delete Trainer")).when(trainerRepository).deleteTrainerById(trainerId);
-    trainerService.deleteTrainerById(trainerId);
-  }
-
-  @Test
-  public void testDeleteTrainerSuccess() {
-    // Arrange
-    long trainerId = 1;
-    ArgumentCaptor<Long> trainerIdCaptor = ArgumentCaptor.forClass(Long.class);
-    doNothing().when(trainerRepository).deleteTrainerById(trainerIdCaptor.capture());
-
-    // Act
-    trainerService.deleteTrainerById(trainerId);
-
-    // Assert
-    verify(trainerRepository).deleteTrainerById(trainerIdCaptor.getValue());
-    assertEquals(trainerId, trainerIdCaptor.getValue());
-  }*/
 }
-

@@ -1,61 +1,146 @@
 package com.epam.upskill.service.impl;
 
+import com.epam.upskill.converter.TrainingConverter;
 import com.epam.upskill.dao.TrainingRepository;
-import com.epam.upskill.entity.Training;
-import org.junit.jupiter.api.Assertions;
+import com.epam.upskill.dto.TrainingDto;
+import com.epam.upskill.entity.*;
+import com.epam.upskill.service.TraineeService;
+import com.epam.upskill.service.TrainerService;
+import com.epam.upskill.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-public class TrainingServiceImplTest {
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
+class TrainingServiceImplTest {
+
   @InjectMocks
   private TrainingServiceImpl trainingService;
 
   @Mock
   private TrainingRepository trainingRepository;
 
+  @Mock
+  private UserService userService;
+
+  @Mock
+  private TraineeService traineeService;
+
+  @Mock
+  private TrainerService trainerService;
+
+  @Mock
+  private TrainingConverter trainingConverter;
   @BeforeEach
   public void setUp() {
     MockitoAnnotations.openMocks(this);
   }
-
   @Test
-  public void testGetTrainingById() {
-    // Arrange
-    long trainingId = 1;
-    Training expectedTraining = new Training();
-    expectedTraining.setId(trainingId);
-    Mockito.when(trainingRepository.findById(trainingId)).thenReturn(expectedTraining);
+  void testFindTrainingById() {
+    long trainingId = 1L;
+    Training training = new Training();
+    when(trainingRepository.findById(trainingId)).thenReturn(Optional.of(training));
 
-    // Act
-    Training resultTraining = trainingService.getTrainingById(trainingId);
+    Optional<Training> result = trainingService.findTrainingById(trainingId);
 
-    // Assert
-    Assertions.assertEquals(expectedTraining, resultTraining);
+    assertTrue(result.isPresent());
+    assertEquals(training, result.get());
   }
 
   @Test
-  public void testGetTrainingByIdNotFound() {
-    // Arrange
-    long trainingId = 1;
-    Mockito.when(trainingRepository.findById(trainingId)).thenReturn(null);
+  void testFindTrainingById_TrainingNotFound() {
+    long trainingId = 1L;
+    when(trainingRepository.findById(trainingId)).thenReturn(Optional.empty());
 
-    // Act
-    Training resultTraining = trainingService.getTrainingById(trainingId);
+    Optional<Training> result = trainingService.findTrainingById(trainingId);
 
-    // Assert
-    Assertions.assertNull(resultTraining);
+    assertTrue(result.isEmpty());
   }
-/*
-  @Test
-  public void testCreateTraining() {
-    // Arrange
-    TrainingDto trainingDto = new TrainingDto("Training Name", new Date(), 120, 1);
 
-    // Act and Assert
-    Assertions.assertDoesNotThrow(() -> trainingService.createTraining(trainingDto));
-  }*/
+  @Test
+  void testSaveTraining() {
+    TrainingDto trainingDto = new TrainingDto("TrainingName", LocalDate.now(), 60, 1, 2, 3);
+    Trainee trainee = new Trainee();
+    Trainer trainer = new Trainer();
+    TrainingType trainingType = new TrainingType();
+    Training training = new Training();
+
+    when(traineeService.findById(trainingDto.traineeId())).thenReturn(Optional.of(trainee));
+    when(trainerService.findById(trainingDto.trainerId())).thenReturn(Optional.of(trainer));
+    when(trainingRepository.findTrainingTypeById(trainingDto.trainingTypeId())).thenReturn(trainingType);
+    when(trainingConverter.toTraining(eq(trainingDto), any(Training.class))).thenReturn(training);
+    when(trainingRepository.save(training)).thenReturn(training);
+
+    Training result = trainingService.saveTraining(trainingDto);
+
+    assertNotNull(result);
+    assertEquals(training, result);
+    assertEquals(trainee, result.getTrainee());
+    assertEquals(trainer, result.getTrainer());
+    assertEquals(trainingType, result.getTrainingType());
+  }
+
+  @Test
+  void testFindTrainingsByUsernameAndCriteria() {
+    String username = "john_doe";
+    String criteria = "search_criteria";
+    User user = new User();
+    when(userService.findByUsername(username)).thenReturn(Optional.of(user));
+
+    List<Training> trainings = new ArrayList<>();
+    trainings.add(new Training());
+    when(trainingRepository.findTrainingsByUsernameAndCriteria(username, criteria)).thenReturn(trainings);
+
+    List<Training> result = trainingService.findTrainingsByUsernameAndCriteria(username, criteria);
+
+    assertFalse(result.isEmpty());
+    assertEquals(trainings, result);
+  }
+
+  @Test
+  void testFindTrainingsByUsernameAndCriteria_UserNotFound() {
+    String username = "john_doe";
+    when(userService.findByUsername(username)).thenReturn(Optional.empty());
+
+    List<Training> result = trainingService.findTrainingsByUsernameAndCriteria(username, "search_criteria");
+
+    assertTrue(result.isEmpty());
+  }
+
+  @Test
+  void testFindNotAssignedActiveTrainersToTrainee() {
+    long traineeId = 1L;
+    Trainee trainee = new Trainee();
+    when(traineeService.findById(traineeId)).thenReturn(Optional.of(trainee));
+
+    List<Trainer> trainers = new ArrayList<>();
+    trainers.add(new Trainer());
+    when(trainingRepository.getNotAssignedActiveTrainersToTrainee(traineeId)).thenReturn(trainers);
+
+    List<Trainer> result = trainingService.findNotAssignedActiveTrainersToTrainee(traineeId);
+
+    assertFalse(result.isEmpty());
+    assertEquals(trainers, result);
+  }
+
+  @Test
+  void testFindNotAssignedActiveTrainersToTrainee_TraineeNotFound() {
+    long traineeId = 1L;
+    when(traineeService.findById(traineeId)).thenReturn(Optional.empty());
+
+    List<Trainer> result = trainingService.findNotAssignedActiveTrainersToTrainee(traineeId);
+
+    assertTrue(result.isEmpty());
+  }
 }

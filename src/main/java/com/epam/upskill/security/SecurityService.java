@@ -1,6 +1,5 @@
 package com.epam.upskill.security;
 
-import com.epam.upskill.entity.User;
 import com.epam.upskill.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,9 +14,6 @@ public class SecurityService {
     if (user.isEmpty()) {
       throw new IllegalArgumentException("User not authorized");
     }
-    if (!user.get().getPassword().equals(principal.password())) {
-      return false;
-    }
-    return true;
-  }
+   return user.get().getPassword().equals(principal.password());
+ }
 }
