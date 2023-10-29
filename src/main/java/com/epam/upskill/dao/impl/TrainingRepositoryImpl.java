@@ -56,7 +56,6 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     TypedQuery<TrainingType> query = entityManager.createQuery(
         "SELECT tt FROM TrainingType tt WHERE tt.id = :id", TrainingType.class);
     query.setParameter("id", id);
-
     try {
       return query.getSingleResult();
     } catch (NoResultException e) {

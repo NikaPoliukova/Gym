@@ -52,7 +52,7 @@ public class TrainerRepositoryImpl implements TrainerRepository {
   }
 
   @Override
-  public  Optional<Trainer> findByUsername(String username) {
+  public Optional<Trainer> findByUsername(String username) {
     return Optional.ofNullable(entityManager.createQuery("SELECT t FROM Trainer t  WHERE t.username = :username",
             Trainer.class)
         .setParameter("username", username)

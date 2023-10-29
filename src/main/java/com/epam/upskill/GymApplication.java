@@ -1,11 +1,15 @@
 package com.epam.upskill;
 
 
-import com.epam.upskill.dto.TrainingDto;
+import com.epam.upskill.dto.PrepareUserDto;
+import com.epam.upskill.entity.Trainee;
+import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.Training;
 import com.epam.upskill.facade.RegistrationFacade;
 import com.epam.upskill.facade.TrainingFacade;
 import com.epam.upskill.facade.UserFacade;
+import com.epam.upskill.service.TraineeService;
+import com.epam.upskill.service.TrainerService;
 import com.epam.upskill.util.RandomDataGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +17,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.time.LocalDate;
 import java.util.Optional;
 
 
@@ -25,7 +28,8 @@ public class GymApplication implements CommandLineRunner {
   private final UserFacade userFacade;
   private final RegistrationFacade registrationFacade;
   private final TrainingFacade trainingFacade;
-
+  private final TraineeService traineeService;
+  private final TrainerService trainerService;
   public static void main(String[] args) {
     SpringApplication.run(GymApplication.class, args);
   }
@@ -40,23 +44,16 @@ public class GymApplication implements CommandLineRunner {
         .trainingTypeId(1)
         .traineeId(38)
         .trainerId(34)
-        .build());*/
-    Optional<Training> training = trainingFacade.findTrainingById(4L);
-    log.info("training = " + training.get().getId() + " name = " + training.get().getTrainingName()
-        + " Date = "  + training.get().getTrainingDate()
-        + " Duration =  " + training.get().getTrainingDuration() + " TrainingType = "
-        + training.get().getTrainingType() + " " + training.get().getTrainer() + " "
-        + training.get().getTrainee());
-
-
-    /*registrationFacade.registration(new TraineeRegistration("NNN", "DIMA",
-        "Minsk", LocalDate.now()));*/
+        .build());
+    Optional<Trainer> trainer = trainerService.findById(34L);
+    log.info("trainer = " + trainer + "  " + trainer.get().getTrainings() + "  " + trainer.get().getSpecialization());
+    registrationFacade.registration(new TraineeRegistration("NNN", "DIMA", "Minsk", LocalDate.now()));*/
 
     RandomDataGenerator randomDataGenerator = new RandomDataGenerator();
-    /*for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 2; i++) {
       PrepareUserDto prepareUserDto = randomDataGenerator.generateRandomPrepareUserDtoForTrainer();
       userFacade.handle(prepareUserDto);
-      log.info("operation =  " + prepareUserDto.operation() + "  username = " + prepareUserDto.username()
+      log.info("OPERATION FOR TRAINER =  " + prepareUserDto.operation() + "  username = " + prepareUserDto.username()
           + "  password = " + prepareUserDto.password() + "  address = " + prepareUserDto.address()
           + "  specialization = " + prepareUserDto.specialization()
           + "  criteria = " + prepareUserDto.criteria()
@@ -65,12 +62,12 @@ public class GymApplication implements CommandLineRunner {
     for (int i = 0; i < 2; i++) {
       PrepareUserDto prepareUserDto = randomDataGenerator.generateRandomPrepareUserDtoForTrainee();
       userFacade.handle(prepareUserDto);
-      log.info("operation =  " + prepareUserDto.operation() + "  username = " + prepareUserDto.username()
+      log.info("OPERATION FOR TRAINEE =  " + prepareUserDto.operation() + "  username = " + prepareUserDto.username()
           + "  password = " + prepareUserDto.password() + "  address = " + prepareUserDto.address()
           + "  specialization = " + prepareUserDto.specialization()
           + "  criteria = " + prepareUserDto.criteria()
           + "  id = " + prepareUserDto.id());
-    }*/
+    }
   }
 }
 

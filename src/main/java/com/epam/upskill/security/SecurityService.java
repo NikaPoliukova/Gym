@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 public class SecurityService {
   private final UserService userService;
 
- public boolean authenticate(Principal principal) {
+  public boolean authenticate(Principal principal) {
     var user = userService.findByUsername(principal.username());
     if (user.isEmpty()) {
       throw new IllegalArgumentException("User not authorized");
     }
-   return user.get().getPassword().equals(principal.password());
- }
+    return user.get().getPassword().equals(principal.password());
+  }
 }

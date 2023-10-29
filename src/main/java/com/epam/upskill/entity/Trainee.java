@@ -1,5 +1,6 @@
 package com.epam.upskill.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -7,6 +8,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@ToString
 @Builder(builderMethodName = "traineeBuilder")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,6 +24,8 @@ public class Trainee extends User {
 
   private String address;
 
+  @JsonManagedReference
   @OneToMany(mappedBy = "trainee", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
   private List<Training> trainings = new ArrayList<>();
+
 }

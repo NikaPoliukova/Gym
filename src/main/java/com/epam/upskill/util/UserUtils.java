@@ -23,7 +23,8 @@ public class UserUtils {
       return username;
     } else {
       username += calculateUsernameCounter(users, username) + 1;
-    }return username;
+    }
+    return username;
   }
 
 

@@ -6,10 +6,8 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.epam.upskill.util.UserUtils.createUsername;
 import static com.epam.upskill.util.UserUtils.isUsernameUnique;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
 class UserUtilsTest {
 

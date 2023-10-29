@@ -52,7 +52,7 @@ public class JPAConfig {
     properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
     properties.setProperty("hibernate.hbm2ddl.auto", hbm2ddlAuto);
     properties.setProperty("hibernate.format_sql", hibernateDialect);
-    properties.setProperty("hibernate.show_sql", "true");
+   // properties.setProperty("hibernate.show_sql", "true");
     properties.setProperty("hibernate.default_schema", "gym_schema");
     return properties;
   }
