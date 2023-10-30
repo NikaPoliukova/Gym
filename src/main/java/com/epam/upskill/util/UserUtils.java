@@ -10,8 +10,10 @@ import java.util.List;
 @UtilityClass
 public class UserUtils {
 
+  private static final int LENGTH_OF_PASSWORD = 10;
+
   public static String generateRandomPassword() {
-    return RandomStringUtils.randomAlphanumeric(10);
+    return RandomStringUtils.randomAlphanumeric(LENGTH_OF_PASSWORD);
   }
 
   public static String createUsername(String firstName, String lastName, List<User> users) {
@@ -19,14 +21,8 @@ public class UserUtils {
       throw new IllegalArgumentException("First name or last name must not be null or empty");
     }
     String username = String.format("%s.%s", firstName, lastName);
-    if (isUsernameUnique(users, username)) {
-      return username;
-    } else {
-      username += calculateUsernameCounter(users, username) + 1;
-    }
-    return username;
+    return isUsernameUnique(users, username) ? username : username + calculateUsernameCounter(users, username) + 1;
   }
-
 
   public static boolean isUsernameUnique(List<User> userList, String usernameToCheck) {
     return userList.stream()

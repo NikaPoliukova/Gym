@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -32,27 +31,18 @@ public class TraineeServiceImpl implements TraineeService {
 
   @Override
   @Transactional(readOnly = true)
-  public Optional<Trainee> findById(long traineeId) {
+  public Trainee findById(long traineeId) {
     log.debug("Fetching Trainee by ID: " + traineeId);
-    var trainee = traineeRepository.findById(traineeId);
-    if (trainee.isEmpty()) {
-      log.error("Trainee not found with id: {}", traineeId);
-      throw new TraineeNotFoundException("Trainee not found with id: " + traineeId);
-    }
-    log.info("Trainee found with id: {}", traineeId);
-    return trainee;
+    return traineeRepository.findById(traineeId).orElseThrow(()
+        -> new TraineeNotFoundException("Trainee not found with id: " + traineeId));
   }
 
   @Override
   @Transactional(readOnly = true)
   public Trainee findByUsername(String username) {
-    var trainee = traineeRepository.findByUsername(username);
-    if (trainee.isEmpty()) {
-      log.error("Trainee not found with username: {}", username);
-      throw new TraineeNotFoundException("Trainee not found with username: " + username);
-    }
-    log.info("Trainee found with username: {}", username);
-    return trainee.get();
+    log.info("Fetching with username: {}", username);
+    return traineeRepository.findByUsername(username).orElseThrow(()
+        -> new TraineeNotFoundException("Trainee not found with username: " + username));
   }
 
   @Override
@@ -80,23 +70,23 @@ public class TraineeServiceImpl implements TraineeService {
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED)
-  public Optional<Trainee> updateTrainee(@Valid TraineeDto traineeDto) {
+  public Trainee updateTrainee(@Valid TraineeDto traineeDto) {
     log.info("Updating Trainee with TraineeDto: " + traineeDto);
     var trainee = findById(traineeDto.id());
     if (traineeDto.address() == null || traineeDto.address().isEmpty()) {
       throw new IllegalArgumentException("Address cannot be null or empty");
     }
-    trainee.ifPresent(t -> t.setAddress(traineeDto.address()));
-    return traineeRepository.update(trainee.orElse(null));
+    trainee.setAddress(traineeDto.address());
+    return traineeRepository.update(trainee).get();
   }
 
   @Override
   @Transactional
   public void toggleProfileActivation(long traineeId) {
     var trainee = findById(traineeId);
-    var currentStatus = trainee.get().isActive();
-    trainee.get().setActive(!currentStatus);
-    traineeRepository.toggleProfileActivation(trainee.get());
+    var currentStatus = trainee.isActive();
+    trainee.setActive(!currentStatus);
+    traineeRepository.toggleProfileActivation(trainee);
   }
 }
 

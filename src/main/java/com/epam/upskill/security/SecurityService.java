@@ -11,9 +11,9 @@ public class SecurityService {
 
   public boolean authenticate(Principal principal) {
     var user = userService.findByUsername(principal.username());
-    if (user.isEmpty()) {
+    if (user == null) {
       throw new IllegalArgumentException("User not authorized");
     }
-    return user.get().getPassword().equals(principal.password());
+    return user.getPassword().equals(principal.password());
   }
 }

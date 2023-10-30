@@ -1,13 +1,8 @@
 package com.epam.upskill;
 
 
-import com.epam.upskill.dao.UserRepository;
-import com.epam.upskill.facade.RegistrationFacade;
-import com.epam.upskill.facade.TrainingFacade;
 import com.epam.upskill.facade.UserFacade;
-import com.epam.upskill.service.TraineeService;
-import com.epam.upskill.service.TrainerService;
-import com.epam.upskill.service.UserService;
+import com.epam.upskill.util.RandomDataGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -20,56 +15,44 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class GymApplication implements CommandLineRunner {
 
-  private final UserFacade userFacade;
-  private final RegistrationFacade registrationFacade;
-  private final TrainingFacade trainingFacade;
-  private final TraineeService traineeService;
-  private final TrainerService trainerService;
-  private final UserService userService;
+//  private static final int NUMBER_OF_OPERATION = 2;
+//  private static final String OPERATION_FOR_TRAINER = "OPERATION FOR TRAINER =  ";
+//  private static final String OPERATION_FOR_TRAINEE = "OPERATION FOR TRAINEE =  ";
+//
+//  private static final String USER_DTO_TEMPLATE = """
+//      %s%s username =%s password = %s address =%s specialization %s criteria = %s id = %s
+//      """;
+//
+//  private final UserFacade userFacade;
+//  private final RandomDataGenerator randomDataGenerator;
 
   public static void main(String[] args) {
     SpringApplication.run(GymApplication.class, args);
   }
 
   @Override
-  public void run(String... args) throws Exception {
-
-    userService.delete(40L);
-
-
-   /* trainingFacade.saveTraining(TrainingDto.builder()
-        .trainingName("Java")
-        .trainingDate(LocalDate.now())
-        .trainingDuration(10)
-        .trainingTypeId(1)
-        .traineeId(38)
-        .trainerId(34)
-        .build());
-    Optional<Trainer> trainer = trainerService.findById(34L);
-    log.info("trainer = " + trainer + "  " + trainer.get().getTrainings() + "  " + trainer.get().getSpecialization());
-    registrationFacade.registration(new TraineeRegistration("NNN", "DIMA", "Minsk", LocalDate.now()));*/
-
-//    RandomDataGenerator randomDataGenerator = new RandomDataGenerator();
-//    for (int i = 0; i < 2; i++) {
-//      PrepareUserDto prepareUserDto = randomDataGenerator.generateRandomPrepareUserDtoForTrainer();
+  public void run(String... args) {
+//    IntStream.range(0, NUMBER_OF_OPERATION).forEach(i -> {
+//      var prepareUserDto = randomDataGenerator.prepareTrainer();
 //      userFacade.handle(prepareUserDto);
-//      log.info("OPERATION FOR TRAINER =  " + prepareUserDto.operation() + "  username = " + prepareUserDto.username()
-//          + "  password = " + prepareUserDto.password() + "  address = " + prepareUserDto.address()
-//          + "  specialization = " + prepareUserDto.specialization()
-//          + "  criteria = " + prepareUserDto.criteria()
-//          + "  id = " + prepareUserDto.id());
-//    }
-//    for (int i = 0; i < 2; i++) {
-//      PrepareUserDto prepareUserDto = randomDataGenerator.generateRandomPrepareUserDtoForTrainee();
+//      log.info(prepareUser(OPERATION_FOR_TRAINER, prepareUserDto));
+//    });
+//
+//    IntStream.range(0, NUMBER_OF_OPERATION).forEach(i -> {
+//      var prepareUserDto = randomDataGenerator.prepareTrainee();
 //      userFacade.handle(prepareUserDto);
-//      log.info("OPERATION FOR TRAINEE =  " + prepareUserDto.operation() + "  username = " + prepareUserDto.username()
-//          + "  password = " + prepareUserDto.password() + "  address = " + prepareUserDto.address()
-//          + "  specialization = " + prepareUserDto.specialization()
-//          + "  criteria = " + prepareUserDto.criteria()
-//          + "  id = " + prepareUserDto.id());
-//    }
+//      log.info(prepareUser(OPERATION_FOR_TRAINEE, prepareUserDto));
+//    });
+//  }
+//
+//  private static String prepareUser(String x, PrepareUserDto userDto) {
+//    return USER_DTO_TEMPLATE.formatted(x, userDto.operation(), userDto.username(),
+//        userDto.password(), userDto.address(), userDto.specialization(),
+//        userDto.criteria(), userDto.id());
+//  }
   }
 }
+
 
 
 

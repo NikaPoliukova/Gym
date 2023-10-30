@@ -52,10 +52,10 @@ class TrainingServiceImplTest {
     Training training = new Training();
     when(trainingRepository.findById(trainingId)).thenReturn(Optional.of(training));
 
-    Optional<Training> result = trainingService.findTrainingById(trainingId);
+   Training result = trainingService.findTrainingById(trainingId);
 
-    assertTrue(result.isPresent());
-    assertEquals(training, result.get());
+    assertTrue(result!=null);
+    assertEquals(training, result);
   }
 
   @Test
@@ -63,9 +63,9 @@ class TrainingServiceImplTest {
     long trainingId = 1L;
     when(trainingRepository.findById(trainingId)).thenReturn(Optional.empty());
 
-    Optional<Training> result = trainingService.findTrainingById(trainingId);
+   Training result = trainingService.findTrainingById(trainingId);
 
-    assertTrue(result.isEmpty());
+    assertTrue(result == null);
   }
 
   @Test
@@ -96,7 +96,7 @@ class TrainingServiceImplTest {
     String username = "john_doe";
     String criteria = "search_criteria";
     User user = new User();
-    when(userService.findByUsername(username)).thenReturn(Optional.of(user));
+    when(userService.findByUsername(username)).thenReturn(user);
 
     List<Training> trainings = new ArrayList<>();
     trainings.add(new Training());
@@ -111,7 +111,7 @@ class TrainingServiceImplTest {
   @Test
   void testFindTrainingsByUsernameAndCriteria_UserNotFound() {
     String username = "john_doe";
-    when(userService.findByUsername(username)).thenReturn(Optional.empty());
+    when(userService.findByUsername(username)).thenReturn(null);
 
     List<Training> result = trainingService.findTrainingsByUsernameAndCriteria(username, "search_criteria");
 

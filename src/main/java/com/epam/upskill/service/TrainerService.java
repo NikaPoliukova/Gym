@@ -8,15 +8,15 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TrainerService {
-  Optional<Trainer> findById(long trainerId);
+  Trainer findById(long trainerId);
 
-  Optional<Trainer> findByUsername(String username);
+  Trainer findByUsername(String username);
 
   List<Trainer> findAll();
 
   Trainer saveTrainer(TrainerRegistration trainerDto);
 
-  Optional<Trainer> updateTrainer(TrainerDto trainerDto);
+  Trainer updateTrainer(TrainerDto trainerDto);
 
   List<Trainer> findByIsActive();
 

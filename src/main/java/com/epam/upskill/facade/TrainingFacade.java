@@ -15,7 +15,7 @@ import java.util.Optional;
 public class TrainingFacade {
   private final TrainingService trainingService;
 
-  public Optional<Training> findTrainingById(long trainingId) {
+  public Training findTrainingById(long trainingId) {
     return trainingService.findTrainingById(trainingId);
   }
 

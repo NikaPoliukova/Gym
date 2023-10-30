@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TrainingService {
-  Optional<Training> findTrainingById(long trainingId);
+  Training findTrainingById(long trainingId);
 
   Training saveTraining(TrainingDto trainingDto);
 

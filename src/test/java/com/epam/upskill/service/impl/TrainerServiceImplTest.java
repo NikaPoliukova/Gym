@@ -16,13 +16,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class TrainerServiceImplTest {
@@ -138,11 +138,11 @@ class TrainerServiceImplTest {
     when(trainerRepository.findById(trainerId)).thenReturn(Optional.of(trainer));
     when(trainerRepository.update(trainer)).thenReturn(trainer);
 
-    Optional<Trainer> result = trainerService.updateTrainer(trainerDto);
+    Trainer result = trainerService.updateTrainer(trainerDto);
 
-    assertTrue(result.isPresent());
-    assertEquals(trainer, result.get());
-    assertEquals(trainerDto.specialization(), result.get().getSpecialization());
+    assertTrue(result != null);
+    assertEquals(trainer, result);
+    assertEquals(trainerDto.specialization(), result.getSpecialization());
   }
 
   @Test

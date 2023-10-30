@@ -5,12 +5,13 @@ import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.Training;
 import com.epam.upskill.entity.TrainingType;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.*;
-
-import javax.persistence.criteria.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,21 +41,22 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     return entityManager.createQuery("SELECT e FROM training e", Training.class).getResultList();
   }
 
-public List<Training> findTrainingsByUsernameAndCriteria(String username, String trainingName) {
-  CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-  CriteriaQuery<Training> query = cb.createQuery(Training.class);
-  Root<Training> training = query.from(Training.class);
-  Predicate traineePredicate = cb.equal(training.get("trainee").get("username"), username);
-  Predicate trainerPredicate = cb.equal(training.get("trainer").get("username"), username);
-  Predicate usernamePredicate = cb.or(traineePredicate, trainerPredicate);
-  query.where(usernamePredicate);
-  if (!trainingName.isEmpty()) {
-    Predicate trainingNamePredicate = cb.like(training.get("trainingName"), "%" + trainingName + "%");
-    query.where(cb.and(usernamePredicate, trainingNamePredicate));
+  @Override
+  public List<Training> findTrainingsByUsernameAndCriteria(String username, String trainingName) {
+    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+    CriteriaQuery<Training> query = cb.createQuery(Training.class);
+    Root<Training> training = query.from(Training.class);
+    Predicate traineePredicate = cb.equal(training.get("trainee").get("username"), username);
+    Predicate trainerPredicate = cb.equal(training.get("trainer").get("username"), username);
+    Predicate usernamePredicate = cb.or(traineePredicate, trainerPredicate);
+    query.where(usernamePredicate);
+    if (!trainingName.isEmpty()) {
+      Predicate trainingNamePredicate = cb.like(training.get("trainingName"), "%" + trainingName + "%");
+      query.where(cb.and(usernamePredicate, trainingNamePredicate));
+    }
+    TypedQuery<Training> typedQuery = entityManager.createQuery(query);
+    return typedQuery.getResultList();
   }
-  TypedQuery<Training> typedQuery = entityManager.createQuery(query);
-  return typedQuery.getResultList();
-}
 
   @Override
   public TrainingType findTrainingTypeById(int id) {

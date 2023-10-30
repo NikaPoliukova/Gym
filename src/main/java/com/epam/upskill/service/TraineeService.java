@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TraineeService {
-  Optional<Trainee> findById(long traineeId);
+  Trainee findById(long traineeId);
 
   Trainee findByUsername(String username);
 
@@ -16,7 +16,7 @@ public interface TraineeService {
 
   List<Trainee> findAll();
 
-  Optional<Trainee> updateTrainee(TraineeDto trainee);
+  Trainee updateTrainee(TraineeDto trainee);
 
   void toggleProfileActivation(long userId);
 }

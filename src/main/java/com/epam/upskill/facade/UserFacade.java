@@ -15,6 +15,8 @@ import com.epam.upskill.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import static com.epam.upskill.facade.CommandStrategy.*;
+
 @RequiredArgsConstructor
 @Service
 public class UserFacade {
@@ -26,90 +28,51 @@ public class UserFacade {
 
 
   public void handle(PrepareUserDto prepareUserDto) {
-    if (!securityService.authenticate(new Principal(prepareUserDto.username(), prepareUserDto.password()))) {
-      throw new IllegalArgumentException("User not found");
-    }
+    checkIfAuthenticated(prepareUserDto);
     var user = userService.findByUsername(prepareUserDto.username());
-    if (user.get() instanceof Trainee) {
+    if (user instanceof Trainee) {
       handleTraineeOperations(prepareUserDto);
-    } else if (user.get() instanceof Trainer) {
+    } else if (user instanceof Trainer) {
       handleTrainerOperations(prepareUserDto);
     }
   }
 
-  private void handleTraineeOperations(PrepareUserDto prepareUserDto) {
-    switch (prepareUserDto.operation()) {
-      case "get" -> traineeService.findByUsername(prepareUserDto.username());
-      case "updatePassword" ->
-          userService.updateUserPassword(new UserDto(prepareUserDto.id(), prepareUserDto.password()));
-      case "update" -> traineeService.updateTrainee(new TraineeDto(prepareUserDto.id(), prepareUserDto.password(),
-          prepareUserDto.address()));
-      case "toggleActivation" -> traineeService.toggleProfileActivation(prepareUserDto.id());
-      case "delete" -> userService.delete(prepareUserDto.id());
-      case "getTrainings" -> trainingService.findTrainingsByUsernameAndCriteria(prepareUserDto.username(),
-          prepareUserDto.criteria());
-      case "getNotAssignedTrainers" -> trainingService.findNotAssignedActiveTrainersToTrainee(prepareUserDto.id());
-      default -> throw new IllegalArgumentException("Operation not found");
+  private void checkIfAuthenticated(PrepareUserDto prepareUserDto) {
+    if (!securityService.authenticate(new Principal(prepareUserDto.username(), prepareUserDto.password()))) {
+      throw new IllegalArgumentException("User not found");
     }
   }
 
-  private void handleTrainerOperations(PrepareUserDto prepareUserDto) {
-    switch (prepareUserDto.operation()) {
-      case "get" -> trainerService.findByUsername(prepareUserDto.username());
-      case "updatePassword" ->
-          userService.updateUserPassword(new UserDto(prepareUserDto.id(), prepareUserDto.password()));
-      case "update" -> trainerService.updateTrainer(new TrainerDto(prepareUserDto.id(), prepareUserDto.password(),
-          prepareUserDto.address()));
-      case "toggleActivation" -> trainerService.toggleProfileActivation(prepareUserDto.id());
-      case "getTrainings" -> trainingService.findTrainingsByUsernameAndCriteria(prepareUserDto.username(),
-          prepareUserDto.criteria());
-      default -> throw new IllegalArgumentException("Operation not found");
+  private void handleTraineeOperations(PrepareUserDto userDto) {
+    switch (userDto.operation()) {
+      case GET_COMMAND -> traineeService.findByUsername(userDto.username());
+      case UPDATE_PASSWORD_COMMAND -> userService.updateUserPassword(new UserDto(userDto.id(), userDto.password()));
+      case UPDATE_COMMAND ->
+          traineeService.updateTrainee(new TraineeDto(userDto.id(), userDto.password(), userDto.address()));
+      case TOGGLE_COMMAND -> traineeService.toggleProfileActivation(userDto.id());
+      case DELETE_COMMAND -> userService.delete(userDto.id());
+      case GET_TRAININGS_COMMAND ->
+          trainingService.findTrainingsByUsernameAndCriteria(userDto.username(), userDto.criteria());
+      case GET_NO_ASSIGNED_TRAININGS_COMMAND -> trainingService.findNotAssignedActiveTrainersToTrainee(userDto.id());
+      default -> throwExceptionIfNotFound();
     }
   }
-//  private final Map<String, BiConsumer<User, String>> strategies = new HashMap<>();
-//
-//  @PostConstruct
-//  private void init() {
-//    strategies.put("Admin", (user, operation) -> {
-//      switch (operation) {
-//        case "printTrainer" -> trainerService.findByUsername(user.getUsername());
-//        /*case "updatePassword" -> trainerService.updateTrainerPassword(trainerDto);
-//        case "update" -> trainerService.updateTrainer(trainerDto);
-//        case "toggleActivation" -> userService.toggleProfileActivation(trainer.getId());
-//        case "getTrainings" -> trainingService.getTrainingsByUsernameAndCriteria(trainer.getUsername(), criteria);*/
-//        default -> throw new IllegalArgumentException("Operation not found");
-//      }
-//
-//    });
-//    strategies.put("User", (user, operation) -> {
-//      switch (operation) {
-//        case "printTrainer" -> trainerService.findByUsername(user.getUsername());
-//        case "getTrainings" -> trainingService.findTrainingsByUsernameAndCriteria();
-//        case "NotActiveTrainersForTrainee" -> trainingService.findNotAssignedActiveTrainersToTrainee();
-//        case "findActiveTrainers" -> trainerService.findByUsername();
-//        /*case "updatePassword" -> trainerService.updateTrainerPassword(trainerDto);
-//        case "update" -> trainerService.updateTrainer(trainerDto);
-//        case "toggleActivation" -> userService.toggleProfileActivation(trainer.getId());
-//        case "getTrainings" -> trainingService.getTrainingsByUsernameAndCriteria(trainer.getUsername(), criteria);*/
-//        default -> throw new IllegalArgumentException("Operation not found");
-//      }
-//
-//    });
-//    strategies.put("Anonymous", (user, operation) -> {
-//      switch (operation) {
-//        case "registrationTrainee" -> traineeService.saveTrainee();
-//        case "registrationTrainer" -> trainerService.saveTrainer();
-//        default -> throw new IllegalArgumentException("Operation not found");
-//      }
-//    });
-//  }
-//  private final Map<String, BiConsumer<User, String>> strategies = new HashMap<>();
-//
-//  public void handle(Principal principal, String operation) {
-//    var user = securityService.authenticate(principal);
-//    strategies.get(user.getRole()).accept(user, operation);
-//  }
 
+  private void handleTrainerOperations(PrepareUserDto userDto) {
+    switch (userDto.operation()) {
+      case GET_COMMAND -> trainerService.findByUsername(userDto.username());
+      case UPDATE_PASSWORD_COMMAND -> userService.updateUserPassword(new UserDto(userDto.id(), userDto.password()));
+      case UPDATE_COMMAND -> trainerService.updateTrainer(new TrainerDto(userDto.id(), userDto.password(),
+          userDto.address()));
+      case TOGGLE_COMMAND -> trainerService.toggleProfileActivation(userDto.id());
+      case GET_TRAININGS_COMMAND -> trainingService.findTrainingsByUsernameAndCriteria(userDto.username(),
+          userDto.criteria());
+      default -> throwExceptionIfNotFound();
+    }
+  }
 
+  private static void throwExceptionIfNotFound() {
+    throw new IllegalArgumentException("Operation not found");
+  }
 }
 

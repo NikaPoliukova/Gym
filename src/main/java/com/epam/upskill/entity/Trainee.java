@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-@ToString
 @Builder(builderMethodName = "traineeBuilder")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,4 +27,8 @@ public class Trainee extends User {
   @OneToMany(mappedBy = "trainee", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
   private List<Training> trainings = new ArrayList<>();
 
+  public String toString() {
+    return "Trainee(dateOfBirth=" + this.getDateOfBirth() + ", address=" + this.getAddress()
+        + ", trainings=" + this.getTrainings() + ")";
+  }
 }

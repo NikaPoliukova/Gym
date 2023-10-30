@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,47 +23,36 @@ public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
 
   @Override
-  public Optional<User> findById(long userId) {
-    return userRepository.findById(userId);
+  public User findById(long userId) {
+    return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("yserId = " + userId));
   }
 
   @Override
   @Transactional(readOnly = true)
   public List<User> findAll() {
-    List<User> users = userRepository.findAll();
-    if (users != null) {
-      return users;
-    } else {
-      return Collections.emptyList();
-    }
+    var users = userRepository.findAll();
+    return users != null ? users : Collections.emptyList();
   }
 
+  //TODO optional.map
   @Override
   @Transactional(readOnly = true)
-  public Optional<User> findByUsername(String username) {
-    var user = userRepository.findByUsername(username);
-    if (user.isEmpty()) {
-      throw new UserNotFoundException(username);
-    }
-    return user;
+  public User findByUsername(String username) {
+    return userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
   }
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED)
   public void updateUserPassword(@Valid UserDto userDto) {
-    var user = userRepository.findById(userDto.id());
-    user.get().setPassword(userDto.password());
-    userRepository.update(user.get());
+    var user = findById(userDto.id());
+    user.setPassword(userDto.password());
+    userRepository.update(user);
   }
 
   @Override
   @Transactional
   public void delete(long userId) {
-    Optional<User> user = findById(userId);
-    if (user.isEmpty()) {
-      throw new UserNotFoundException("userId =" + userId);
-    } else {
-      userRepository.delete(userId);
-    }
+    findById(userId);
+    userRepository.delete(userId);
   }
 }
