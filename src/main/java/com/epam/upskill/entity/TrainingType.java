@@ -32,13 +32,8 @@ public class TrainingType {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-
     TrainingType that = (TrainingType) o;
-
-    if (id != that.id) return false;
-    if (trainingTypeName != that.trainingTypeName) return false;
-
-    return true;
+    return id == that.id && trainingTypeName == that.trainingTypeName;
   }
 
   @Override

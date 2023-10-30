@@ -51,16 +51,4 @@ public class Training {
   public int hashCode() {
     return (int) (id ^ (id >>> 32)); // Используем id для вычисления hashCode
   }
-//  @Override
-//  public String toString() {
-//    return "Training{" +
-//        "id=" + id +
-//        ", trainingName='" + trainingName + '\'' +
-//        ", trainingDate=" + trainingDate +
-//        ", trainingDuration=" + trainingDuration +
-//        ", trainee=" + trainee +
-//        ", trainer=" + trainer +
-//        ", trainingType=" + trainingType +
-//        '}';
-//  }
 }

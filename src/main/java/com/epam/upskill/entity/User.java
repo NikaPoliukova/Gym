@@ -1,14 +1,11 @@
 package com.epam.upskill.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 
-
+@ToString
 @RequiredArgsConstructor
 @Getter
 @Setter
@@ -37,17 +34,4 @@ public class User {
   private boolean isActive;
 
   private String role;
-
-//  @Override
-//  public String toString() {
-//    return "User{" +
-//        "id=" + id +
-//        ", firstName='" + firstName + '\'' +
-//        ", lastName='" + lastName + '\'' +
-//        ", username='" + username + '\'' +
-//        ", password='" + password + '\'' +
-//        ", isActive=" + isActive +
-//        ", role='" + role + '\'' +
-//        '}';
-//  }
 }

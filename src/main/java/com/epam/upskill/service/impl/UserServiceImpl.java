@@ -58,8 +58,13 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRED)
+  @Transactional
   public void delete(long userId) {
-    userRepository.delete(userId);
+    Optional<User> user = findById(userId);
+    if (user.isEmpty()) {
+      throw new UserNotFoundException("userId =" + userId);
+    } else {
+      userRepository.delete(userId);
+    }
   }
 }

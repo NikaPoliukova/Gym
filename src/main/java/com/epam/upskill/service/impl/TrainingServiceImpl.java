@@ -55,13 +55,13 @@ public class TrainingServiceImpl implements TrainingService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<Training> findTrainingsByUsernameAndCriteria(String username, String criteria) {
-    log.debug("Fetching Trainings by username: " + username + " and criteria: " + criteria);
+  public List<Training> findTrainingsByUsernameAndCriteria(String username, String specialization) {
+    log.debug("Fetching Trainings by username: " + username + " and criteria: " + specialization);
     var user = userService.findByUsername(username);
     if (user.isEmpty()) {
       return Collections.emptyList();
     } else {
-      return trainingRepository.findTrainingsByUsernameAndCriteria(username, criteria);
+      return trainingRepository.findTrainingsByUsernameAndCriteria(username, specialization);
     }
   }
 
