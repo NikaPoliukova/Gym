@@ -100,7 +100,7 @@ class TrainingServiceImplTest {
 
     List<Training> trainings = new ArrayList<>();
     trainings.add(new Training());
-    when(trainingRepository.findTrainingsByUsernameAndCriteria(username, criteria)).thenReturn(trainings);
+    //when(trainingRepository.findTrainingsByUsernameAndCriteria(username, criteria)).thenReturn(trainings);
 
     List<Training> result = trainingService.findTrainingsByUsernameAndCriteria(username, criteria);
 
@@ -122,7 +122,7 @@ class TrainingServiceImplTest {
   void testFindNotAssignedActiveTrainersToTrainee() {
     long traineeId = 1L;
     Trainee trainee = new Trainee();
-    when(traineeService.findById(traineeId)).thenReturn(Optional.of(trainee));
+    when(traineeService.findById(traineeId)).thenReturn(trainee);
 
     List<Trainer> trainers = new ArrayList<>();
     trainers.add(new Trainer());
@@ -137,7 +137,7 @@ class TrainingServiceImplTest {
   @Test
   void testFindNotAssignedActiveTrainersToTrainee_TraineeNotFound() {
     long traineeId = 1L;
-    when(traineeService.findById(traineeId)).thenReturn(Optional.empty());
+    when(traineeService.findById(traineeId)).thenReturn(null);
 
     List<Trainer> result = trainingService.findNotAssignedActiveTrainersToTrainee(traineeId);
 

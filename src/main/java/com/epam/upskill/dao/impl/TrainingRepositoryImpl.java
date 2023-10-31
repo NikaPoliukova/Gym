@@ -41,8 +41,10 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     return entityManager.createQuery("SELECT e FROM training e", Training.class).getResultList();
   }
 
+  //TODO обновить и добавить поля
   @Override
-  public List<Training> findTrainingsByUsernameAndCriteria(String username, String trainingName) {
+  public List<Training> findTrainingsByUsernameAndCriteria(String username, String password, String periodFrom, String periodTo,
+                                                           String trainerName, String trainingType) {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     CriteriaQuery<Training> query = cb.createQuery(Training.class);
     Root<Training> training = query.from(Training.class);
@@ -50,10 +52,10 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     Predicate trainerPredicate = cb.equal(training.get("trainer").get("username"), username);
     Predicate usernamePredicate = cb.or(traineePredicate, trainerPredicate);
     query.where(usernamePredicate);
-    if (!trainingName.isEmpty()) {
-      Predicate trainingNamePredicate = cb.like(training.get("trainingName"), "%" + trainingName + "%");
-      query.where(cb.and(usernamePredicate, trainingNamePredicate));
-    }
+//    if (!trainingName.isEmpty()) {
+//      Predicate trainingNamePredicate = cb.like(training.get("trainingName"), "%" + trainingName + "%");
+//      query.where(cb.and(usernamePredicate, trainingNamePredicate));
+//    }
     TypedQuery<Training> typedQuery = entityManager.createQuery(query);
     return typedQuery.getResultList();
   }
@@ -70,12 +72,30 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     }
   }
 
+  @Override
+  public TrainingType findTrainingTypeByName(String name) {
+    TypedQuery<TrainingType> query = entityManager.createQuery(
+        "SELECT tt FROM TrainingType tt WHERE tt.training_type_name = :name", TrainingType.class);
+    query.setParameter("name", name);
+    try {
+      return query.getSingleResult();
+    } catch (NoResultException e) {
+      throw new EntityNotFoundException("TrainingType not found with name: " + name);
+    }
+  }
+
   public List<Trainer> getNotAssignedActiveTrainersToTrainee(long traineeId) {
     TypedQuery<Trainer> query = entityManager.createQuery(
         "SELECT DISTINCT t.trainer FROM Training t  WHERE t.trainee.id = :traineeId " +
             "AND t.trainer.isActive = false ", Trainer.class);
     query.setParameter("traineeId", traineeId);
     return query.getResultList();
+  }
+
+  @Override
+  public List<TrainingType> findTrainingTypes() {
+    return entityManager.createQuery("SELECT tt FROM TrainingType tt ", TrainingType.class).getResultList();
+
   }
 }
 

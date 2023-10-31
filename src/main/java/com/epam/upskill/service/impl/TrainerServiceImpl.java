@@ -1,10 +1,14 @@
 package com.epam.upskill.service.impl;
 
+import com.epam.upskill.converter.TraineeConverter;
 import com.epam.upskill.converter.TrainerConverter;
 import com.epam.upskill.dao.TrainerRepository;
+import com.epam.upskill.dto.TraineeDtoForTrainer;
 import com.epam.upskill.dto.TrainerDto;
 import com.epam.upskill.dto.TrainerRegistration;
+import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.entity.Trainer;
+import com.epam.upskill.exception.TraineeNotFoundException;
 import com.epam.upskill.exception.TrainerNotFoundException;
 import com.epam.upskill.service.TrainerService;
 import com.epam.upskill.service.UserService;
@@ -25,6 +29,7 @@ public class TrainerServiceImpl implements TrainerService {
 
   private final TrainerRepository trainerRepository;
   private final UserService userService;
+  private final TraineeConverter traineeConverter;
   private final TrainerConverter trainerConverter;
 
   @Override
@@ -41,6 +46,12 @@ public class TrainerServiceImpl implements TrainerService {
     log.info("Fetching Trainer by username: " + username);
     return trainerRepository.findByUsername(username).orElseThrow(()
         -> new TrainerNotFoundException("Trainer not found with username: " + username));
+  }
+  @Override
+  public Trainer findByUsernameAndPassword(String username, String password) {
+    log.info("Fetching with username: = " + username+ " and password = " + password);
+    return trainerRepository.findByUsernameAndPassword(username,password).orElseThrow(()
+        -> new TraineeNotFoundException("Trainee not found with username: = " + username+ " and password = " + password));
   }
 
   @Override
@@ -87,6 +98,16 @@ public class TrainerServiceImpl implements TrainerService {
     var currentStatus = trainer.isActive();
     trainer.setActive(!currentStatus);
     trainerRepository.toggleProfileActivation(trainer);
+  }
+
+  @Override
+  public List<TraineeDtoForTrainer> findTraineesForTrainer(long id) {
+    List<Trainee> listTrainees = trainerRepository.findTraineesForTrainer(id);
+    if (listTrainees.isEmpty()) {
+      return Collections.emptyList();
+    } else {
+      return traineeConverter.toTraineeDtoForTrainer(listTrainees);
+    }
   }
 }
 

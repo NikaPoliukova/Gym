@@ -2,12 +2,14 @@ package com.epam.upskill.dao.impl;
 
 import com.epam.upskill.dao.TraineeRepository;
 import com.epam.upskill.entity.Trainee;
+import com.epam.upskill.entity.Trainer;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,6 +38,15 @@ public class TraineeRepositoryImpl implements TraineeRepository {
   }
 
   @Override
+  public Optional<Trainee> findByUsernameAndPassword(String username, String password) {
+    return Optional.of(entityManager.createQuery("SELECT t FROM Trainee t  WHERE " +
+            "t.username = :username AND t.password = :password", Trainee.class)
+        .setParameter("username", username)
+        .setParameter("password", password)
+        .getSingleResult());
+  }
+
+  @Override
   public Optional<Trainee> update(Trainee trainee) {
     log.debug("Updating Trainee: " + trainee);
     return Optional.of(entityManager.merge(trainee));
@@ -57,6 +68,14 @@ public class TraineeRepositoryImpl implements TraineeRepository {
   public void toggleProfileActivation(Trainee trainee) {
     log.debug("Toggling Trainee profile activation: " + trainee);
     entityManager.merge(trainee);
+  }
+
+  @Override
+  public List<Trainer> findTrainersForTrainee(long traineeId) {
+    TypedQuery<Trainer> query = entityManager.createQuery(
+        "SELECT DISTINCT t.trainer FROM Training t WHERE t.traineeId = :traineeId", Trainer.class);
+    query.setParameter("traineeId", traineeId);
+    return query.getResultList();
   }
 }
 

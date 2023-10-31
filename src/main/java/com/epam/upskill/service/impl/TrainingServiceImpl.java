@@ -2,11 +2,11 @@ package com.epam.upskill.service.impl;
 
 import com.epam.upskill.converter.TrainingConverter;
 import com.epam.upskill.dao.TrainingRepository;
-import com.epam.upskill.dto.TrainingDto;
+import com.epam.upskill.dto.TrainingRequest;
 import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.Training;
+import com.epam.upskill.entity.TrainingType;
 import com.epam.upskill.exception.TrainingNotFoundException;
-import com.epam.upskill.exception.UserNotFoundException;
 import com.epam.upskill.service.TraineeService;
 import com.epam.upskill.service.TrainerService;
 import com.epam.upskill.service.TrainingService;
@@ -42,12 +42,12 @@ public class TrainingServiceImpl implements TrainingService {
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED)
-  public Training saveTraining(@Valid TrainingDto trainingDto) {
-    log.info("Creating Training: " + trainingDto);
-    var trainee = traineeService.findById(trainingDto.traineeId());
-    var trainer = trainerService.findById(trainingDto.trainerId());
-    var trainingType = trainingRepository.findTrainingTypeById(trainingDto.trainingTypeId());
-    var training = trainingConverter.toTraining(trainingDto, new Training());
+  public Training saveTraining(@Valid TrainingRequest request) {
+    log.info("Creating Training: " + request);
+    var trainee = traineeService.findByUsername(request.traineeUsername());
+    var trainer = trainerService.findByUsername(request.trainerUsername());
+    var trainingType = trainingRepository.findTrainingTypeByName(request.trainingName());
+    var training = trainingConverter.toTraining(request, new Training());
     training.setTrainee(trainee);
     training.setTrainer(trainer);
     training.setTrainingType(trainingType);
@@ -55,12 +55,10 @@ public class TrainingServiceImpl implements TrainingService {
   }
 
   @Override
-  @Transactional(readOnly = true)
-  public List<Training> findTrainingsByUsernameAndCriteria(String username, String specialization) {
-    log.debug("Fetching Trainings by username: " + username + " and criteria: " + specialization);
-    userService.findByUsername(username);
-    return trainingRepository.findTrainingsByUsernameAndCriteria(username, specialization);
-
+  public List<Training> findTrainingsByUsernameAndCriteria(String username, String password, String periodFrom,
+                                                           String periodTo, String trainerName, String trainingType) {
+    return trainingRepository.findTrainingsByUsernameAndCriteria(username, password, periodFrom, periodTo,
+        trainerName, trainingType);
   }
 
   @Override
@@ -68,5 +66,10 @@ public class TrainingServiceImpl implements TrainingService {
   public List<Trainer> findNotAssignedActiveTrainersToTrainee(long traineeId) {
     traineeService.findById(traineeId);
     return trainingRepository.getNotAssignedActiveTrainersToTrainee(traineeId);
+  }
+
+  @Override
+  public List<TrainingType> findTrainingTypes() {
+    return trainingRepository.findTrainingTypes();
   }
 }

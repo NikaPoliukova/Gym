@@ -1,6 +1,7 @@
 package com.epam.upskill.dao.impl;
 
 import com.epam.upskill.dao.TrainerRepository;
+import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.entity.Trainer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -34,6 +35,14 @@ public class TrainerRepositoryImpl implements TrainerRepository {
   }
 
   @Override
+  public List<Trainee> findTraineesForTrainer(long trainerId) {
+    TypedQuery<Trainee> query = entityManager.createQuery(
+        "SELECT DISTINCT t.trainee FROM Training t WHERE t.trainerId = :trainerId", Trainee.class);
+    query.setParameter("trainerId", trainerId);
+    return query.getResultList();
+  }
+
+  @Override
   public Optional<Trainer> findById(long id) {
     log.debug("Finding Trainer by ID: " + id);
     return Optional.ofNullable(entityManager.find(Trainer.class, id));
@@ -56,6 +65,15 @@ public class TrainerRepositoryImpl implements TrainerRepository {
     return Optional.ofNullable(entityManager.createQuery("SELECT t FROM Trainer t  WHERE t.username = :username",
             Trainer.class)
         .setParameter("username", username)
+        .getSingleResult());
+  }
+
+  @Override
+  public Optional<Trainer> findByUsernameAndPassword(String username, String password) {
+    return Optional.of(entityManager.createQuery("SELECT t FROM Trainer t  WHERE " +
+            "t.username = :username AND t.password = :password", Trainer.class)
+        .setParameter("username", username)
+        .setParameter("password", password)
         .getSingleResult());
   }
 

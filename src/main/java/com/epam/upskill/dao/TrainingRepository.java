@@ -10,7 +10,12 @@ public interface TrainingRepository extends AbstractRepository<Training> {
 
   TrainingType findTrainingTypeById(int id);
 
-  List<Training> findTrainingsByUsernameAndCriteria(String trainerUsername, String specialization);
+  TrainingType findTrainingTypeByName(String name);
+
+  List<Training> findTrainingsByUsernameAndCriteria(String username, String password, String periodFrom, String periodTo,
+                                                    String trainerName, String trainingType);
 
   List<Trainer> getNotAssignedActiveTrainersToTrainee(long traineeId);
+
+  List<TrainingType> findTrainingTypes();
 }

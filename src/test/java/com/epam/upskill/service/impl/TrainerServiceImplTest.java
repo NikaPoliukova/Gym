@@ -50,9 +50,9 @@ class TrainerServiceImplTest {
     long trainerId = 1L;
     Trainer trainer = new Trainer();
     when(trainerRepository.findById(trainerId)).thenReturn(Optional.of(trainer));
-    Optional<Trainer> result = trainerService.findById(trainerId);
-    assertTrue(result.isPresent());
-    assertEquals(trainer, result.get());
+   Trainer result = trainerService.findById(trainerId);
+    assertTrue(result!= null);
+    assertEquals(trainer, result);
   }
 
   @Test
@@ -69,11 +69,10 @@ class TrainerServiceImplTest {
     String username = "john_doe";
     Trainer trainer = new Trainer();
     when(trainerRepository.findByUsername(username)).thenReturn(Optional.of(trainer));
+    Trainer result = trainerService.findByUsername(username);
 
-    Optional<Trainer> result = trainerService.findByUsername(username);
-
-    assertTrue(result.isPresent());
-    assertEquals(trainer, result.get());
+    assertTrue(result != null);
+    assertEquals(trainer, result);
   }
 
   @Test

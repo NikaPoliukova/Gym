@@ -1,5 +1,6 @@
 package com.epam.upskill.dao;
 
+import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.entity.Trainer;
 
 import java.util.List;
@@ -13,4 +14,9 @@ public interface TrainerRepository extends AbstractRepository<Trainer> {
   void toggleProfileActivation(Trainer trainer);
 
   List<Trainer> findByIsActive();
+
+  List<Trainee> findTraineesForTrainer(long id);
+
+  Optional<Trainer> findByUsernameAndPassword(String username, String password);
 }
+

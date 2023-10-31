@@ -1,9 +1,11 @@
 package com.epam.upskill.service.impl;
 
 import com.epam.upskill.converter.TraineeConverter;
+import com.epam.upskill.converter.TrainerConverter;
 import com.epam.upskill.dao.TraineeRepository;
 import com.epam.upskill.dto.TraineeDto;
 import com.epam.upskill.dto.TraineeRegistration;
+import com.epam.upskill.dto.TrainerDtoForTrainee;
 import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.exception.TraineeNotFoundException;
 import com.epam.upskill.service.TraineeService;
@@ -27,6 +29,7 @@ public class TraineeServiceImpl implements TraineeService {
   private final TraineeRepository traineeRepository;
   private final UserService userService;
   private final TraineeConverter traineeConverter;
+  private final TrainerConverter trainerConverter;
 
 
   @Override
@@ -43,6 +46,13 @@ public class TraineeServiceImpl implements TraineeService {
     log.info("Fetching with username: {}", username);
     return traineeRepository.findByUsername(username).orElseThrow(()
         -> new TraineeNotFoundException("Trainee not found with username: " + username));
+  }
+
+  @Override
+  public Trainee findByUsernameAndPassword(String username, String password) {
+    log.info("Fetching with username: = " + username+ " and password = " + password);
+    return traineeRepository.findByUsernameAndPassword(username,password).orElseThrow(()
+        -> new TraineeNotFoundException("Trainee not found with username: = " + username+ " and password = " + password));
   }
 
   @Override
@@ -87,6 +97,17 @@ public class TraineeServiceImpl implements TraineeService {
     var currentStatus = trainee.isActive();
     trainee.setActive(!currentStatus);
     traineeRepository.toggleProfileActivation(trainee);
+  }
+
+  //TODO проверить метод с конвертером
+  @Override
+  public List<TrainerDtoForTrainee> findTrainersForTrainee(long id) {
+    var listTrainers = traineeRepository.findTrainersForTrainee(id);
+    if (listTrainers.isEmpty()) {
+      return Collections.emptyList();
+    } else {
+      return trainerConverter.toTrainerDtoForTrainee(listTrainers);
+    }
   }
 }
 

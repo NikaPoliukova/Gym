@@ -43,9 +43,15 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED)
-  public void updateUserPassword(@Valid UserDto userDto) {
+  public void updateUserPassword(UserDto userDto) {
     var user = findById(userDto.id());
     user.setPassword(userDto.password());
+    userRepository.update(user);
+  }
+  @Override
+  public void updateLogin(UserDto userDto){
+    var user = findById(userDto.id());
+    user.setUsername(userDto.username());
     userRepository.update(user);
   }
 
