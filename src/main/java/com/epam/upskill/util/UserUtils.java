@@ -5,6 +5,8 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @UtilityClass
@@ -34,5 +36,10 @@ public class UserUtils {
         .map(User::getUsername)
         .filter(userUsername -> userUsername != null && userUsername.startsWith(username))
         .count();
+  }
+
+  public static LocalDate getLocalDate(String dateOfBirth) {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    return LocalDate.parse(dateOfBirth, formatter);
   }
 }

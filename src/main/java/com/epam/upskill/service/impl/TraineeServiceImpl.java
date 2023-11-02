@@ -3,8 +3,8 @@ package com.epam.upskill.service.impl;
 import com.epam.upskill.converter.TraineeConverter;
 import com.epam.upskill.converter.TrainerConverter;
 import com.epam.upskill.dao.TraineeRepository;
-import com.epam.upskill.dto.TraineeDto;
 import com.epam.upskill.dto.TraineeRegistration;
+import com.epam.upskill.dto.TraineeUpdateRequest;
 import com.epam.upskill.dto.TrainerDtoForTrainee;
 import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.exception.TraineeNotFoundException;
@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -50,9 +51,9 @@ public class TraineeServiceImpl implements TraineeService {
 
   @Override
   public Trainee findByUsernameAndPassword(String username, String password) {
-    log.info("Fetching with username: = " + username+ " and password = " + password);
-    return traineeRepository.findByUsernameAndPassword(username,password).orElseThrow(()
-        -> new TraineeNotFoundException("Trainee not found with username: = " + username+ " and password = " + password));
+    log.info("Fetching with username: = " + username + " and password = " + password);
+    return traineeRepository.findByUsernameAndPassword(username, password).orElseThrow(()
+        -> new TraineeNotFoundException("Trainee not found with username: = " + username + " and password = " + password));
   }
 
   @Override
@@ -80,13 +81,19 @@ public class TraineeServiceImpl implements TraineeService {
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED)
-  public Trainee updateTrainee(@Valid TraineeDto traineeDto) {
-    log.info("Updating Trainee with TraineeDto: " + traineeDto);
-    var trainee = findById(traineeDto.id());
-    if (traineeDto.address() == null || traineeDto.address().isEmpty()) {
-      throw new IllegalArgumentException("Address cannot be null or empty");
+  public Trainee updateTrainee(TraineeUpdateRequest request) {
+    log.info("Updating Trainee with TraineeDto: " + request);
+    var trainee = findByUsername(request.username());
+    Optional.ofNullable(request.firstName()).filter(firstName -> !firstName.isEmpty())
+        .ifPresent(trainee::setFirstName);
+    Optional.ofNullable(request.lastName()).filter(lastName -> !lastName.isEmpty())
+        .ifPresent(trainee::setLastName);
+    Optional.ofNullable(request.dateOfBirth()).ifPresent(trainee::setDateOfBirth);
+    Optional.ofNullable(request.address()).filter(address -> !address.isEmpty())
+        .ifPresent(trainee::setAddress);
+    if (request.isActive() != trainee.isActive()) {
+      trainee.setActive(request.isActive());
     }
-    trainee.setAddress(traineeDto.address());
     return traineeRepository.update(trainee).get();
   }
 
@@ -99,7 +106,7 @@ public class TraineeServiceImpl implements TraineeService {
     traineeRepository.toggleProfileActivation(trainee);
   }
 
-  //TODO проверить метод с конвертером
+
   @Override
   public List<TrainerDtoForTrainee> findTrainersForTrainee(long id) {
     var listTrainers = traineeRepository.findTrainersForTrainee(id);

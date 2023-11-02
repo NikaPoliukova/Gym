@@ -13,7 +13,7 @@ public interface TrainingService {
 
   Training saveTraining(TrainingRequest trainingRequest);
 
-  List<Training> findTrainingsByUsernameAndCriteria(String username, String password, String periodFrom, String periodTo,
+  List<Training> findTrainingsByUsernameAndCriteria(String username,  String periodFrom, String periodTo,
                                                     String trainerName, String trainingType);
 
   List<Trainer> findNotAssignedActiveTrainersToTrainee(long traineeId);

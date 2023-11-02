@@ -1,11 +1,12 @@
 package com.epam.upskill.dto;
 
+import java.time.LocalDate;
+
 public record TraineeUpdateRequest(
     String username,
-    String password,
     String firstName,
     String lastName,
-    String dateOfBirth,
+    LocalDate dateOfBirth,
     String address,
     boolean isActive
 ) {

@@ -4,8 +4,8 @@ import com.epam.upskill.converter.TraineeConverter;
 import com.epam.upskill.converter.TrainerConverter;
 import com.epam.upskill.dao.TrainerRepository;
 import com.epam.upskill.dto.TraineeDtoForTrainer;
-import com.epam.upskill.dto.TrainerDto;
 import com.epam.upskill.dto.TrainerRegistration;
+import com.epam.upskill.dto.TrainerUpdateRequest;
 import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.exception.TraineeNotFoundException;
@@ -47,11 +47,12 @@ public class TrainerServiceImpl implements TrainerService {
     return trainerRepository.findByUsername(username).orElseThrow(()
         -> new TrainerNotFoundException("Trainer not found with username: " + username));
   }
+
   @Override
   public Trainer findByUsernameAndPassword(String username, String password) {
-    log.info("Fetching with username: = " + username+ " and password = " + password);
-    return trainerRepository.findByUsernameAndPassword(username,password).orElseThrow(()
-        -> new TraineeNotFoundException("Trainee not found with username: = " + username+ " and password = " + password));
+    log.info("Fetching with username: = " + username + " and password = " + password);
+    return trainerRepository.findByUsernameAndPassword(username, password).orElseThrow(()
+        -> new TraineeNotFoundException("Trainee not found with username: = " + username + " and password = " + password));
   }
 
   @Override
@@ -78,10 +79,10 @@ public class TrainerServiceImpl implements TrainerService {
 
   @Override
   @Transactional
-  public Trainer updateTrainer(@Valid TrainerDto trainerDto) {
-    log.info("Updating Trainer with TrainerDto: " + trainerDto);
-    var trainer = trainerRepository.findById(trainerDto.id()).get();
-    trainer.setSpecialization(trainerDto.specialization());
+  public Trainer updateTrainer(TrainerUpdateRequest request) {
+    log.info("Updating Trainer with TrainerDto: " + request);
+    var trainer = trainerRepository.findByUsername(request.username()).get();
+    trainerConverter.toTrainer(request);
     return trainerRepository.update(trainer);
   }
 

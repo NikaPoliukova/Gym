@@ -1,6 +1,7 @@
 package com.epam.upskill.dao.impl;
 
 import com.epam.upskill.dao.TrainingRepository;
+import com.epam.upskill.dto.TrainingTypeEnum;
 import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.Training;
 import com.epam.upskill.entity.TrainingType;
@@ -43,7 +44,7 @@ public class TrainingRepositoryImpl implements TrainingRepository {
 
   //TODO обновить и добавить поля
   @Override
-  public List<Training> findTrainingsByUsernameAndCriteria(String username, String password, String periodFrom, String periodTo,
+  public List<Training> findTrainingsByUsernameAndCriteria(String username, String periodFrom, String periodTo,
                                                            String trainerName, String trainingType) {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     CriteriaQuery<Training> query = cb.createQuery(Training.class);
@@ -75,8 +76,8 @@ public class TrainingRepositoryImpl implements TrainingRepository {
   @Override
   public TrainingType findTrainingTypeByName(String name) {
     TypedQuery<TrainingType> query = entityManager.createQuery(
-        "SELECT tt FROM TrainingType tt WHERE tt.training_type_name = :name", TrainingType.class);
-    query.setParameter("name", name);
+        "SELECT tt FROM TrainingType tt WHERE tt.trainingTypeName = :name", TrainingType.class);
+    query.setParameter("name", TrainingTypeEnum.valueOf(name));
     try {
       return query.getSingleResult();
     } catch (NoResultException e) {

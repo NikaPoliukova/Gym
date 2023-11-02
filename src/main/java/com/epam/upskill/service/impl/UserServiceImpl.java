@@ -3,6 +3,7 @@ package com.epam.upskill.service.impl;
 
 import com.epam.upskill.dao.UserRepository;
 import com.epam.upskill.dto.UserDto;
+import com.epam.upskill.dto.UserUpdatePass;
 import com.epam.upskill.entity.User;
 import com.epam.upskill.exception.UserNotFoundException;
 import com.epam.upskill.service.UserService;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,13 +43,23 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED)
-  public void updateUserPassword(UserDto userDto) {
-    var user = findById(userDto.id());
-    user.setPassword(userDto.password());
+  public void updatePassword(UserUpdatePass userUpdatePass) {
+    var user = findByUsernameAndPassword(userUpdatePass.username(), userUpdatePass.oldPassword());
+   user.setPassword(userUpdatePass.newPassword());
     userRepository.update(user);
   }
+
   @Override
-  public void updateLogin(UserDto userDto){
+  public User findByUsernameAndPassword(String username, String password) {
+    if (username == null || password == null) {
+      throw new UserNotFoundException("Empty username or password");
+    }
+    return userRepository.findByUsernameAndPassword(username, password)
+        .orElseThrow(() -> new UserNotFoundException("User not found"));
+  }
+
+  @Override
+  public void updateLogin(UserDto userDto) {
     var user = findById(userDto.id());
     user.setUsername(userDto.username());
     userRepository.update(user);

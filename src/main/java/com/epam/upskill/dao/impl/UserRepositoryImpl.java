@@ -75,4 +75,17 @@ public class UserRepositoryImpl implements UserRepository {
     query.setParameter("userId", id);
     return Optional.ofNullable(query.getSingleResult());
   }
+
+  @Override
+  public Optional<User> findByUsernameAndPassword(String username, String oldPassword) {
+    TypedQuery<User> query = entityManager
+        .createQuery("SELECT u FROM User u WHERE u.username = :username AND u.password = : password", User.class);
+    query.setParameter("username", username);
+    query.setParameter("password", oldPassword);
+    try {
+      return Optional.ofNullable(query.getSingleResult());
+    } catch (NoResultException e) {
+      throw new UserNotFoundException("User named '" + username + "' was not found.");
+    }
+  }
 }

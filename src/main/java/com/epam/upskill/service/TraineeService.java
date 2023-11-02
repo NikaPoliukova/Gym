@@ -2,6 +2,7 @@ package com.epam.upskill.service;
 
 import com.epam.upskill.dto.TraineeDto;
 import com.epam.upskill.dto.TraineeRegistration;
+import com.epam.upskill.dto.TraineeUpdateRequest;
 import com.epam.upskill.dto.TrainerDtoForTrainee;
 import com.epam.upskill.entity.Trainee;
 
@@ -18,9 +19,8 @@ public interface TraineeService {
 
   List<Trainee> findAll();
 
-  Trainee updateTrainee(TraineeDto trainee);
+  Trainee updateTrainee(TraineeUpdateRequest traineeUpdateRequest);
 
   void toggleProfileActivation(long userId);
-
   List<TrainerDtoForTrainee> findTrainersForTrainee(long id);
 }

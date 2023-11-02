@@ -1,6 +1,7 @@
 package com.epam.upskill.service;
 
 import com.epam.upskill.dto.UserDto;
+import com.epam.upskill.dto.UserUpdatePass;
 import com.epam.upskill.entity.User;
 
 import java.util.List;
@@ -11,7 +12,9 @@ public interface UserService {
 
   List<User> findAll();
 
-  void updateUserPassword(UserDto userDto);
+  void updatePassword(UserUpdatePass userUpdatePass);
+
+  User findByUsernameAndPassword(String username, String password);
 
   void updateLogin(UserDto userDto);
 

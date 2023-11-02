@@ -1,10 +1,13 @@
 package com.epam.upskill.dto;
 
+import java.time.LocalDate;
+
 public record TrainingRequest(
     String traineeUsername,
     String trainerUsername,
     String trainingName,
-    String trainingDate,
+    LocalDate trainingDate,
+    String trainingType,
     int trainingDuration
 ) {
 }

@@ -1,10 +1,13 @@
 package com.epam.upskill.dto;
 
+import java.util.List;
+
 public record TrainerUpdateResponse(
     String username,
-    String password,
     String firstName,
     String lastName,
-    boolean isActive
+    String specialization,
+    boolean isActive,
+    List<TraineeDtoForTrainer> trainingList
 ) {
 }

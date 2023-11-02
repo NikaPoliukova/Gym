@@ -46,7 +46,7 @@ public class TrainingServiceImpl implements TrainingService {
     log.info("Creating Training: " + request);
     var trainee = traineeService.findByUsername(request.traineeUsername());
     var trainer = trainerService.findByUsername(request.trainerUsername());
-    var trainingType = trainingRepository.findTrainingTypeByName(request.trainingName());
+    var trainingType = trainingRepository.findTrainingTypeByName(request.trainingType());
     var training = trainingConverter.toTraining(request, new Training());
     training.setTrainee(trainee);
     training.setTrainer(trainer);
@@ -55,9 +55,9 @@ public class TrainingServiceImpl implements TrainingService {
   }
 
   @Override
-  public List<Training> findTrainingsByUsernameAndCriteria(String username, String password, String periodFrom,
+  public List<Training> findTrainingsByUsernameAndCriteria(String username,  String periodFrom,
                                                            String periodTo, String trainerName, String trainingType) {
-    return trainingRepository.findTrainingsByUsernameAndCriteria(username, password, periodFrom, periodTo,
+    return trainingRepository.findTrainingsByUsernameAndCriteria(username,  periodFrom, periodTo,
         trainerName, trainingType);
   }
 

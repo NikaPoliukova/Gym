@@ -19,4 +19,6 @@ public interface TrainerConverter {
   TrainerUpdateResponse toTrainerUpdateResponse(Trainer trainer);
 
   List<TrainerUpdateResponse> toTrainerUpdateResponse(List<Trainer> trainers);
+
+  Trainer toTrainer(TrainerUpdateRequest request);
 }

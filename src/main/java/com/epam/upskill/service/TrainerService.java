@@ -3,6 +3,7 @@ package com.epam.upskill.service;
 import com.epam.upskill.dto.TraineeDtoForTrainer;
 import com.epam.upskill.dto.TrainerDto;
 import com.epam.upskill.dto.TrainerRegistration;
+import com.epam.upskill.dto.TrainerUpdateRequest;
 import com.epam.upskill.entity.Trainer;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public interface TrainerService {
 
   Trainer saveTrainer(TrainerRegistration trainerDto);
 
-  Trainer updateTrainer(TrainerDto trainerDto);
+  Trainer updateTrainer(TrainerUpdateRequest request);
 
   List<Trainer> findByIsActive();
 

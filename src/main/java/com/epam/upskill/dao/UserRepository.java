@@ -14,5 +14,7 @@ public interface UserRepository extends AbstractRepository<User> {
   void toggleProfileActivation(User user);
 
   Optional<User> findUserById(long id);
+
+  Optional<User> findByUsernameAndPassword(String username, String oldPassword);
 }
 
