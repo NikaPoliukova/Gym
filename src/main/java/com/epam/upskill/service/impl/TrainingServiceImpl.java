@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -55,17 +56,22 @@ public class TrainingServiceImpl implements TrainingService {
   }
 
   @Override
-  public List<Training> findTrainingsByUsernameAndCriteria(String username,  String periodFrom,
+  public List<Training> findTrainingsByUsernameAndCriteria(String username, String periodFrom,
                                                            String periodTo, String trainerName, String trainingType) {
-    return trainingRepository.findTrainingsByUsernameAndCriteria(username,  periodFrom, periodTo,
+    return trainingRepository.findTrainingsByUsernameAndCriteria(username, periodFrom, periodTo,
         trainerName, trainingType);
   }
 
   @Override
   @Transactional
-  public List<Trainer> findNotAssignedActiveTrainersToTrainee(long traineeId) {
-    traineeService.findById(traineeId);
-    return trainingRepository.getNotAssignedActiveTrainersToTrainee(traineeId);
+  public List<Trainer> findNotAssignedActiveTrainersToTrainee(String username) {
+    var traineeId = traineeService.findByUsername(username).getId();
+    List<Trainer> activeTrainers = trainingRepository.getAssignedActiveTrainersToTrainee(traineeId);
+    List<Trainer> trainersList = trainerService.findAll();
+    return trainersList.stream()
+        .filter(trainer -> !activeTrainers.contains(trainer))
+        .toList();
+
   }
 
   @Override

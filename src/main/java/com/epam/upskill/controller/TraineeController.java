@@ -53,18 +53,17 @@ public class TraineeController {
     return ResponseEntity.ok(traineeUpdateResponse);
   }
 
-
+  //работает
   @DeleteMapping("/trainee")
   public ResponseEntity<String> deleteTraineeProfile(@RequestParam String username) {
     var trainee = traineeService.findByUsername(username);
     userService.delete(trainee.getId());
     return ResponseEntity.ok("200 OK");
   }
-
+  //работает
   @GetMapping("/trainee/not-active-trainers")
   public ResponseEntity<List<TrainerDtoForTrainee>> findNotAssignedActiveTrainers(@RequestParam String username) {
-    var trainee = traineeService.findByUsername(username);
-    List<Trainer> trainerList = trainingService.findNotAssignedActiveTrainersToTrainee(trainee.getId());
+    List<Trainer> trainerList = trainingService.findNotAssignedActiveTrainersToTrainee(username);
     trainerConverter.toTrainerDtoForTrainee(trainerList);
     return ResponseEntity.ok(trainerConverter.toTrainerDtoForTrainee(trainerList));
   }
@@ -72,7 +71,7 @@ public class TraineeController {
   @PutMapping("/trainee/trainers")
   public ResponseEntity<List<TrainerDtoForTrainee>> updateTraineeTrainerList(@RequestParam String username,
                                                                              @RequestParam List<TrainersDtoList> list) {
-//TODO реализовать логику обновления
+
     List<TrainerDtoForTrainee> updatedTrainersList = new ArrayList<>();
     return ResponseEntity.ok(updatedTrainersList);
   }

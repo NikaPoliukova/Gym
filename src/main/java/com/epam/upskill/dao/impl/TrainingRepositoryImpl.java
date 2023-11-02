@@ -85,10 +85,9 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     }
   }
 
-  public List<Trainer> getNotAssignedActiveTrainersToTrainee(long traineeId) {
+  public List<Trainer> getAssignedActiveTrainersToTrainee(long traineeId) {
     TypedQuery<Trainer> query = entityManager.createQuery(
-        "SELECT DISTINCT t.trainer FROM Training t  WHERE t.trainee.id = :traineeId " +
-            "AND t.trainer.isActive = false ", Trainer.class);
+        "SELECT DISTINCT t.trainer FROM Training t  WHERE t.trainee.id = :traineeId " , Trainer.class);
     query.setParameter("traineeId", traineeId);
     return query.getResultList();
   }
