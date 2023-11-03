@@ -17,16 +17,16 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-@Api(tags = "Trainings", description = "Operations for managing trainings")
+@Api(tags = "Trainings")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/trainings")   //Работает
+@RequestMapping("/api/v1/trainings")
 public class TrainingController {
   private final TrainingService trainingService;
   private final TrainingTypeConverter converter;
   private final TraineeService traineeService;
   private final TrainerService trainerService;
-
+  //Работает
   @PostMapping("/add-training")
   public ResponseEntity<Void> saveTraining(@RequestParam String traineeUsername,
                                            @RequestParam String trainerUsername,
@@ -42,7 +42,7 @@ public class TrainingController {
     return ResponseEntity.ok().build();
   }
 
-
+  //Работает
   @ApiOperation("Get a list of training types")
   @GetMapping("/get-training-types")
   public ResponseEntity<List<TrainingTypeResponse>> getTrainingTypes() {

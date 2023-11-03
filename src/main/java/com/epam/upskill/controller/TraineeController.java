@@ -59,7 +59,7 @@ public class TraineeController {
     userService.delete(trainee.getId());
     return ResponseEntity.ok("200 OK");
   }
-
+  //работает
   @GetMapping("/trainee/not-active-trainers")
   public ResponseEntity<List<TrainerDtoForTrainee>> findNotAssignedActiveTrainers(@RequestParam String username) {
     List<Trainer> trainerList = trainingService.findNotAssignedActiveTrainersToTrainee(username);
