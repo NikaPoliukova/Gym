@@ -23,7 +23,7 @@ public class UserUtils {
       throw new IllegalArgumentException("First name or last name must not be null or empty");
     }
     String username = String.format("%s.%s", firstName, lastName);
-    return isUsernameUnique(users, username) ? username : username + calculateUsernameCounter(users, username) + 1;
+    return isUsernameUnique(users, username) ? username : username + calculateUsernameCounter(users, username);
   }
 
   public static boolean isUsernameUnique(List<User> userList, String usernameToCheck) {
@@ -35,7 +35,7 @@ public class UserUtils {
     return (int) users.stream()
         .map(User::getUsername)
         .filter(userUsername -> userUsername != null && userUsername.startsWith(username))
-        .count();
+        .count()+1;
   }
 
   public static LocalDate getLocalDate(String dateOfBirth) {

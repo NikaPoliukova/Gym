@@ -33,5 +33,4 @@ public class User {
   @Column(name = "is_active")
   private boolean isActive;
 
-  private String role;
 }

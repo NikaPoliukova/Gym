@@ -99,10 +99,9 @@ public class TraineeServiceImpl implements TraineeService {
 
   @Override
   @Transactional
-  public void toggleProfileActivation(long traineeId) {
+  public void toggleProfileActivation(long traineeId,boolean isActive) {
     var trainee = findById(traineeId);
-    var currentStatus = trainee.isActive();
-    trainee.setActive(!currentStatus);
+    trainee.setActive(isActive);
     traineeRepository.toggleProfileActivation(trainee);
   }
 

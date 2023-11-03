@@ -5,6 +5,8 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
+
 @RequiredArgsConstructor
 @Getter
 @Builder
@@ -25,6 +27,7 @@ public class Training {
 
   @Column(name = "training_duration")
   private int trainingDuration;
+
   @JsonBackReference
   @ManyToOne
   @JoinColumn(name = "trainee_id")
@@ -37,6 +40,7 @@ public class Training {
   @ManyToOne
   @JoinColumn(name = "training_type_id")
   private TrainingType trainingType;
+
 
   @Override
   public boolean equals(Object o) {

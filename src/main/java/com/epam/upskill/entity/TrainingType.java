@@ -25,8 +25,6 @@ public class TrainingType {
   @Column(name = "training_type_name")
   private TrainingTypeEnum trainingTypeName;
 
-  @OneToMany(mappedBy = "trainingType", fetch = FetchType.EAGER)
-  private List<Training> trainings;
 
   @Override
   public boolean equals(Object o) {

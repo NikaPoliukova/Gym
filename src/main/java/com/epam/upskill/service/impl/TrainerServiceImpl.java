@@ -3,11 +3,13 @@ package com.epam.upskill.service.impl;
 import com.epam.upskill.converter.TraineeConverter;
 import com.epam.upskill.converter.TrainerConverter;
 import com.epam.upskill.dao.TrainerRepository;
+import com.epam.upskill.dao.TrainingRepository;
 import com.epam.upskill.dto.TraineeDtoForTrainer;
 import com.epam.upskill.dto.TrainerRegistration;
 import com.epam.upskill.dto.TrainerUpdateRequest;
 import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.entity.Trainer;
+import com.epam.upskill.entity.TrainingType;
 import com.epam.upskill.exception.TraineeNotFoundException;
 import com.epam.upskill.exception.TrainerNotFoundException;
 import com.epam.upskill.service.TrainerService;
@@ -18,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,6 +32,7 @@ public class TrainerServiceImpl implements TrainerService {
   private final UserService userService;
   private final TraineeConverter traineeConverter;
   private final TrainerConverter trainerConverter;
+  private final TrainingRepository trainingRepository;
 
   @Override
   @Transactional
@@ -64,16 +66,20 @@ public class TrainerServiceImpl implements TrainerService {
 
   @Override
   @Transactional
-  public Trainer saveTrainer(@Valid TrainerRegistration trainerDto) {
-    log.info("Creating Trainer from TrainerRegistration: " + trainerDto);
-    var username = UserUtils.createUsername(trainerDto.firstName(), trainerDto.lastName(), userService.findAll());
+  public Trainer saveTrainer(TrainerRegistration trainerRegistration) {
+    log.info("Creating Trainer from TrainerRegistration: " + trainerRegistration);
+    var username = UserUtils.createUsername(trainerRegistration.firstName(), trainerRegistration.lastName(),
+        userService.findAll());
     var password = UserUtils.generateRandomPassword();
-    Trainer trainer = trainerConverter.toTrainer(trainerDto);
-    trainer.setFirstName(trainerDto.firstName());
-    trainer.setLastName(trainerDto.lastName());
+    Trainer trainer = new Trainer();
+    TrainingType trainingType =trainingRepository.findTrainingTypeByName(trainerRegistration.specialization());
+//    Trainer trainer = trainerConverter.toTrainer(trainerRegistration);
+    trainer.setFirstName(trainerRegistration.firstName());
+    trainer.setLastName(trainerRegistration.lastName());
     trainer.setUsername(username);
     trainer.setPassword(password);
     trainer.setActive(true);
+    trainer.setSpecialization(trainingType);
     return trainerRepository.save(trainer);
   }
 

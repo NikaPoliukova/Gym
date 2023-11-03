@@ -27,9 +27,7 @@ import java.util.stream.Collectors;
 public class TrainingServiceImpl implements TrainingService {
 
   private final TrainingRepository trainingRepository;
-
-  private final UserService userService;
-  private final TraineeService traineeService;
+    private final TraineeService traineeService;
   private final TrainerService trainerService;
   private final TrainingConverter trainingConverter;
 

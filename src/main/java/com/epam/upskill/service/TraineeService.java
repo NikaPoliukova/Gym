@@ -21,6 +21,6 @@ public interface TraineeService {
 
   Trainee updateTrainee(TraineeUpdateRequest traineeUpdateRequest);
 
-  void toggleProfileActivation(long userId);
+  void toggleProfileActivation(long userId,boolean isActive);
   List<TrainerDtoForTrainee> findTrainersForTrainee(long id);
 }

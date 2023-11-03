@@ -24,6 +24,7 @@ public interface TraineeConverter {
   TraineeUpdateResponse toTraineeUpdateResponse(Trainee trainee, TraineeService traineeService);
 
   @Mapping(target = "trainersList", expression = "java(trainingsList(trainee,traineeService))")
+  @Mapping(target = "isActive", expression = "java(mapIsActive(trainee))")
   TraineeResponse toTraineeResponse(Trainee trainee, TraineeService traineeService);
 
   @Named("mapTrainersForTrainee")

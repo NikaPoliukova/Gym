@@ -30,9 +30,9 @@ public class TraineeController {
   private final TrainingConverter trainingConverter;
   private final TrainingService trainingService;
 
-  //работает
+//работает
   @GetMapping("/trainee-profile")
-  public ResponseEntity<TraineeResponse> findTraineeProfile(@RequestParam String username) {
+  public ResponseEntity<TraineeResponse> findTraineeProfile(@RequestParam("username") String username) {
     var trainee = traineeService.findByUsername(username);
     var traineeResponse = converter.toTraineeResponse(trainee, traineeService);
     return ResponseEntity.ok(traineeResponse);
@@ -46,13 +46,12 @@ public class TraineeController {
                                                                     @RequestParam(value = "address", required = false) String address,
                                                                     @RequestParam("isActive") boolean isActive) {
     LocalDate localDate = getLocalDate(dateOfBirth);
-    TraineeUpdateRequest traineeUpdateRequest = new TraineeUpdateRequest(username, firstName,
-        lastName, localDate, address, isActive);
+    TraineeUpdateRequest traineeUpdateRequest = new TraineeUpdateRequest(username, firstName, lastName, localDate,
+        address, isActive);
     var trainee = traineeService.updateTrainee(traineeUpdateRequest);
     var traineeUpdateResponse = converter.toTraineeUpdateResponse(trainee,traineeService);
     return ResponseEntity.ok(traineeUpdateResponse);
   }
-
   //работает
   @DeleteMapping("/trainee")
   public ResponseEntity<String> deleteTraineeProfile(@RequestParam String username) {
@@ -60,7 +59,7 @@ public class TraineeController {
     userService.delete(trainee.getId());
     return ResponseEntity.ok("200 OK");
   }
-  //работает
+
   @GetMapping("/trainee/not-active-trainers")
   public ResponseEntity<List<TrainerDtoForTrainee>> findNotAssignedActiveTrainers(@RequestParam String username) {
     List<Trainer> trainerList = trainingService.findNotAssignedActiveTrainersToTrainee(username);
@@ -69,7 +68,9 @@ public class TraineeController {
   }
 
   @PutMapping("/trainee/trainers")
-  public ResponseEntity<List<TrainerDtoForTrainee>> updateTraineeTrainerList(@RequestParam String username,
+  public ResponseEntity<List<TrainerDtoForTrainee>> updateTraineeTrainerList(@RequestParam("username") String username,
+                                                                             @RequestParam("trainingDate") String trainingDate,
+                                                                             @RequestParam("trainingType") String trainingType,
                                                                              @RequestParam List<TrainersDtoList> list) {
 
     List<TrainerDtoForTrainee> updatedTrainersList = new ArrayList<>();
@@ -87,11 +88,12 @@ public class TraineeController {
     //TODO Для каждого тренинга нужно засетать имя тренера
     return ResponseEntity.ok(trainingConverter.toTrainingResponse(trainingsList));
   }
-
+  //работает
   @PatchMapping("/activate-deactivate-trainee")
-  public ResponseEntity<Void> activateDeactivateTrainee(@RequestParam String username, @RequestParam boolean isActive) {
+  public ResponseEntity<Void> activateDeactivateTrainee(@RequestParam("username")String username,
+                                                        @RequestParam("active") boolean isActive) {
     var trainee = traineeService.findByUsername(username);
-    traineeService.toggleProfileActivation(trainee.getId());
+    traineeService.toggleProfileActivation(trainee.getId(),isActive);
     return ResponseEntity.ok().build();
   }
 }

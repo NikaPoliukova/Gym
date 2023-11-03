@@ -18,12 +18,12 @@ import java.util.List;
 @Entity
 public class Trainer extends User {
 
-  private String specialization;
+  @ManyToOne
+  @JoinColumn(name = "training_type_id")
+  private TrainingType specialization;
 
   @JsonManagedReference
   @OneToMany(mappedBy = "trainer", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
   private List<Training> trainings = new ArrayList<>();
-
-
 }
 
