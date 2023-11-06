@@ -25,46 +25,45 @@ public class TrainerController {
   private final TrainingService trainingService;
   private final TrainingConverter trainingConverter;
 
+  //работает
   @GetMapping("/trainer")
   public ResponseEntity<TrainerResponse> getTrainerProfile(@RequestParam String username) {
     var trainer = trainerService.findByUsername(username);
-    var listTrainers = trainerService.findTraineesForTrainer(trainer.getId());
-    var trainerResponse = converter.toTrainerResponse(trainer);
-    //TODO нету листа тренеров
+    var trainerResponse = converter.toTrainerResponse(trainer, trainerService);
     return ResponseEntity.ok(trainerResponse);
   }
 
+  //работает
   @PutMapping("/trainer")
-  public ResponseEntity<TrainerUpdateResponse> updateTrainerProfile(@RequestParam String username,
-                                                                    @RequestParam String firstName,
-                                                                    @RequestParam String lastName,
+  public ResponseEntity<TrainerUpdateResponse> updateTrainerProfile(@RequestParam("username") String username,
+                                                                    @RequestParam("firstName") String firstName,
+                                                                    @RequestParam("lastName") String lastName,
+                                                                    @RequestParam("specialization") String specialization,
                                                                     @RequestParam("isActive") boolean isActive) {
-    TrainerUpdateRequest request = new TrainerUpdateRequest(username, firstName, lastName, isActive);
-    var trainer = trainerService.updateTrainer(request);
-    //TODO проверить конвертер
-    //TODO нету листа тренеров
-    var trainerUpdateResponse = converter.toTrainerUpdateResponse(trainer);
+    TrainerUpdateRequest request = new TrainerUpdateRequest(username, firstName, lastName, specialization, isActive);
+    var trainer = trainerService.update(request);
+    var trainerUpdateResponse = converter.toTrainerUpdateResponse(trainer, trainerService);
     return ResponseEntity.ok(trainerUpdateResponse);
   }
 
+  //работает
   @GetMapping("/trainer/trainings-list")
-  public ResponseEntity<List<TrainingTrainerResponse>> getTrainerTrainingsList(@RequestParam String username,
-                                                                               @RequestParam(required = false) String periodFrom,
-                                                                               @RequestParam(required = false) String periodTo,
-                                                                               @RequestParam(required = false) String traineeName
-  ) {
+  public ResponseEntity<List<TrainingTrainerResponse>> findTrainerTrainingsList(@RequestParam String username,
+                                                                                @RequestParam(required = false) String periodFrom,
+                                                                                @RequestParam(required = false) String periodTo,
+                                                                                @RequestParam(required = false) String traineeName) {
 
-    List<Training> trainingsList = trainingService.findTrainingsByUsernameAndCriteria(username, periodFrom,
-        periodTo, traineeName, "");
+    List<Training> trainingsList = trainingService.findTrainerTrainings(username, periodFrom,
+        periodTo, traineeName);
     return ResponseEntity.ok(trainingConverter.toTrainerTrainingResponse(trainingsList));
 
   }
-
+  //работает
   @PatchMapping("/activate-deactivate-trainer")
-  public ResponseEntity<Void> activateDeactivateTrainer(@RequestParam String username,
-                                                        @RequestParam boolean isActive) {
+  public ResponseEntity<Void> activateDeactivateTrainer(@RequestParam("username") String username,
+                                                        @RequestParam("active") boolean isActive) {
     var trainer = trainerService.findByUsername(username);
-    trainerService.toggleProfileActivation(trainer.getId());
+    trainerService.toggleProfileActivation(trainer.getId(),isActive);
     return ResponseEntity.ok().build();
   }
 }

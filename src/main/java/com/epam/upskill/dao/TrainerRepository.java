@@ -3,13 +3,14 @@ package com.epam.upskill.dao;
 import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.entity.Trainer;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
 public interface TrainerRepository extends AbstractRepository<Trainer> {
   Optional<Trainer> findByUsername(String username);
 
-  Trainer update(Trainer trainer);
+  Optional<Trainer> update(Trainer trainer);
 
   void toggleProfileActivation(Trainer trainer);
 

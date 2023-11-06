@@ -16,6 +16,8 @@ public interface TrainingRepository extends AbstractRepository<Training> {
   List<Training> findTrainingsByUsernameAndCriteria(String username,  String periodFrom, String periodTo,
                                                     String trainerName,  TrainingTypeEnum myEnum);
   List<Training> findTrainingsByUsernameAndCriteria(long traineeId, String trainingDate, String trainingName);
+  List<Training> findTrainerTrainings(long traineeId, String periodFrom, String periodTo,
+                                                    String traineeName);
   List<Trainer> getAssignedActiveTrainersToTrainee(long traineeId);
 
   List<TrainingType> findTrainingTypes();

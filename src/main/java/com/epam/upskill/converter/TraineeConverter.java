@@ -16,6 +16,9 @@ public interface TraineeConverter {
 
   Trainee toTrainee(TraineeRegistration traineeDto);
 
+  @Mapping(target = "traineeUsername", expression = "java(mapUserName(trainee))")
+  @Mapping(target = "traineeFirstName", expression = "java(mapFirstName(trainee))")
+  @Mapping(target = "traineeLastName", expression = "java(mapLastName(trainee))")
   TraineeDtoForTrainer toTraineeDtoForTrainer(Trainee trainee);
 
   List<TraineeDtoForTrainer> toTraineeDtoForTrainer(List<Trainee> trainees);
@@ -38,4 +41,14 @@ public interface TraineeConverter {
     return trainee.isActive();
   }
 
+   default String mapUserName(Trainee trainee) {
+    return trainee.getUsername();
+  }
+
+   default String mapFirstName(Trainee trainee) {
+    return trainee.getFirstName();
+  }
+  default String mapLastName(Trainee trainee) {
+    return trainee.getLastName();
+  }
 }

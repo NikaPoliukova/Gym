@@ -37,7 +37,7 @@ public class TrainerRepositoryImpl implements TrainerRepository {
   @Override
   public List<Trainee> findTraineesForTrainer(long trainerId) {
     TypedQuery<Trainee> query = entityManager.createQuery(
-        "SELECT DISTINCT t.trainee FROM Training t WHERE t.trainerId = :trainerId", Trainee.class);
+        "SELECT DISTINCT t.trainee FROM Training t WHERE t.trainer.id = :trainerId", Trainee.class);
     query.setParameter("trainerId", trainerId);
     return query.getResultList();
   }
@@ -78,9 +78,9 @@ public class TrainerRepositoryImpl implements TrainerRepository {
   }
 
   @Override
-  public Trainer update(Trainer trainer) {
+  public Optional<Trainer> update(Trainer trainer) {
     log.debug("Updating Trainer: " + trainer);
-    return entityManager.merge(trainer);
+    return Optional.of(entityManager.merge(trainer));
   }
 }
 

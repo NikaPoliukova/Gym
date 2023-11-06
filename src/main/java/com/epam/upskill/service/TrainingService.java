@@ -18,6 +18,8 @@ public interface TrainingService {
                                                     String trainerName, String trainingType);
 
   List<Training> findTrainingsByUsernameAndCriteria(long traineeId, String trainingDate, String trainingName);
+  List<Training> findTrainerTrainings(String username, String periodFrom, String periodTo,
+                                                    String traineeName);
 
   List<Trainer> findNotAssignedActiveTrainersToTrainee(String username);
 

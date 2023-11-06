@@ -6,6 +6,7 @@ public record TrainerUpdateRequest(
     String username,
     String firstName,
     String lastName,
+    String specialization,
     boolean isActive
 ) {
 }

@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -72,7 +73,7 @@ public class TrainerServiceImpl implements TrainerService {
         userService.findAll());
     var password = UserUtils.generateRandomPassword();
     Trainer trainer = new Trainer();
-    TrainingType trainingType =trainingRepository.findTrainingTypeByName(trainerRegistration.specialization());
+    TrainingType trainingType = trainingRepository.findTrainingTypeByName(trainerRegistration.specialization());
 //    Trainer trainer = trainerConverter.toTrainer(trainerRegistration);
     trainer.setFirstName(trainerRegistration.firstName());
     trainer.setLastName(trainerRegistration.lastName());
@@ -85,11 +86,17 @@ public class TrainerServiceImpl implements TrainerService {
 
   @Override
   @Transactional
-  public Trainer updateTrainer(TrainerUpdateRequest request) {
+  public Trainer update(TrainerUpdateRequest request) {
     log.info("Updating Trainer with TrainerDto: " + request);
-    var trainer = trainerRepository.findByUsername(request.username()).get();
-    trainerConverter.toTrainer(request);
-    return trainerRepository.update(trainer);
+    var trainer = findByUsername(request.username());
+    Optional.ofNullable(request.firstName()).filter(firstName -> !firstName.isEmpty())
+        .ifPresent(trainer::setFirstName);
+    Optional.ofNullable(request.lastName()).filter(lastName -> !lastName.isEmpty())
+        .ifPresent(trainer::setLastName);
+    if (request.isActive() != trainer.isActive()) {
+      trainer.setActive(request.isActive());
+    }
+    return trainerRepository.update(trainer).get();
   }
 
   @Override
@@ -100,10 +107,9 @@ public class TrainerServiceImpl implements TrainerService {
 
   @Override
   @Transactional
-  public void toggleProfileActivation(long trainerId) {
+  public void toggleProfileActivation(long trainerId, boolean isActive) {
     var trainer = findById(trainerId);
-    var currentStatus = trainer.isActive();
-    trainer.setActive(!currentStatus);
+    trainer.setActive(isActive);
     trainerRepository.toggleProfileActivation(trainer);
   }
 

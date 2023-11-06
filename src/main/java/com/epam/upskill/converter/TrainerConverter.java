@@ -1,10 +1,8 @@
 package com.epam.upskill.converter;
 
 import com.epam.upskill.dto.*;
-import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.TrainingType;
-import com.epam.upskill.service.TraineeService;
 import com.epam.upskill.service.TrainerService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -25,19 +23,34 @@ public interface TrainerConverter {
     return trainingType;
   }
 
-  @Mapping(source = "specialization.trainingTypeName", target = "specialization")
+  @Mapping(target = "specialization", expression = "java(mapEnumToString(trainer.getSpecialization().getTrainingTypeName()))")
   TrainerDtoForTrainee toTrainerDtoForTrainee(Trainer trainer);
 
   List<TrainerDtoForTrainee> toTrainerDtoForTrainee(List<Trainer> listTrainers);
 
-  @Mapping(source = "specialization.trainingTypeName", target = "specialization")
-  TrainerResponse toTrainerResponse(Trainer trainer);
+  @Mapping(target = "specialization", expression = "java(mapEnumToString(trainer.getSpecialization().getTrainingTypeName()))")
+  @Mapping(target = "isActive", expression = "java(toBoolean(trainer))")
+  @Mapping(target = "traineesList", expression = "java(traineesList(trainer.getId(),trainerService))")
+  TrainerResponse toTrainerResponse(Trainer trainer,TrainerService trainerService);
 
-  @Mapping(source = "specialization.trainingTypeName", target = "specialization")
-  TrainerUpdateResponse toTrainerUpdateResponse(Trainer trainer);
+  @Mapping(target = "traineeList", expression = "java(traineesList(trainer.getId(),trainerService))")
+  @Mapping(target = "isActive", expression = "java(toBoolean(trainer))")
+  @Mapping(target = "specialization", expression = "java(mapEnumToString(trainer.getSpecialization().getTrainingTypeName()))")
+  TrainerUpdateResponse toTrainerUpdateResponse(Trainer trainer, TrainerService trainerService);
 
-  List<TrainerUpdateResponse> toTrainerUpdateResponse(List<Trainer> trainers);
+// List<TrainerUpdateResponse> toTrainerUpdateResponse(List<Trainer> trainers);
 
-  Trainer toTrainer(TrainerUpdateRequest request);
+//  Trainer toTrainer(TrainerUpdateRequest request);
 
+
+  default List<TraineeDtoForTrainer> traineesList(long trainerId, TrainerService trainerService) {
+    return trainerService.findTraineesForTrainer(trainerId);
+  }
+
+  default boolean toBoolean(Trainer trainer) {
+    return trainer.isActive();
+  }
+  default String mapEnumToString(TrainingTypeEnum trainingTypeEnum) {
+    return trainingTypeEnum.toString();
+  }
 }

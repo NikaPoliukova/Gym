@@ -26,8 +26,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.epam.upskill.dto.TrainingTypeEnum.YOGA;
-
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -79,6 +77,17 @@ public class TrainingServiceImpl implements TrainingService {
   }
 
   @Override
+  public List<Training> findTrainerTrainings(String username, String periodFrom, String periodTo,
+                                             String traineeName) {
+    var trainerId = trainerService.findByUsername(username).getId();
+    List<Training> trainings = trainingRepository.findTrainerTrainings(trainerId, periodFrom, periodTo, traineeName);
+    if (trainings.isEmpty()) {
+      return Collections.emptyList();
+    }
+    return trainings;
+  }
+
+  @Override
   @Transactional
   public List<Trainer> findNotAssignedActiveTrainersToTrainee(String username) {
     var traineeId = traineeService.findByUsername(username).getId();
@@ -116,24 +125,24 @@ public class TrainingServiceImpl implements TrainingService {
       newTrainerList.add(trainer);
     }
 
-      for (Trainer newTrainer : newTrainerList) {
-        TrainingRequest trainingRequest = new TrainingRequest(
-            trainee.getUsername(),
-            newTrainer.getUsername(),
-            patternTraining.getTrainingName(),
-            patternTraining.getTrainingDate(),
-            patternTraining.getTrainingType().getTrainingTypeName().toString(),
-            patternTraining.getTrainingDuration()
-        );
-        Training training = saveTraining(trainingRequest);
-        TrainerDtoForTrainee trainerResponse = new TrainerDtoForTrainee(
-            training.getTrainer().getUsername(),
-            training.getTrainer().getFirstName(),
-            training.getTrainer().getLastName(),
-            training.getTrainer().getSpecialization().getTrainingTypeName().toString()
-        );
-        newTrainerListForResponse.add(trainerResponse);
-      }
+    for (Trainer newTrainer : newTrainerList) {
+      TrainingRequest trainingRequest = new TrainingRequest(
+          trainee.getUsername(),
+          newTrainer.getUsername(),
+          patternTraining.getTrainingName(),
+          patternTraining.getTrainingDate(),
+          patternTraining.getTrainingType().getTrainingTypeName().toString(),
+          patternTraining.getTrainingDuration()
+      );
+      Training training = saveTraining(trainingRequest);
+      TrainerDtoForTrainee trainerResponse = new TrainerDtoForTrainee(
+          training.getTrainer().getUsername(),
+          training.getTrainer().getFirstName(),
+          training.getTrainer().getLastName(),
+          training.getTrainer().getSpecialization().getTrainingTypeName().toString()
+      );
+      newTrainerListForResponse.add(trainerResponse);
+    }
 
     return newTrainerListForResponse;
   }

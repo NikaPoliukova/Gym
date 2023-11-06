@@ -8,6 +8,6 @@ public record TrainerUpdateResponse(
     String lastName,
     String specialization,
     boolean isActive,
-    List<TraineeDtoForTrainer> trainingList
+    List<TraineeDtoForTrainer> traineeList
 ) {
 }

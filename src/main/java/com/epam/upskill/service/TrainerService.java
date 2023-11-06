@@ -19,11 +19,11 @@ public interface TrainerService {
 
   Trainer saveTrainer(TrainerRegistration trainerDto);
 
-  Trainer updateTrainer(TrainerUpdateRequest request);
+  Trainer update(TrainerUpdateRequest request);
 
   List<Trainer> findByIsActive();
 
-  void toggleProfileActivation(long userId);
+  void toggleProfileActivation(long trainerId,boolean isActive);
 
   List<TraineeDtoForTrainer> findTraineesForTrainer(long id);
 }
