@@ -1,6 +1,5 @@
 package com.epam.upskill.dao;
 
-import com.epam.upskill.dto.TrainerDtoForTrainee;
 import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.entity.Trainer;
 

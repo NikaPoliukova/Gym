@@ -42,7 +42,6 @@ public class TraineeServiceImpl implements TraineeService {
   }
 
   @Override
-  @Transactional(readOnly = true)
   public Trainee findByUsername(String username) {
     log.info("Fetching with username: {}", username);
     return traineeRepository.findByUsername(username).orElseThrow(()
@@ -99,7 +98,7 @@ public class TraineeServiceImpl implements TraineeService {
 
   @Override
   @Transactional
-  public void toggleProfileActivation(long traineeId,boolean isActive) {
+  public void toggleProfileActivation(long traineeId, boolean isActive) {
     var trainee = findById(traineeId);
     trainee.setActive(isActive);
     traineeRepository.toggleProfileActivation(trainee);
@@ -115,6 +114,41 @@ public class TraineeServiceImpl implements TraineeService {
       return trainerConverter.toTrainerDtoForTrainee(listTrainers);
     }
   }
+
+//  @Override
+//  public List<TrainerDtoForTrainee> updateTraineeTrainerList(String username, String trainingDate, String trainingName,
+//                                                             List<TrainersDtoList> list) {
+//    Trainee trainee = findByUsername(username);
+//    List<Training> trainings = trainingRepository.findTrainingsByUsernameAndCriteria(trainee.getId(), trainingDate, trainingName);
+//    Training patternTraining = trainings.get(0);
+//    // Создаем новый список тренеров и список DTO для ответа
+//    List<TrainerDtoForTrainee> newTrainerList = new ArrayList<>();
+//    List<Trainer> newTrainers = list.stream()
+//        .map(trainerDto -> trainerService.findByUsername(trainerDto.username()))
+//        .toList();
+//    // Удаляем старые тренировки
+//    trainings.forEach(trainingRepository::delete);
+//    // Создаем новые тренировки и записываем тренеров в список DTO
+//    for (Trainer newTrainer : newTrainers) {
+//      TrainingRequest trainingRequest = new TrainingRequest(
+//          trainee.getUsername(),
+//          newTrainer.getUsername(),
+//          patternTraining.getTrainingName(),
+//          patternTraining.getTrainingDate(),
+//          patternTraining.getTrainingType().getTrainingTypeName().toString(),
+//          patternTraining.getTrainingDuration()
+//      );
+//      Training training = trainingService.saveTraining(trainingRequest);
+//      TrainerDtoForTrainee trainerDto = new TrainerDtoForTrainee(
+//          training.getTrainer().getUsername(),
+//          training.getTrainer().getFirstName(),
+//          training.getTrainer().getLastName(),
+//          training.getTrainer().getSpecialization().getTrainingTypeName().toString()
+//      );
+//      newTrainerList.add(trainerDto);
+//    }
+//    return newTrainerList;
+//  }
 }
 
 

@@ -78,5 +78,6 @@ public class TraineeRepositoryImpl implements TraineeRepository {
     return query.getResultList();
   }
 
+
 }
 

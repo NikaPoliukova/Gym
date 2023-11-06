@@ -1,8 +1,11 @@
 package com.epam.upskill.converter;
 
 import com.epam.upskill.dto.*;
+import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.TrainingType;
+import com.epam.upskill.service.TraineeService;
+import com.epam.upskill.service.TrainerService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -13,6 +16,7 @@ import java.util.List;
 public interface TrainerConverter {
   @Mapping(source = "specialization", target = "specialization", qualifiedByName = "mapSpecialization")
   Trainer toTrainer(TrainerRegistration trainerRegistration);
+
 
   @Named("mapSpecialization")
   default TrainingType mapSpecialization(String specialization) {
@@ -35,4 +39,5 @@ public interface TrainerConverter {
   List<TrainerUpdateResponse> toTrainerUpdateResponse(List<Trainer> trainers);
 
   Trainer toTrainer(TrainerUpdateRequest request);
+
 }

@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.epam.upskill.util.UserUtils.getLocalDate;
@@ -30,13 +29,14 @@ public class TraineeController {
   private final TrainingConverter trainingConverter;
   private final TrainingService trainingService;
 
-//работает
+  //работает
   @GetMapping("/trainee-profile")
   public ResponseEntity<TraineeResponse> findTraineeProfile(@RequestParam("username") String username) {
     var trainee = traineeService.findByUsername(username);
     var traineeResponse = converter.toTraineeResponse(trainee, traineeService);
     return ResponseEntity.ok(traineeResponse);
   }
+
   //работает
   @PutMapping("/trainee")
   public ResponseEntity<TraineeUpdateResponse> updateTraineeProfile(@RequestParam("username") String username,
@@ -49,9 +49,10 @@ public class TraineeController {
     TraineeUpdateRequest traineeUpdateRequest = new TraineeUpdateRequest(username, firstName, lastName, localDate,
         address, isActive);
     var trainee = traineeService.updateTrainee(traineeUpdateRequest);
-    var traineeUpdateResponse = converter.toTraineeUpdateResponse(trainee,traineeService);
+    var traineeUpdateResponse = converter.toTraineeUpdateResponse(trainee, traineeService);
     return ResponseEntity.ok(traineeUpdateResponse);
   }
+
   //работает
   @DeleteMapping("/trainee")
   public ResponseEntity<String> deleteTraineeProfile(@RequestParam String username) {
@@ -59,6 +60,7 @@ public class TraineeController {
     userService.delete(trainee.getId());
     return ResponseEntity.ok("200 OK");
   }
+
   //работает
   @GetMapping("/trainee/not-active-trainers")
   public ResponseEntity<List<TrainerDtoForTrainee>> findNotAssignedActiveTrainers(@RequestParam String username) {
@@ -66,34 +68,33 @@ public class TraineeController {
     trainerConverter.toTrainerDtoForTrainee(trainerList);
     return ResponseEntity.ok(trainerConverter.toTrainerDtoForTrainee(trainerList));
   }
-
+  //работает
   @PutMapping("/trainee/trainers")
   public ResponseEntity<List<TrainerDtoForTrainee>> updateTraineeTrainerList(@RequestParam("username") String username,
                                                                              @RequestParam("trainingDate") String trainingDate,
-                                                                             @RequestParam("trainingType") String trainingType,
-                                                                             @RequestParam List<TrainersDtoList> list) {
-
-    List<TrainerDtoForTrainee> updatedTrainersList = new ArrayList<>();
-    return ResponseEntity.ok(updatedTrainersList);
+                                                                             @RequestParam("trainingName") String trainingName,
+                                                                             @RequestBody List<TrainersDtoList> list) {
+    return ResponseEntity.ok(trainingService.updateTraineeTrainerList(username, trainingDate, trainingName, list));
   }
-
+  //работает
   @GetMapping("/trainee/trainings-list")
   public ResponseEntity<List<TrainingTraineeResponse>> findTraineeTrainingsList(@RequestParam String username,
                                                                                 @RequestParam(required = false) String periodFrom,
                                                                                 @RequestParam(required = false) String periodTo,
                                                                                 @RequestParam(required = false) String trainerName,
                                                                                 @RequestParam(required = false) String trainingType) {
+
     List<Training> trainingsList = trainingService.findTrainingsByUsernameAndCriteria(username, periodFrom,
         periodTo, trainerName, trainingType);
-    //TODO Для каждого тренинга нужно засетать имя тренера
     return ResponseEntity.ok(trainingConverter.toTrainingResponse(trainingsList));
   }
+
   //работает
   @PatchMapping("/activate-deactivate-trainee")
-  public ResponseEntity<Void> activateDeactivateTrainee(@RequestParam("username")String username,
+  public ResponseEntity<Void> activateDeactivateTrainee(@RequestParam("username") String username,
                                                         @RequestParam("active") boolean isActive) {
     var trainee = traineeService.findByUsername(username);
-    traineeService.toggleProfileActivation(trainee.getId(),isActive);
+    traineeService.toggleProfileActivation(trainee.getId(), isActive);
     return ResponseEntity.ok().build();
   }
 }
