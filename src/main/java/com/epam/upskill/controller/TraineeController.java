@@ -9,10 +9,12 @@ import com.epam.upskill.entity.Training;
 import com.epam.upskill.service.TraineeService;
 import com.epam.upskill.service.TrainingService;
 import com.epam.upskill.service.UserService;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -29,70 +31,76 @@ public class TraineeController {
   private final TrainingConverter trainingConverter;
   private final TrainingService trainingService;
 
-  //работает
-  @GetMapping("/trainee-profile")
-  public ResponseEntity<TraineeResponse> findTraineeProfile(@RequestParam("username") String username) {
+
+  @GetMapping("/trainee/profile")
+  @ApiOperation("Find Trainee by username")
+  public ResponseEntity<TraineeResponse> findTrainee(@RequestParam("username") @NotBlank String username) {
     var trainee = traineeService.findByUsername(username);
     var traineeResponse = converter.toTraineeResponse(trainee, traineeService);
     return ResponseEntity.ok(traineeResponse);
   }
 
-  //работает
-  @PutMapping("/trainee")
-  public ResponseEntity<TraineeUpdateResponse> updateTraineeProfile(@RequestParam("username") String username,
-                                                                    @RequestParam("firstName") String firstName,
-                                                                    @RequestParam("lastName") String lastName,
-                                                                    @RequestParam(value = "dateOfBirth", required = false) String dateOfBirth,
-                                                                    @RequestParam(value = "address", required = false) String address,
-                                                                    @RequestParam("isActive") boolean isActive) {
+  @PutMapping("/trainee/profile")
+  @ApiOperation("Update Trainee profile")
+  public ResponseEntity<TraineeUpdateResponse> updateTrainee(
+      @RequestParam("username") @NotBlank String username,
+      @RequestParam("firstName") String firstName,
+      @RequestParam("lastName") String lastName,
+      @RequestParam(value = "dateOfBirth", required = false) String dateOfBirth,
+      @RequestParam(value = "address", required = false) String address,
+      @RequestParam("isActive") boolean isActive) {
     LocalDate localDate = getLocalDate(dateOfBirth);
     TraineeUpdateRequest traineeUpdateRequest = new TraineeUpdateRequest(username, firstName, lastName, localDate,
         address, isActive);
     var trainee = traineeService.updateTrainee(traineeUpdateRequest);
-    var traineeUpdateResponse = converter.toTraineeUpdateResponse(trainee, traineeService);
-    return ResponseEntity.ok(traineeUpdateResponse);
+    return ResponseEntity.ok(converter.toTraineeUpdateResponse(trainee, traineeService));
   }
 
-  //работает
   @DeleteMapping("/trainee")
-  public ResponseEntity<String> deleteTraineeProfile(@RequestParam String username) {
+  @ApiOperation("Delete Trainee by username")
+  public ResponseEntity<String> deleteTrainee(@RequestParam("username") @NotBlank String username) {
     var trainee = traineeService.findByUsername(username);
     userService.delete(trainee.getId());
     return ResponseEntity.ok("200 OK");
   }
 
-  //работает
   @GetMapping("/trainee/not-active-trainers")
-  public ResponseEntity<List<TrainerDtoForTrainee>> findNotAssignedActiveTrainers(@RequestParam String username) {
+  @ApiOperation("Find not assigned active trainers for a Trainee")
+  public ResponseEntity<List<TrainerDtoForTrainee>> findNotActiveTrainers(
+      @RequestParam("username") @NotBlank String username) {
     List<Trainer> trainerList = trainingService.findNotAssignedActiveTrainersToTrainee(username);
     trainerConverter.toTrainerDtoForTrainee(trainerList);
     return ResponseEntity.ok(trainerConverter.toTrainerDtoForTrainee(trainerList));
   }
-  //работает
+
   @PutMapping("/trainee/trainers")
-  public ResponseEntity<List<TrainerDtoForTrainee>> updateTraineeTrainerList(@RequestParam("username") String username,
-                                                                             @RequestParam("trainingDate") String trainingDate,
-                                                                             @RequestParam("trainingName") String trainingName,
-                                                                             @RequestBody List<TrainersDtoList> list) {
+  @ApiOperation("Update Trainee's trainers")
+  public ResponseEntity<List<TrainerDtoForTrainee>> updateTraineeTrainerList(
+      @RequestParam("username") @NotBlank String username,
+      @RequestParam("trainingDate") @NotBlank String trainingDate,
+      @RequestParam("trainingName") @NotBlank String trainingName,
+      @RequestBody List<TrainersDtoList> list) {
     return ResponseEntity.ok(trainingService.updateTraineeTrainerList(username, trainingDate, trainingName, list));
   }
-  //работает
-  @GetMapping("/trainee/trainings-list")
-  public ResponseEntity<List<TrainingTraineeResponse>> findTraineeTrainingsList(@RequestParam String username,
-                                                                                @RequestParam(required = false) String periodFrom,
-                                                                                @RequestParam(required = false) String periodTo,
-                                                                                @RequestParam(required = false) String trainerName,
-                                                                                @RequestParam(required = false) String trainingType) {
 
+  @GetMapping("/trainee/trainings")
+  @ApiOperation("Find Trainee's trainings")
+  public ResponseEntity<List<TrainingTraineeResponse>> findTraineeTrainingsList(
+      @RequestParam("username") @NotBlank String username,
+      @RequestParam(required = false) String periodFrom,
+      @RequestParam(required = false) String periodTo,
+      @RequestParam(required = false) String trainerName,
+      @RequestParam(required = false) String trainingType) {
     List<Training> trainingsList = trainingService.findTrainingsByUsernameAndCriteria(username, periodFrom,
         periodTo, trainerName, trainingType);
     return ResponseEntity.ok(trainingConverter.toTrainingResponse(trainingsList));
   }
 
-  //работает
-  @PatchMapping("/activate-deactivate-trainee")
-  public ResponseEntity<Void> activateDeactivateTrainee(@RequestParam("username") String username,
-                                                        @RequestParam("active") boolean isActive) {
+
+  @PatchMapping("/trainer/toggle-activation")
+  @ApiOperation("Activate or deactivate a Trainee's profile")
+  public ResponseEntity<Void> toggleActivation(@RequestParam("username") @NotBlank String username,
+                                               @RequestParam("active") @NotBlank boolean isActive) {
     var trainee = traineeService.findByUsername(username);
     traineeService.toggleProfileActivation(trainee.getId(), isActive);
     return ResponseEntity.ok().build();

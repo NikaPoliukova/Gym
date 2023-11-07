@@ -3,6 +3,7 @@ package com.epam.upskill.converter;
 import com.epam.upskill.dto.*;
 import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.entity.Trainer;
+import com.epam.upskill.entity.TrainingType;
 import com.epam.upskill.service.TraineeService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

@@ -38,11 +38,6 @@ public interface TrainerConverter {
   @Mapping(target = "specialization", expression = "java(mapEnumToString(trainer.getSpecialization().getTrainingTypeName()))")
   TrainerUpdateResponse toTrainerUpdateResponse(Trainer trainer, TrainerService trainerService);
 
-// List<TrainerUpdateResponse> toTrainerUpdateResponse(List<Trainer> trainers);
-
-//  Trainer toTrainer(TrainerUpdateRequest request);
-
-
   default List<TraineeDtoForTrainer> traineesList(long trainerId, TrainerService trainerService) {
     return trainerService.findTraineesForTrainer(trainerId);
   }

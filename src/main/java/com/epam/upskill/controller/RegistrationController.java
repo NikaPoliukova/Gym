@@ -14,40 +14,38 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import javax.validation.constraints.NotBlank;
 
-//РАБОТАEТ
+import static com.epam.upskill.util.UserUtils.getLocalDate;
+
+
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/registration")
 @Api(tags = "Registration")
 public class RegistrationController {
   private final TraineeService traineeService;
   private final TrainerService trainerService;
 
-  @PostMapping("/trainee-registration")
+  @PostMapping("/trainee")
   @ApiOperation("Register a new trainee")
-  public ResponseEntity<Principal> traineeRegistration(@RequestParam String firstName,
-                                                       @RequestParam String lastName,
+  public ResponseEntity<Principal> traineeRegistration(@RequestParam("firstName") @NotBlank String firstName,
+                                                       @RequestParam("lastName") @NotBlank String lastName,
                                                        @RequestParam(required = false) String address,
                                                        @RequestParam(required = false) String dateOfBirth) {
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    LocalDate localDate = LocalDate.parse(dateOfBirth, formatter);
-    TraineeRegistration traineeRegistration = new TraineeRegistration(firstName, lastName, address, localDate);
+    TraineeRegistration traineeRegistration = new TraineeRegistration(firstName, lastName, address,
+        getLocalDate(dateOfBirth));
     var trainee = traineeService.saveTrainee(traineeRegistration);
-    var principal = new Principal(trainee.getUsername(), trainee.getPassword());
-    return ResponseEntity.ok(principal);
+    return ResponseEntity.ok(new Principal(trainee.getUsername(), trainee.getPassword()));
   }
 
-  @PostMapping("/trainer-registration")
+  @PostMapping("/trainer")
   @ApiOperation("Register a new trainer")
-  public ResponseEntity<Principal> trainerRegistration(@RequestParam String firstName,
-                                                       @RequestParam String lastName,
-                                                       @RequestParam String specialization) {
+  public ResponseEntity<Principal> trainerRegistration(@RequestParam("firstName") @NotBlank String firstName,
+                                                       @RequestParam("lastName") @NotBlank String lastName,
+                                                       @RequestParam("specialization") @NotBlank String specialization) {
     TrainerRegistration trainerRegistration = new TrainerRegistration(firstName, lastName, specialization);
     var trainer = trainerService.saveTrainer(trainerRegistration);
-    var principal = new Principal(trainer.getUsername(), trainer.getPassword());
-    return ResponseEntity.ok(principal);
+    return ResponseEntity.ok(new Principal(trainer.getUsername(), trainer.getPassword()));
   }
 }
