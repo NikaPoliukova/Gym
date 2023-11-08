@@ -4,7 +4,7 @@ import com.epam.upskill.converter.TrainingTypeConverter;
 import com.epam.upskill.dto.TrainingRequest;
 import com.epam.upskill.dto.TrainingTypeResponse;
 import com.epam.upskill.entity.TrainingType;
-import com.epam.upskill.exception.TrainingSaveException;
+import com.epam.upskill.exception.OperationFailedException;
 import com.epam.upskill.service.TrainingService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,8 +41,8 @@ public class TrainingController {
       TrainingRequest trainingRequest = new TrainingRequest(traineeUsername, trainerUsername, trainingName,
           date, type, duration);
       trainingService.saveTraining(trainingRequest);
-    } catch (TrainingSaveException ex) {
-      throw new TrainingSaveException();
+    } catch (OperationFailedException ex) {
+      throw new OperationFailedException(trainingName + "with date " + date, "Save training");
     }
   }
 

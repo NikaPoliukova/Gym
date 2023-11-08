@@ -7,7 +7,7 @@ import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.Training;
 import com.epam.upskill.entity.TrainingType;
-import com.epam.upskill.exception.TrainingNotFoundException;
+import com.epam.upskill.exception.OperationFailedException;
 import com.epam.upskill.service.TraineeService;
 import com.epam.upskill.service.TrainerService;
 import com.epam.upskill.service.TrainingService;
@@ -47,7 +47,7 @@ public class TrainingServiceImpl implements TrainingService {
     MDC.put(TRANSACTION_ID, transactionId);
     log.info("Transaction ID: {} | Fetching Training by ID: {}", transactionId, trainingId);
     return trainingRepository.findById(trainingId).orElseThrow(()
-        -> new TrainingNotFoundException("trainingId = " + trainingId));
+        -> new OperationFailedException(" training id", "find training by id"));
 
   }
 

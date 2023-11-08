@@ -4,8 +4,8 @@ import com.epam.upskill.converter.TrainerConverter;
 import com.epam.upskill.converter.TrainingConverter;
 import com.epam.upskill.dto.*;
 import com.epam.upskill.entity.Training;
-import com.epam.upskill.exception.TrainerNotFoundException;
-import com.epam.upskill.exception.UpdateTrainerException;
+import com.epam.upskill.exception.OperationFailedException;
+import com.epam.upskill.exception.UserNotFoundException;
 import com.epam.upskill.service.TrainerService;
 import com.epam.upskill.service.TrainingService;
 import io.swagger.annotations.ApiOperation;
@@ -39,8 +39,8 @@ public class TrainerController {
     try {
       var trainer = trainerService.findByUsername(username);
       return converter.toTrainerResponse(trainer, trainerService);
-    } catch (TrainerNotFoundException ex) {
-      throw new TrainerNotFoundException(username);
+    } catch (UserNotFoundException ex) {
+      throw new UserNotFoundException(username);
     }
   }
 
@@ -56,8 +56,8 @@ public class TrainerController {
       var trainer = trainerService.update(new TrainerUpdateRequest(username, firstName, lastName, specialization, isActive));
       var trainerUpdateResponse = converter.toTrainerUpdateResponse(trainer, trainerService);
       return ResponseEntity.ok(trainerUpdateResponse);
-    } catch (UpdateTrainerException ex) {
-      throw new UpdateTrainerException(username);
+    } catch (OperationFailedException ex) {
+      throw new OperationFailedException(username," update Trainer's profile" );
     }
   }
 

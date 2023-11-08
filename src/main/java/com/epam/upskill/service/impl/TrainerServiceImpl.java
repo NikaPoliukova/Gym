@@ -9,8 +9,7 @@ import com.epam.upskill.dto.TrainerUpdateRequest;
 import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.TrainingType;
-import com.epam.upskill.exception.TraineeNotFoundException;
-import com.epam.upskill.exception.TrainerNotFoundException;
+import com.epam.upskill.exception.UserNotFoundException;
 import com.epam.upskill.service.TrainerService;
 import com.epam.upskill.service.UserService;
 import com.epam.upskill.util.UserUtils;
@@ -44,7 +43,7 @@ public class TrainerServiceImpl implements TrainerService {
     MDC.put(TRANSACTION_ID, transactionId);
     log.info("Transaction ID: {} | Fetching Trainer by ID: {}", transactionId, trainerId);
     return trainerRepository.findById(trainerId).orElseThrow(()
-        -> new TrainerNotFoundException("Trainer not found with id: " + trainerId));
+        -> new UserNotFoundException("trainer with id = " + trainerId));
   }
 
   @Override
@@ -54,7 +53,7 @@ public class TrainerServiceImpl implements TrainerService {
     MDC.put(TRANSACTION_ID, transactionId);
     log.info("Transaction ID: {} | Fetching Trainer by username: {}", transactionId, username);
     return trainerRepository.findByUsername(username).orElseThrow(()
-        -> new TrainerNotFoundException("Trainer not found with username: " + username));
+        -> new UserNotFoundException(username));
   }
 
   @Override
@@ -64,7 +63,7 @@ public class TrainerServiceImpl implements TrainerService {
     MDC.put(TRANSACTION_ID, transactionId);
     log.info("Transaction ID: {} | Fetching with username: {} and password = {}", transactionId, username, password);
     return trainerRepository.findByUsernameAndPassword(username, password).orElseThrow(()
-        -> new TraineeNotFoundException("Trainee not found with username: " + username + " and password = " + password));
+        -> new UserNotFoundException(username));
 
   }
 

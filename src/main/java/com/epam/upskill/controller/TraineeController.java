@@ -6,9 +6,8 @@ import com.epam.upskill.converter.TrainingConverter;
 import com.epam.upskill.dto.*;
 import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.Training;
-import com.epam.upskill.exception.TraineeNotFoundException;
-import com.epam.upskill.exception.UpdateTraineeException;
-import com.epam.upskill.exception.UpdateTrainerListException;
+import com.epam.upskill.exception.OperationFailedException;
+import com.epam.upskill.exception.UserNotFoundException;
 import com.epam.upskill.service.TraineeService;
 import com.epam.upskill.service.TrainingService;
 import com.epam.upskill.service.UserService;
@@ -44,8 +43,8 @@ public class TraineeController {
     try {
       var trainee = traineeService.findByUsername(username);
       return converter.toTraineeResponse(trainee, traineeService);
-    } catch (TraineeNotFoundException ex) {
-      throw new TraineeNotFoundException(username);
+    } catch (UserNotFoundException ex) {
+      throw new UserNotFoundException(username);
     }
   }
 
@@ -63,8 +62,8 @@ public class TraineeController {
       TraineeUpdateRequest traineeUpdateRequest = new TraineeUpdateRequest(username, firstName, lastName, dateOfBirth, address, isActive);
       var trainee = traineeService.updateTrainee(traineeUpdateRequest);
       return converter.toTraineeUpdateResponse(trainee, traineeService);
-    } catch (UpdateTraineeException ex) {
-      throw new UpdateTraineeException(username);
+    } catch (OperationFailedException ex) {
+      throw new OperationFailedException(username, "update trainee");
     }
   }
 
@@ -75,8 +74,8 @@ public class TraineeController {
     try {
       var trainee = traineeService.findByUsername(username);
       userService.delete(trainee.getId());
-    } catch (TraineeNotFoundException ex) {
-      throw new TraineeNotFoundException(username);
+    } catch (OperationFailedException ex) {
+      throw new OperationFailedException(username,"delete trainee" );
     }
   }
 
@@ -98,8 +97,8 @@ public class TraineeController {
       @RequestBody @NotEmpty List<TrainersDtoList> list) {
     try {
       return trainingService.updateTraineeTrainerList(new UpdateTraineeTrainerDto(username, trainingDate, trainingName, list));
-    } catch (UpdateTrainerListException ex) {
-      throw new UpdateTrainerListException(username);
+    } catch (OperationFailedException ex) {
+      throw new OperationFailedException(username, "update trainee's trainers");
     }
   }
 
@@ -116,7 +115,6 @@ public class TraineeController {
     if (periodFrom != null && periodTo != null && periodFrom.isAfter(periodTo)) {
       throw new IllegalArgumentException("periodFrom must be before or equal to periodTo");
     }
-
     List<Training> trainingsList = trainingService.findTrainingsByUsernameAndCriteria(new TrainingTraineeRequest
         (username, periodFrom, periodTo, trainerName, trainingType));
     return trainingConverter.toTrainingResponse(trainingsList);
@@ -130,8 +128,8 @@ public class TraineeController {
     try {
       var trainee = traineeService.findByUsername(username);
       traineeService.toggleProfileActivation(trainee.getId(), isActive);
-    } catch (TraineeNotFoundException ex) {
-      throw new TraineeNotFoundException(username);
+    } catch (OperationFailedException ex) {
+      throw new OperationFailedException(username,"activate or deactivate a trainee ");
     }
   }
 }

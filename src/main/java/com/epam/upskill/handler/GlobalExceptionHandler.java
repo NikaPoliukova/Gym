@@ -1,6 +1,8 @@
 package com.epam.upskill.handler;
 
-import com.epam.upskill.exception.*;
+import com.epam.upskill.exception.AuthenticationException;
+import com.epam.upskill.exception.RegistrationException;
+import com.epam.upskill.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -15,21 +17,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   public ResponseEntity<ErrorResponse> handleException(Exception ex) {
     ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", ex.getMessage());
     return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-  }
-
-  @ExceptionHandler(TraineeNotFoundException.class)
-  public ResponseEntity<String> handleTraineeNotFoundException(TraineeNotFoundException ex) {
-    return new ResponseEntity<>("Trainee not found: " + ex.getMessage(), HttpStatus.NOT_FOUND);
-  }
-
-  @ExceptionHandler(TrainerNotFoundException.class)
-  public ResponseEntity<String> handleTrainerNotFoundException(TrainerNotFoundException ex) {
-    return new ResponseEntity<>("Trainer not found: " + ex.getMessage(), HttpStatus.NOT_FOUND);
-  }
-
-  @ExceptionHandler(TrainingNotFoundException.class)
-  public ResponseEntity<String> handleTrainingNotFoundException(TrainingNotFoundException ex) {
-    return new ResponseEntity<>("Training not found: " + ex.getMessage(), HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(UserNotFoundException.class)

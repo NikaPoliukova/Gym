@@ -1,7 +1,7 @@
 package com.epam.upskill.controller;
 
 import com.epam.upskill.dto.UserUpdatePass;
-import com.epam.upskill.exception.UserUpdateException;
+import com.epam.upskill.exception.OperationFailedException;
 import com.epam.upskill.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -30,11 +30,11 @@ public class UserController {
       String newPassword) {
     try {
       if (oldPassword.equals(newPassword)) {
-        throw new UserUpdateException("New password cannot be the same as the old password");
+        throw new OperationFailedException(" user because new password cannot be the same as the old password", "change login");
       }
       userService.updatePassword(new UserUpdatePass(username, oldPassword, newPassword));
-    } catch (UserUpdateException ex) {
-      throw new UserUpdateException(username);
+    } catch (OperationFailedException ex) {
+      throw new OperationFailedException(username, "change login");
     }
   }
 }
