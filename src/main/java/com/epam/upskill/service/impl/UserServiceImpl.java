@@ -5,6 +5,7 @@ import com.epam.upskill.dao.UserRepository;
 import com.epam.upskill.dto.UserDto;
 import com.epam.upskill.dto.UserUpdatePass;
 import com.epam.upskill.entity.User;
+import com.epam.upskill.exception.OperationFailedException;
 import com.epam.upskill.exception.UserNotFoundException;
 import com.epam.upskill.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -26,16 +27,15 @@ import java.util.UUID;
 @Service
 @Validated
 public class UserServiceImpl implements UserService {
+  public static final String TRANSACTION_ID = "transactionId";
   private final UserRepository userRepository;
 
   @Override
   @Transactional
   public User findById(long userId) {
     String transactionId = UUID.randomUUID().toString();
-    MDC.put("transactionId", transactionId);
-
-    log.info("Transaction ID: {} | Fetching User by ID: {}", transactionId, userId);
-    return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("userId = " + userId));
+    MDC.put(TRANSACTION_ID, transactionId);
+    return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(" witt userId = " + userId));
 
   }
 
@@ -43,10 +43,7 @@ public class UserServiceImpl implements UserService {
   @Transactional(readOnly = true)
   public List<User> findAll() {
     String transactionId = UUID.randomUUID().toString();
-    MDC.put("transactionId", transactionId);
-
-    log.info("Transaction ID: {} | Fetching all Users", transactionId);
-
+    MDC.put(TRANSACTION_ID, transactionId);
     var users = userRepository.findAll();
     return users != null ? users : Collections.emptyList();
   }
@@ -55,9 +52,7 @@ public class UserServiceImpl implements UserService {
   @Transactional(readOnly = true)
   public User findByUsername(@NotBlank String username) {
     String transactionId = UUID.randomUUID().toString();
-    MDC.put("transactionId", transactionId);
-
-    log.info("Transaction ID: {} | Fetching User by username: {}", transactionId, username);
+    MDC.put(TRANSACTION_ID, transactionId);
     return userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
 
   }
@@ -66,9 +61,7 @@ public class UserServiceImpl implements UserService {
   @Transactional
   public void updatePassword(@Valid UserUpdatePass userUpdatePass) {
     String transactionId = UUID.randomUUID().toString();
-    MDC.put("transactionId", transactionId);
-    log.info("Transaction ID: {} | Updating password for User with username: {}", transactionId, userUpdatePass.username());
-
+    MDC.put(TRANSACTION_ID, transactionId);
     var user = findByUsernameAndPassword(userUpdatePass.username(), userUpdatePass.oldPassword());
     user.setPassword(userUpdatePass.newPassword());
     userRepository.update(user);
@@ -78,28 +71,22 @@ public class UserServiceImpl implements UserService {
   @Transactional
   public User findByUsernameAndPassword(@NotBlank String username, @NotBlank String password) {
     String transactionId = UUID.randomUUID().toString();
-    MDC.put("transactionId", transactionId);
-
-    log.info("Transaction ID: {} | Fetching User by username: {} and password", transactionId, username);
-
+    MDC.put(TRANSACTION_ID, transactionId);
     return userRepository.findByUsernameAndPassword(username, password)
-        .orElseThrow(() -> new UserNotFoundException("User not found"));
+        .orElseThrow(() -> new UserNotFoundException(username));
   }
 
   @Override
   @Transactional
   public void updateLogin(@Valid UserDto userDto) {
     String transactionId = UUID.randomUUID().toString();
-    MDC.put("transactionId", transactionId);
-
-    log.info("Transaction ID: {} | Updating login for User with ID: {}", transactionId, userDto.id());
+    MDC.put(TRANSACTION_ID, transactionId);
     try {
       var user = findById(userDto.id());
       user.setUsername(userDto.username());
       userRepository.update(user);
-    } catch (UserNotFoundException ex) {
-      log.warn("Transaction ID: {} | User not found with ID: {}", transactionId, userDto.id());
-      throw new UserNotFoundException("User not found with ID: " + userDto.id());
+    } catch (OperationFailedException ex) {
+      throw new OperationFailedException(userDto.username(), "update login");
     }
   }
 
@@ -107,14 +94,12 @@ public class UserServiceImpl implements UserService {
   @Transactional
   public void delete(@NotNull long userId) {
     String transactionId = UUID.randomUUID().toString();
-    MDC.put("transactionId", transactionId);
-    log.info("Transaction ID: {} | Deleting User with ID: {}", transactionId, userId);
+    MDC.put(TRANSACTION_ID, transactionId);
     try {
       findById(userId);
       userRepository.delete(userId);
-    } catch (UserNotFoundException ex) {
-      log.warn("Transaction ID: {} | User not found with ID: {}", transactionId, userId);
-      throw new UserNotFoundException("User not found with ID: " + userId);
+    } catch (OperationFailedException ex) {
+      throw new OperationFailedException(" user with id=  " + userId, "delete user");
     }
   }
 }

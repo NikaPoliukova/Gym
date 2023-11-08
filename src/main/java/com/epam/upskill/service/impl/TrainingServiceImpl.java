@@ -21,7 +21,6 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -131,7 +130,6 @@ public class TrainingServiceImpl implements TrainingService {
   public void delete(@NotNull Training training) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put(TRANSACTION_ID, transactionId);
-    log.info("Transaction ID: {} | Deleting Training: {}", transactionId, training);
     trainingRepository.delete(training);
   }
 
@@ -140,27 +138,18 @@ public class TrainingServiceImpl implements TrainingService {
   public List<TrainerDtoForTrainee> updateTraineeTrainerList(@Valid UpdateTraineeTrainerDto dto) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put(TRANSACTION_ID, transactionId);
-
-    log.info("Transaction ID: {} | Updating Trainee Trainer List for Trainee with username: {}",
-        transactionId, dto.username());
-
     Trainee trainee = traineeService.findByUsername(dto.username());
     List<Training> trainings = findTrainingsByUsernameAndCriteria(trainee.getId(), dto.trainingDate(), dto.trainingName());
     Training patternTraining = trainings.get(0);
     trainings.forEach(trainingRepository::delete);
-
-    List<Trainer> newTrainerList = new ArrayList<>();
-    List<TrainerDtoForTrainee> newTrainerListForResponse = new ArrayList<>();
-    for (TrainersDtoList trainerDto : dto.list()) {
-      newTrainerList.add(trainerService.findByUsername(trainerDto.username()));
-    }
-    for (Trainer newTrainer : newTrainerList) {
-      TrainingRequest trainingRequest = getTrainingRequest(trainee, patternTraining, newTrainer);
-      Training training = saveTraining(trainingRequest);
-      newTrainerListForResponse.add(getTrainerResponse(training));
-    }
-    return newTrainerListForResponse;
-
+    return dto.list().stream()
+        .map(trainerDto -> trainerService.findByUsername(trainerDto.username()))
+        .map(newTrainer -> {
+          TrainingRequest trainingRequest = getTrainingRequest(trainee, patternTraining, newTrainer);
+          Training training = saveTraining(trainingRequest);
+          return getTrainerResponse(training);
+        })
+        .toList();
   }
 
 

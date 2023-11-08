@@ -41,7 +41,6 @@ public class TrainerServiceImpl implements TrainerService {
   public Trainer findById(long trainerId) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put(TRANSACTION_ID, transactionId);
-    log.info("Transaction ID: {} | Fetching Trainer by ID: {}", transactionId, trainerId);
     return trainerRepository.findById(trainerId).orElseThrow(()
         -> new UserNotFoundException("trainer with id = " + trainerId));
   }
@@ -51,7 +50,6 @@ public class TrainerServiceImpl implements TrainerService {
   public Trainer findByUsername(String username) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put(TRANSACTION_ID, transactionId);
-    log.info("Transaction ID: {} | Fetching Trainer by username: {}", transactionId, username);
     return trainerRepository.findByUsername(username).orElseThrow(()
         -> new UserNotFoundException(username));
   }
@@ -61,7 +59,6 @@ public class TrainerServiceImpl implements TrainerService {
   public Trainer findByUsernameAndPassword(String username, String password) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put(TRANSACTION_ID, transactionId);
-    log.info("Transaction ID: {} | Fetching with username: {} and password = {}", transactionId, username, password);
     return trainerRepository.findByUsernameAndPassword(username, password).orElseThrow(()
         -> new UserNotFoundException(username));
 
@@ -72,7 +69,6 @@ public class TrainerServiceImpl implements TrainerService {
   public List<Trainer> findAll() {
     String transactionId = UUID.randomUUID().toString();
     MDC.put(TRANSACTION_ID, transactionId);
-    log.debug("Transaction ID: {} | Fetching all Trainers", transactionId);
     List<Trainer> trainerMap = trainerRepository.findAll();
     return trainerMap != null ? trainerMap : Collections.emptyList();
   }
@@ -82,7 +78,6 @@ public class TrainerServiceImpl implements TrainerService {
   public Trainer saveTrainer(TrainerRegistration trainerRegistration) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put(TRANSACTION_ID, transactionId);
-    log.info("Transaction ID: {} | Creating Trainer from TrainerRegistration: {}", transactionId, trainerRegistration);
     var username = UserUtils.createUsername(trainerRegistration.firstName(), trainerRegistration.lastName(),
         userService.findAll());
     var password = UserUtils.generateRandomPassword();
@@ -97,7 +92,6 @@ public class TrainerServiceImpl implements TrainerService {
   public Trainer update(TrainerUpdateRequest request) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put(TRANSACTION_ID, transactionId);
-    log.info("Transaction ID: {} | Updating Trainer with TrainerDto: {}", transactionId, request);
     var trainer = findByUsername(request.username());
     Optional.ofNullable(request.firstName()).filter(firstName -> !firstName.isEmpty())
         .ifPresent(trainer::setFirstName);
@@ -112,7 +106,6 @@ public class TrainerServiceImpl implements TrainerService {
   public List<Trainer> findByIsActive() {
     String transactionId = UUID.randomUUID().toString();
     MDC.put(TRANSACTION_ID, transactionId);
-    log.info("Transaction ID: {} | Fetching active Trainers", transactionId);
     List<Trainer> activeTrainers = trainerRepository.findByIsActive();
     return activeTrainers.isEmpty() ? Collections.emptyList() : activeTrainers;
 
@@ -123,7 +116,6 @@ public class TrainerServiceImpl implements TrainerService {
   public void toggleProfileActivation(long trainerId, boolean isActive) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put(TRANSACTION_ID, transactionId);
-    log.info("Transaction ID: {} | Toggling profile activation for Trainer with ID: {}", transactionId, trainerId);
     var trainer = findById(trainerId);
     trainer.setActive(isActive);
     trainerRepository.toggleProfileActivation(trainer);
@@ -135,7 +127,6 @@ public class TrainerServiceImpl implements TrainerService {
   public List<TraineeDtoForTrainer> findTraineesForTrainer(long id) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put(TRANSACTION_ID, transactionId);
-    log.info("Transaction ID: {} | Fetching Trainees for Trainer with ID: {}", transactionId, id);
     List<Trainee> listTrainees = trainerRepository.findTraineesForTrainer(id);
     if (listTrainees.isEmpty()) {
       return Collections.emptyList();

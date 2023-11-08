@@ -8,8 +8,8 @@ import com.epam.upskill.dto.TraineeUpdateRequest;
 import com.epam.upskill.dto.TrainerDtoForTrainee;
 import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.exception.UserNotFoundException;
-import com.epam.upskill.logger.OperationLogger;
-import com.epam.upskill.logger.TransactionLogger;
+import com.epam.upskill.logger.OperationLoggerAspect;
+import com.epam.upskill.logger.TransactionLoggerAspect;
 import com.epam.upskill.service.TraineeService;
 import com.epam.upskill.service.UserService;
 import com.epam.upskill.util.UserUtils;
@@ -40,8 +40,6 @@ public class TraineeServiceImpl implements TraineeService {
   private final UserService userService;
   private final TraineeConverter traineeConverter;
   private final TrainerConverter trainerConverter;
-  private final TransactionLogger transactionLogger;
-  private final OperationLogger operationLogger;
 
   @Override
   @Transactional
@@ -49,7 +47,7 @@ public class TraineeServiceImpl implements TraineeService {
     String transactionId = UUID.randomUUID().toString();
     MDC.put(TRANSACTION_ID, transactionId);
     return traineeRepository.findById(traineeId).orElseThrow(()
-        -> new UserNotFoundException("trainee with id = "+ traineeId));
+        -> new UserNotFoundException("trainee with id = " + traineeId));
 
   }
 
@@ -58,9 +56,6 @@ public class TraineeServiceImpl implements TraineeService {
   public Trainee findByUsername(@NotBlank String username) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put(TRANSACTION_ID, transactionId);
-
-    log.info("Transaction ID: {} | Fetching with username: {}", transactionId, username);
-
     return traineeRepository.findByUsername(username).orElseThrow(()
         -> new UserNotFoundException(username));
 
@@ -71,9 +66,8 @@ public class TraineeServiceImpl implements TraineeService {
   public Trainee findByUsernameAndPassword(String username, String password) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put(TRANSACTION_ID, transactionId);
-    log.info("Transaction ID: {} | Fetching with username: {} and password = {}", transactionId, username, password);
     return traineeRepository.findByUsernameAndPassword(username, password).orElseThrow(()
-        -> new UserNotFoundException(username ));
+        -> new UserNotFoundException(username));
 
   }
 
@@ -82,23 +76,22 @@ public class TraineeServiceImpl implements TraineeService {
   public List<Trainee> findAll() {
     String transactionId = UUID.randomUUID().toString();
     MDC.put(TRANSACTION_ID, transactionId);
-    log.debug("Transaction ID: {} | Fetching all Trainees", transactionId);
-        List<Trainee> trainees = traineeRepository.findAll();
-      return trainees != null ? trainees : Collections.emptyList();
-     }
+    List<Trainee> trainees = traineeRepository.findAll();
+    return trainees != null ? trainees : Collections.emptyList();
+  }
 
   @Override
   @Transactional
   public Trainee saveTrainee(@Valid TraineeRegistration traineeDto) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put(TRANSACTION_ID, transactionId);
-    log.info("Transaction ID: {} | Creating Trainee from TraineeRegistration: {}", transactionId, traineeDto);
-      var username = UserUtils.createUsername(traineeDto.firstName(), traineeDto.lastName(),
-          userService.findAll());
-      var password = UserUtils.generateRandomPassword();
-      var trainee = traineeConverter.toTrainee(traineeDto);
-      fillInTheTrainee(traineeDto, username, password, trainee);
-      return traineeRepository.save(trainee);
+
+    var username = UserUtils.createUsername(traineeDto.firstName(), traineeDto.lastName(),
+        userService.findAll());
+    var password = UserUtils.generateRandomPassword();
+    var trainee = traineeConverter.toTrainee(traineeDto);
+    fillInTheTrainee(traineeDto, username, password, trainee);
+    return traineeRepository.save(trainee);
   }
 
   @Override
@@ -106,20 +99,12 @@ public class TraineeServiceImpl implements TraineeService {
   public Trainee updateTrainee(@Valid TraineeUpdateRequest request) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put(TRANSACTION_ID, transactionId);
-    log.info("Transaction ID: {} | Updating Trainee with TraineeDto: {}", transactionId, request);
-
-      var trainee = findByUsername(request.username());
-      Optional.ofNullable(request.firstName()).filter(firstName -> !firstName.isEmpty())
-          .ifPresent(trainee::setFirstName);
-      Optional.ofNullable(request.lastName()).filter(lastName -> !lastName.isEmpty())
-          .ifPresent(trainee::setLastName);
-      Optional.ofNullable(request.dateOfBirth()).ifPresent(trainee::setDateOfBirth);
-      Optional.ofNullable(request.address()).filter(address -> !address.isEmpty())
-          .ifPresent(trainee::setAddress);
-      if (request.isActive() != trainee.isActive()) {
-        trainee.setActive(request.isActive());
-      }
-      return traineeRepository.update(trainee).get();
+    var trainee = findByUsername(request.username());
+    fillTrainee(request, trainee);
+    if (request.isActive() != trainee.isActive()) {
+      trainee.setActive(request.isActive());
+    }
+    return traineeRepository.update(trainee).get();
 
   }
 
@@ -128,8 +113,6 @@ public class TraineeServiceImpl implements TraineeService {
   public void toggleProfileActivation(long traineeId, boolean isActive) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put(TRANSACTION_ID, transactionId);
-    log.info("Transaction ID: {} | Toggling profile activation for Trainee with ID: {}", transactionId,
-        traineeId);
     var trainee = findById(traineeId);
     if (trainee.isActive() != isActive) {
       trainee.setActive(isActive);
@@ -143,7 +126,6 @@ public class TraineeServiceImpl implements TraineeService {
   public List<TrainerDtoForTrainee> findTrainersForTrainee(long id) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put(TRANSACTION_ID, transactionId);
-    log.debug("Transaction ID: {} | Fetching trainers for Trainee with ID: {}", transactionId, id);
     var listTrainers = traineeRepository.findTrainersForTrainee(id);
     if (listTrainers.isEmpty()) {
       return Collections.emptyList();
@@ -160,6 +142,17 @@ public class TraineeServiceImpl implements TraineeService {
     trainee.setUsername(username);
     trainee.setActive(true);
   }
+
+  private static void fillTrainee(TraineeUpdateRequest request, Trainee trainee) {
+    Optional.ofNullable(request.firstName()).filter(firstName -> !firstName.isEmpty())
+        .ifPresent(trainee::setFirstName);
+    Optional.ofNullable(request.lastName()).filter(lastName -> !lastName.isEmpty())
+        .ifPresent(trainee::setLastName);
+    Optional.ofNullable(request.dateOfBirth()).ifPresent(trainee::setDateOfBirth);
+    Optional.ofNullable(request.address()).filter(address -> !address.isEmpty())
+        .ifPresent(trainee::setAddress);
+  }
+
 }
 
 
