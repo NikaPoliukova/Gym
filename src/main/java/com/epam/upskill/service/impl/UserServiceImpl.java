@@ -25,7 +25,7 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-@Validated
+
 public class UserServiceImpl implements UserService {
   public static final String TRANSACTION_ID = "transactionId";
   private final UserRepository userRepository;
@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional(readOnly = true)
-  public User findByUsername(@NotBlank String username) {
+  public User findByUsername(String username) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put(TRANSACTION_ID, transactionId);
     return userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));

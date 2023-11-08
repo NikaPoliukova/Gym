@@ -60,7 +60,7 @@ public class UserRepositoryImpl implements UserRepository {
     try {
       return Optional.ofNullable(query.getSingleResult());
     } catch (NoResultException e) {
-      throw new UserNotFoundException("User named '" + username + "' was not found.");
+      throw new UserNotFoundException (username);
     }
   }
 
@@ -77,7 +77,7 @@ public class UserRepositoryImpl implements UserRepository {
     try {
       return Optional.ofNullable(query.getSingleResult());
     } catch (NoResultException e) {
-      throw new UserNotFoundException("User named '" + username + "' was not found.");
+      throw new UserNotFoundException(username);
     }
   }
 }

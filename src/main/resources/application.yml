@@ -21,3 +21,4 @@ hibernate:
 logging:
   level:
     org.hibernate.SQL: DEBUG
+    com.epam.upskill.logger: DEBUG

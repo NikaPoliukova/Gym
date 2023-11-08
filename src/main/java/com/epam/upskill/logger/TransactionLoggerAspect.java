@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 public class TransactionLoggerAspect {
-  private static final Logger logger = LoggerFactory.getLogger("com.example.transaction");
+  private static final Logger logger = LoggerFactory.getLogger("com.epam.upskill.logger");
 
-  @Before("execution(* com.example.service.*.*(..)) && args(.., transactionId)")
+  @Before("execution(* com.epam.upskill.service.impl.*.*(..)) && args(.., transactionId)")
   public void logTransactionStart(String transactionId) {
     logger.info("Transaction ID: {} | Transaction started", transactionId);
   }

@@ -13,15 +13,10 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-  @ExceptionHandler(Exception.class)
-  public ResponseEntity<ErrorResponse> handleException(Exception ex) {
-    ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", ex.getMessage());
-    return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-  }
 
   @ExceptionHandler(UserNotFoundException.class)
   public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
-    return new ResponseEntity<>("User not found: " + ex.getMessage(), HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>( ex.getMessage(), HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(AuthenticationException.class)
@@ -33,5 +28,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseEntity<String> handleCustomException(RegistrationException ex) {
     return ResponseEntity.badRequest().body(ex.getMessage());
+  }
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<ErrorResponse> handleException(Exception ex) {
+    ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", ex.getMessage());
+    return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
