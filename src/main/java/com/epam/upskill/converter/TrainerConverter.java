@@ -15,14 +15,6 @@ public interface TrainerConverter {
   @Mapping(source = "specialization", target = "specialization", qualifiedByName = "mapSpecialization")
   Trainer toTrainer(TrainerRegistration trainerRegistration);
 
-
-  @Named("mapSpecialization")
-  default TrainingType mapSpecialization(String specialization) {
-    TrainingType trainingType = new TrainingType();
-    trainingType.setTrainingTypeName(TrainingTypeEnum.valueOf(specialization));
-    return trainingType;
-  }
-
   @Mapping(target = "specialization", expression = "java(mapEnumToString(trainer.getSpecialization().getTrainingTypeName()))")
   TrainerDtoForTrainee toTrainerDtoForTrainee(Trainer trainer);
 
@@ -31,12 +23,19 @@ public interface TrainerConverter {
   @Mapping(target = "specialization", expression = "java(mapEnumToString(trainer.getSpecialization().getTrainingTypeName()))")
   @Mapping(target = "isActive", expression = "java(toBoolean(trainer))")
   @Mapping(target = "traineesList", expression = "java(traineesList(trainer.getId(),trainerService))")
-  TrainerResponse toTrainerResponse(Trainer trainer,TrainerService trainerService);
+  TrainerResponse toTrainerResponse(Trainer trainer, TrainerService trainerService);
 
   @Mapping(target = "traineeList", expression = "java(traineesList(trainer.getId(),trainerService))")
   @Mapping(target = "isActive", expression = "java(toBoolean(trainer))")
   @Mapping(target = "specialization", expression = "java(mapEnumToString(trainer.getSpecialization().getTrainingTypeName()))")
   TrainerUpdateResponse toTrainerUpdateResponse(Trainer trainer, TrainerService trainerService);
+
+  @Named("mapSpecialization")
+  default TrainingType mapSpecialization(String specialization) {
+    TrainingType trainingType = new TrainingType();
+    trainingType.setTrainingTypeName(TrainingTypeEnum.valueOf(specialization));
+    return trainingType;
+  }
 
   default List<TraineeDtoForTrainer> traineesList(long trainerId, TrainerService trainerService) {
     return trainerService.findTraineesForTrainer(trainerId);
@@ -45,6 +44,7 @@ public interface TrainerConverter {
   default boolean toBoolean(Trainer trainer) {
     return trainer.isActive();
   }
+
   default String mapEnumToString(TrainingTypeEnum trainingTypeEnum) {
     return trainingTypeEnum.toString();
   }

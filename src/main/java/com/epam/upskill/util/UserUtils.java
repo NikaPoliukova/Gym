@@ -35,7 +35,7 @@ public class UserUtils {
     return (int) users.stream()
         .map(User::getUsername)
         .filter(userUsername -> userUsername != null && userUsername.startsWith(username))
-        .count()+1;
+        .count() + 1;
   }
 
   public static LocalDate getLocalDate(String dateOfBirth) {

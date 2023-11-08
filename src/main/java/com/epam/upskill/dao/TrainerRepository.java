@@ -3,7 +3,6 @@ package com.epam.upskill.dao;
 import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.entity.Trainer;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 

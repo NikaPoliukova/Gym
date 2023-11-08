@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -59,7 +60,6 @@ public class TrainingServiceImpl implements TrainingService {
   public Training saveTraining(@Valid TrainingRequest request) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put("transactionId", transactionId);
-
     log.info("Transaction ID: {} | Creating Training: {}", transactionId, request);
     try {
       var trainee = traineeService.findByUsername(request.traineeUsername());
@@ -76,14 +76,14 @@ public class TrainingServiceImpl implements TrainingService {
   }
 
   @Override
-  public List<Training> findTrainingsByUsernameAndCriteria(String username, String periodFrom,
-                                                           String periodTo, String trainerName, String trainingType) {
+  public List<Training> findTrainingsByUsernameAndCriteria(String username, LocalDate periodFrom,
+                                                           LocalDate periodTo, String trainerName, String trainingType) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put("transactionId", transactionId);
 
     try {
       TrainingTypeEnum myEnum = TrainingTypeEnum.valueOf(trainingType);
-      return trainingRepository.findTrainingsByUsernameAndCriteria(username, periodFrom, periodTo,
+      return trainingRepository.findTraineeTrainingsList(username, periodFrom, periodTo,
           trainerName, myEnum);
     } finally {
       MDC.remove("transactionId");
@@ -96,7 +96,7 @@ public class TrainingServiceImpl implements TrainingService {
     MDC.put("transactionId", transactionId);
 
     try {
-      List<Training> trainings = trainingRepository.findTrainingsByUsernameAndCriteria(traineeId, trainingDate, trainingName);
+      List<Training> trainings = trainingRepository.findTraineeTrainingsList(traineeId, trainingDate, trainingName);
       if (trainings.isEmpty()) {
         return Collections.emptyList();
       }
@@ -107,7 +107,7 @@ public class TrainingServiceImpl implements TrainingService {
   }
 
   @Override
-  public List<Training> findTrainerTrainings(String username, String periodFrom, String periodTo,
+  public List<Training> findTrainerTrainings(String username, LocalDate periodFrom, LocalDate periodTo,
                                              String traineeName) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put("transactionId", transactionId);
@@ -197,7 +197,6 @@ public class TrainingServiceImpl implements TrainingService {
       MDC.remove("transactionId");
     }
   }
-
 
 
   private static TrainerDtoForTrainee getTrainerResponse(Training training) {

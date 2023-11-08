@@ -2,12 +2,9 @@ package com.epam.upskill.converter;
 
 import com.epam.upskill.dto.*;
 import com.epam.upskill.entity.Trainee;
-import com.epam.upskill.entity.Trainer;
-import com.epam.upskill.entity.TrainingType;
 import com.epam.upskill.service.TraineeService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 
 import java.util.List;
 
@@ -32,23 +29,23 @@ public interface TraineeConverter {
   @Mapping(target = "isActive", expression = "java(mapIsActive(trainee))")
   TraineeResponse toTraineeResponse(Trainee trainee, TraineeService traineeService);
 
-  @Named("mapTrainersForTrainee")
+
   default List<TrainerDtoForTrainee> trainingsList(Trainee trainee, TraineeService traineeService) {
     return traineeService.findTrainersForTrainee(trainee.getId());
   }
 
-  @Named("getActive")
   default boolean mapIsActive(Trainee trainee) {
     return trainee.isActive();
   }
 
-   default String mapUserName(Trainee trainee) {
+  default String mapUserName(Trainee trainee) {
     return trainee.getUsername();
   }
 
-   default String mapFirstName(Trainee trainee) {
+  default String mapFirstName(Trainee trainee) {
     return trainee.getFirstName();
   }
+
   default String mapLastName(Trainee trainee) {
     return trainee.getLastName();
   }

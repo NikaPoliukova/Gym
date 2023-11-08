@@ -7,6 +7,7 @@ import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.Training;
 import com.epam.upskill.entity.TrainingType;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface TrainingService {
@@ -14,12 +15,13 @@ public interface TrainingService {
 
   Training saveTraining(TrainingRequest trainingRequest);
 
-  List<Training> findTrainingsByUsernameAndCriteria(String username, String periodFrom, String periodTo,
+  List<Training> findTrainingsByUsernameAndCriteria(String username, LocalDate periodFrom, LocalDate periodTo,
                                                     String trainerName, String trainingType);
 
   List<Training> findTrainingsByUsernameAndCriteria(long traineeId, String trainingDate, String trainingName);
-  List<Training> findTrainerTrainings(String username, String periodFrom, String periodTo,
-                                                    String traineeName);
+
+  List<Training> findTrainerTrainings(String username, LocalDate periodFrom, LocalDate periodTo,
+                                      String traineeName);
 
   List<Trainer> findNotAssignedActiveTrainersToTrainee(String username);
 

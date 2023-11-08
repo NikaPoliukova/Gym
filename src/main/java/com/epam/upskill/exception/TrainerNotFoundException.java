@@ -7,3 +7,4 @@ public class TrainerNotFoundException extends NoSuchElementException {
     super("Trainer  was not found.");
   }
 }
+//TODO update pattern

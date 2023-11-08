@@ -7,8 +7,12 @@ import com.epam.upskill.service.TrainerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/**
+ * @deprecated ()
+ */
 @RequiredArgsConstructor
 @Service
+@Deprecated(forRemoval = false,since = "2.0")
 public class RegistrationFacade {
   private final TraineeService traineeService;
   private final TrainerService trainerService;

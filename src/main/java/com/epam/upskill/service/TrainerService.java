@@ -1,7 +1,6 @@
 package com.epam.upskill.service;
 
 import com.epam.upskill.dto.TraineeDtoForTrainer;
-import com.epam.upskill.dto.TrainerDto;
 import com.epam.upskill.dto.TrainerRegistration;
 import com.epam.upskill.dto.TrainerUpdateRequest;
 import com.epam.upskill.entity.Trainer;
@@ -23,7 +22,7 @@ public interface TrainerService {
 
   List<Trainer> findByIsActive();
 
-  void toggleProfileActivation(long trainerId,boolean isActive);
+  void toggleProfileActivation(long trainerId, boolean isActive);
 
   List<TraineeDtoForTrainer> findTraineesForTrainer(long id);
 }

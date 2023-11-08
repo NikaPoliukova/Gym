@@ -6,22 +6,28 @@ import com.epam.upskill.converter.TrainingConverter;
 import com.epam.upskill.dto.*;
 import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.Training;
+import com.epam.upskill.exception.TraineeNotFoundException;
+import com.epam.upskill.exception.UpdateTraineeException;
+import com.epam.upskill.exception.UpdateTrainerListException;
 import com.epam.upskill.service.TraineeService;
 import com.epam.upskill.service.TrainingService;
 import com.epam.upskill.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.epam.upskill.util.UserUtils.getLocalDate;
 
 @RequiredArgsConstructor
 @RestController
+@Validated
 @RequestMapping("/api/v1/trainees")
 public class TraineeController {
   private final UserService userService;
@@ -31,78 +37,99 @@ public class TraineeController {
   private final TrainingConverter trainingConverter;
   private final TrainingService trainingService;
 
-
-  @GetMapping("/trainee/profile")
-  @ApiOperation("Find Trainee by username")
-  public ResponseEntity<TraineeResponse> findTrainee(@RequestParam("username") @NotBlank String username) {
-    var trainee = traineeService.findByUsername(username);
-    var traineeResponse = converter.toTraineeResponse(trainee, traineeService);
-    return ResponseEntity.ok(traineeResponse);
+  @GetMapping("/trainee")
+  @ResponseStatus(HttpStatus.OK)
+  @ApiOperation("Get Trainee by username")
+  public TraineeResponse getTrainee(@RequestParam("username") @NotBlank String username) {
+    try {
+      var trainee = traineeService.findByUsername(username);
+      return converter.toTraineeResponse(trainee, traineeService);
+    } catch (TraineeNotFoundException ex) {
+      throw new TraineeNotFoundException(username);
+    }
   }
 
-  @PutMapping("/trainee/profile")
+  @PutMapping("/trainee/setting/profile")
+  @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Update Trainee profile")
-  public ResponseEntity<TraineeUpdateResponse> updateTrainee(
-      @RequestParam("username") @NotBlank String username,
-      @RequestParam("firstName") String firstName,
-      @RequestParam("lastName") String lastName,
-      @RequestParam(value = "dateOfBirth", required = false) String dateOfBirth,
-      @RequestParam(value = "address", required = false) String address,
-      @RequestParam("isActive") boolean isActive) {
-    LocalDate localDate = getLocalDate(dateOfBirth);
-    TraineeUpdateRequest traineeUpdateRequest = new TraineeUpdateRequest(username, firstName, lastName, localDate,
-        address, isActive);
-    var trainee = traineeService.updateTrainee(traineeUpdateRequest);
-    return ResponseEntity.ok(converter.toTraineeUpdateResponse(trainee, traineeService));
+  public TraineeUpdateResponse updateTrainee(@RequestParam("username") @NotBlank String username,
+                                                             @RequestParam("firstName") String firstName,
+                                                             @RequestParam("lastName") String lastName,
+                                                             @RequestParam(required = false)
+                                                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateOfBirth,
+                                                             @RequestParam(value = "address", required = false) String address,
+                                                             @RequestParam("isActive") boolean isActive) {
+    try {
+      TraineeUpdateRequest traineeUpdateRequest = new TraineeUpdateRequest(username, firstName, lastName, dateOfBirth, address, isActive);
+      var trainee = traineeService.updateTrainee(traineeUpdateRequest);
+      return converter.toTraineeUpdateResponse(trainee, traineeService);
+    } catch (UpdateTraineeException ex) {
+      throw new UpdateTraineeException(username);
+    }
   }
 
-  @DeleteMapping("/trainee")
+  @DeleteMapping
+  @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Delete Trainee by username")
-  public ResponseEntity<String> deleteTrainee(@RequestParam("username") @NotBlank String username) {
-    var trainee = traineeService.findByUsername(username);
-    userService.delete(trainee.getId());
-    return ResponseEntity.ok("200 OK");
+  public void deleteTrainee(@RequestParam("username") @NotBlank String username) {
+    try {
+      var trainee = traineeService.findByUsername(username);
+      userService.delete(trainee.getId());
+    } catch (TraineeNotFoundException ex) {
+      throw new TraineeNotFoundException(username);
+    }
   }
 
-  @GetMapping("/trainee/not-active-trainers")
+  @GetMapping("/not-active-trainers")
+  @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Find not assigned active trainers for a Trainee")
-  public ResponseEntity<List<TrainerDtoForTrainee>> findNotActiveTrainers(
-      @RequestParam("username") @NotBlank String username) {
+  public List<TrainerDtoForTrainee> findNotActiveTrainers(@RequestParam("username") @NotBlank String username) {
     List<Trainer> trainerList = trainingService.findNotAssignedActiveTrainersToTrainee(username);
-    trainerConverter.toTrainerDtoForTrainee(trainerList);
-    return ResponseEntity.ok(trainerConverter.toTrainerDtoForTrainee(trainerList));
+    return trainerConverter.toTrainerDtoForTrainee(trainerList);
   }
 
-  @PutMapping("/trainee/trainers")
+  @PutMapping("/trainers")
+  @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Update Trainee's trainers")
-  public ResponseEntity<List<TrainerDtoForTrainee>> updateTraineeTrainerList(
+  public List<TrainerDtoForTrainee> updateTrainerList(
       @RequestParam("username") @NotBlank String username,
       @RequestParam("trainingDate") @NotBlank String trainingDate,
       @RequestParam("trainingName") @NotBlank String trainingName,
-      @RequestBody List<TrainersDtoList> list) {
-    return ResponseEntity.ok(trainingService.updateTraineeTrainerList(username, trainingDate, trainingName, list));
+      @RequestBody @NotEmpty List<TrainersDtoList> list) {
+    try {
+      return trainingService.updateTraineeTrainerList(username, trainingDate, trainingName, list);
+    } catch (UpdateTrainerListException ex) {
+      throw new UpdateTrainerListException(username);
+    }
   }
 
-  @GetMapping("/trainee/trainings")
+  @GetMapping("/trainings")
+  @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Find Trainee's trainings")
-  public ResponseEntity<List<TrainingTraineeResponse>> findTraineeTrainingsList(
-      @RequestParam("username") @NotBlank String username,
-      @RequestParam(required = false) String periodFrom,
-      @RequestParam(required = false) String periodTo,
-      @RequestParam(required = false) String trainerName,
-      @RequestParam(required = false) String trainingType) {
-    List<Training> trainingsList = trainingService.findTrainingsByUsernameAndCriteria(username, periodFrom,
-        periodTo, trainerName, trainingType);
-    return ResponseEntity.ok(trainingConverter.toTrainingResponse(trainingsList));
+  public List<TrainingTraineeResponse> findTrainingsList(@RequestParam("username") @NotBlank String username,
+                                                         @RequestParam(required = false)
+                                                         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodFrom,
+                                                         @RequestParam(required = false)
+                                                         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodTo,
+                                                         @RequestParam(required = false) String trainerName,
+                                                         @RequestParam(required = false) String trainingType) {
+    if (periodFrom != null && periodTo != null && periodFrom.isAfter(periodTo)) {
+      throw new IllegalArgumentException("periodFrom must be before or equal to periodTo");
+    }
+    List<Training> trainingsList = trainingService.findTrainingsByUsernameAndCriteria(username, periodFrom, periodTo, trainerName, trainingType);
+    return trainingConverter.toTrainingResponse(trainingsList);
   }
 
-
-  @PatchMapping("/trainer/toggle-activation")
+  @PatchMapping("/toggle-activation")
+  @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Activate or deactivate a Trainee's profile")
-  public ResponseEntity<Void> toggleActivation(@RequestParam("username") @NotBlank String username,
-                                               @RequestParam("active") @NotBlank boolean isActive) {
-    var trainee = traineeService.findByUsername(username);
-    traineeService.toggleProfileActivation(trainee.getId(), isActive);
-    return ResponseEntity.ok().build();
+  public void toggleActivation(@RequestParam("username") @NotBlank String username,
+                               @RequestParam("active") @NotBlank boolean isActive) {
+    try {
+      var trainee = traineeService.findByUsername(username);
+      traineeService.toggleProfileActivation(trainee.getId(), isActive);
+    } catch (TraineeNotFoundException ex) {
+      throw new TraineeNotFoundException(username);
+    }
   }
 }

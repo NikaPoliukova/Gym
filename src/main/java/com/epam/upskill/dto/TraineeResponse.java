@@ -1,7 +1,5 @@
 package com.epam.upskill.dto;
 
-import com.epam.upskill.entity.Trainer;
-
 import java.time.LocalDate;
 import java.util.List;
 

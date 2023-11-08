@@ -1,7 +1,6 @@
 package com.epam.upskill.service.impl;
 
 import com.epam.upskill.converter.TraineeConverter;
-import com.epam.upskill.converter.TrainerConverter;
 import com.epam.upskill.dao.TrainerRepository;
 import com.epam.upskill.dao.TrainingRepository;
 import com.epam.upskill.dto.TraineeDtoForTrainer;
@@ -181,6 +180,7 @@ public class TrainerServiceImpl implements TrainerService {
       MDC.remove("transactionId");
     }
   }
+
   private static void fillInTheTrainer(TrainerRegistration trainerRegistration, String username, String password,
                                        Trainer trainer, TrainingType trainingType) {
     trainer.setFirstName(trainerRegistration.firstName());
