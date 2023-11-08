@@ -8,8 +8,6 @@ import com.epam.upskill.dto.TraineeUpdateRequest;
 import com.epam.upskill.dto.TrainerDtoForTrainee;
 import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.exception.UserNotFoundException;
-import com.epam.upskill.logger.OperationLoggerAspect;
-import com.epam.upskill.logger.TransactionLoggerAspect;
 import com.epam.upskill.service.TraineeService;
 import com.epam.upskill.service.UserService;
 import com.epam.upskill.util.UserUtils;
@@ -68,7 +66,6 @@ public class TraineeServiceImpl implements TraineeService {
     MDC.put(TRANSACTION_ID, transactionId);
     return traineeRepository.findByUsernameAndPassword(username, password).orElseThrow(()
         -> new UserNotFoundException(username));
-
   }
 
   @Override

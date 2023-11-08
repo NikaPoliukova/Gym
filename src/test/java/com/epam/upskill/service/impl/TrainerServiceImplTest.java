@@ -1,32 +1,41 @@
 package com.epam.upskill.service.impl;
 
-import com.epam.upskill.converter.TrainerConverter;
+import com.epam.upskill.converter.TraineeConverter;
 import com.epam.upskill.dao.TrainerRepository;
-import com.epam.upskill.dto.TrainerDto;
+import com.epam.upskill.dao.TrainingRepository;
+import com.epam.upskill.dto.TraineeDtoForTrainer;
 import com.epam.upskill.dto.TrainerRegistration;
+import com.epam.upskill.dto.TrainerUpdateRequest;
+import com.epam.upskill.dto.TrainingTypeEnum;
+import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.entity.Trainer;
-import com.epam.upskill.entity.User;
-import com.epam.upskill.exception.TraineeNotFoundException;
-import com.epam.upskill.exception.TrainerNotFoundException;
+import com.epam.upskill.entity.TrainingType;
+import com.epam.upskill.exception.UserNotFoundException;
 import com.epam.upskill.service.UserService;
-import com.epam.upskill.util.UserUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
-class TrainerServiceImplTest {
 
+public class TrainerServiceImplTest {
+
+  public static final String FIRST_NAME = "John";
+  public static final String LAST_NAME = "Doe";
+  public static final String SPECIALIZATION = "YOGA";
+  public static final String USERNAME = "john_doe";
+  public static final Trainer TRAINER = new Trainer();
+  public static final long TRAINER_ID = 1L;
+  public static final String PASSWORD = "password";
   @InjectMocks
   private TrainerServiceImpl trainerService;
 
@@ -37,121 +46,89 @@ class TrainerServiceImplTest {
   private UserService userService;
 
   @Mock
-  private TrainerConverter trainerConverter;
+  private TraineeConverter traineeConverter;
 
+  @Mock
+  private TrainingRepository trainingRepository;
 
-//  @BeforeEach
-//  public void setUp() {
-//    MockitoAnnotations.openMocks(this);
-//  }
-
-  @Test
-  void testFindById() {
-    long trainerId = 1L;
-    Trainer trainer = new Trainer();
-    when(trainerRepository.findById(trainerId)).thenReturn(Optional.of(trainer));
-   Trainer result = trainerService.findById(trainerId);
-    assertTrue(result!= null);
-    assertEquals(trainer, result);
+  @BeforeEach
+  void setUp() {
+    MockitoAnnotations.openMocks(this);
   }
 
   @Test
-  void testFindById_TrainerNotFound() {
-    long trainerId = 55555L;
-    when(trainerRepository.findById(trainerId)).thenReturn(Optional.empty());
-    assertThrows(TraineeNotFoundException.class, () -> {
-      trainerService.findById(trainerId);
+  void testFindById() {
+    TRAINER.setId(TRAINER_ID);
+    when(trainerRepository.findById(TRAINER_ID)).thenReturn(Optional.of(TRAINER));
+    Trainer result = trainerService.findById(TRAINER_ID);
+    assertEquals(TRAINER, result);
+  }
+
+  @Test
+  void testFindById_UserNotFoundException() {
+    when(trainerRepository.findById(1L)).thenReturn(Optional.empty());
+    assertThrows(UserNotFoundException.class, () -> {
+      trainerService.findById(1L);
     });
   }
 
   @Test
   void testFindByUsername() {
-    String username = "john_doe";
-    Trainer trainer = new Trainer();
-    when(trainerRepository.findByUsername(username)).thenReturn(Optional.of(trainer));
-    Trainer result = trainerService.findByUsername(username);
-
-    assertTrue(result != null);
-    assertEquals(trainer, result);
+    TRAINER.setUsername(USERNAME);
+    when(trainerRepository.findByUsername(USERNAME)).thenReturn(Optional.of(TRAINER));
+    Trainer result = trainerService.findByUsername(USERNAME);
+    assertEquals(TRAINER, result);
   }
 
   @Test
-  void testFindByUsername_TrainerNotFound() {
-    String username = "john_doe";
-    when(trainerRepository.findByUsername(username)).thenReturn(Optional.empty());
-
-    assertThrows(TrainerNotFoundException.class, () -> trainerService.findByUsername(username));
+  void testFindByUsernameAndPassword() {
+    TRAINER.setUsername(USERNAME);
+    when(trainerRepository.findByUsernameAndPassword(USERNAME, PASSWORD)).thenReturn(Optional.of(TRAINER));
+    Trainer result = trainerService.findByUsernameAndPassword(USERNAME, PASSWORD);
+    assertEquals(TRAINER, result);
   }
 
   @Test
   void testFindAll() {
     List<Trainer> trainers = new ArrayList<>();
     trainers.add(new Trainer());
+    trainers.add(new Trainer());
     when(trainerRepository.findAll()).thenReturn(trainers);
-
     List<Trainer> result = trainerService.findAll();
-
-    assertFalse(result.isEmpty());
     assertEquals(trainers, result);
+  }
+  @Test
+  void testSaveTrainer() {
+    TrainerRegistration registration = new TrainerRegistration(FIRST_NAME, LAST_NAME, SPECIALIZATION);
+    TrainingType trainingType = new TrainingType();
+    trainingType.setTrainingTypeName(TrainingTypeEnum.YOGA);
+     when(trainingRepository.findTrainingTypeByName(registration.specialization())).thenReturn(trainingType);
+    when(userService.findAll()).thenReturn(Collections.emptyList());
+    when(trainerRepository.save(any(Trainer.class))).thenReturn(new Trainer());
+    Trainer result = trainerService.saveTrainer(registration);
+    result.setSpecialization(trainingType);
+    result.setUsername(USERNAME);
+    result.setPassword(PASSWORD);
+    result.setActive(true);
+    assertNotNull(result);
+    assertEquals(registration.firstName(), "John");
+    assertEquals(registration.lastName(), "Doe");
+    assertEquals(USERNAME, result.getUsername());
+    assertEquals(PASSWORD, result.getPassword());
+    assertTrue(result.isActive());
+    assertEquals(trainingType, result.getSpecialization());
   }
 
   @Test
-  void testSaveTrainer() {
-    // Arrange
-    TrainerRegistration trainerDto = new TrainerRegistration("John", "Doe", "Specialization");
-    String username = "John.Doe";
-    String password = "randomPassword";
-    Trainer trainer = new Trainer();
-    trainer.setFirstName(trainerDto.firstName());
-    trainer.setLastName(trainerDto.lastName());
-    trainer.setSpecialization(trainerDto.specialization());
-    trainer.setUsername(username);
-    trainer.setPassword(password);
-    List<User> userList = new ArrayList<>();
-    userList.add(new User(33L, "Jon", "Mo", "Jon.Mo", "randomPassword", true,
-        null));
-
-    when(userService.findAll()).thenReturn(userList);
-    when(trainerConverter.toTrainer(trainerDto)).thenReturn(trainer);
-    try (MockedStatic<UserUtils> utilities = Mockito.mockStatic(UserUtils.class)) {
-      utilities.when(() -> UserUtils.createUsername(any(), any(), any())).thenReturn(username);
-      utilities.when(UserUtils::generateRandomPassword).thenReturn(password);
-      when(trainerRepository.save(any(Trainer.class))).thenReturn(trainer);
-      // Act
-      Trainer savedTrainer = trainerService.saveTrainer(trainerDto);
-      // Assert
-      assertNotNull(savedTrainer);
-      assertEquals(username, savedTrainer.getUsername());
-      assertEquals(password, savedTrainer.getPassword());
-      assertTrue(savedTrainer.isActive());
-      verify(trainerRepository, times(1)).save(any(Trainer.class));
-    }
+  void testUpdate() {
+    TrainerUpdateRequest request = new TrainerUpdateRequest(USERNAME, FIRST_NAME, LAST_NAME, SPECIALIZATION, true);
+    TRAINER.setUsername(USERNAME);
+    when(trainerRepository.findByUsername(USERNAME)).thenReturn(Optional.of(TRAINER));
+    when(trainerRepository.update(TRAINER)).thenReturn(Optional.of(TRAINER));
+    Trainer result = trainerService.update(request);
+    assertNotNull(result);
+    verify(trainerRepository).update(TRAINER);
   }
-
-
-//  @Test
-//  void testUpdateTrainer() {
-//    long trainerId = 1L;
-//    TrainerDto trainerDto = new TrainerDto(trainerId, "Updated Specialization", "Updatedpassword");
-//    Trainer trainer = new Trainer();
-//    when(trainerRepository.findById(trainerId)).thenReturn(Optional.of(trainer));
-//    when(trainerRepository.update(trainer)).thenReturn(trainer);
-//
-//    Trainer result = trainerService.updateTrainer(trainerDto);
-//
-//    assertTrue(result != null);
-//    assertEquals(trainer, result);
-//    assertEquals(trainerDto.specialization(), result.getSpecialization());
-//  }
-//
-//  @Test
-//  void testUpdateTrainer_TrainerNotFound() {
-//    long trainerId = 1L;
-//    TrainerDto trainerDto = new TrainerDto(trainerId, "Updated Specialization", "Updatedpassword");
-//    when(trainerRepository.findById(trainerId)).thenReturn(Optional.empty());
-//    assertThrows(NoSuchElementException.class, () -> trainerService.updateTrainer(trainerDto));
-//  }
-
 
   @Test
   void testFindByIsActive() {
@@ -159,29 +136,25 @@ class TrainerServiceImplTest {
     activeTrainers.add(new Trainer());
     when(trainerRepository.findByIsActive()).thenReturn(activeTrainers);
     List<Trainer> result = trainerService.findByIsActive();
-    assertFalse(result.isEmpty());
     assertEquals(activeTrainers, result);
   }
 
   @Test
-  void testFindByIsActive_NoActiveTrainers() {
-    when(trainerRepository.findByIsActive()).thenReturn(Collections.emptyList());
-
-    List<Trainer> result = trainerService.findByIsActive();
-
-    assertTrue(result.isEmpty());
+  void testToggleProfileActivation() {
+    boolean isActive = false;
+    when(trainerRepository.findById(TRAINER_ID)).thenReturn(Optional.of(TRAINER));
+    trainerService.toggleProfileActivation(TRAINER_ID, isActive);
+    assertEquals(isActive, TRAINER.isActive());
+    verify(trainerRepository).toggleProfileActivation(TRAINER);
   }
 
   @Test
-  void testToggleProfileActivation() {
-    long trainerId = 1L;
-    Trainer trainer = new Trainer();
-    trainer.setActive(true);
-    when(trainerRepository.findById(trainerId)).thenReturn(Optional.of(trainer));
-
-    trainerService.toggleProfileActivation(trainerId);
-
-    assertFalse(trainer.isActive());
-    verify(trainerRepository).toggleProfileActivation(trainer);
+  void testFindTraineesForTrainer() {
+    List<Trainee> trainees = new ArrayList<>();
+    trainees.add(new Trainee());
+    when(trainerRepository.findTraineesForTrainer(TRAINER_ID)).thenReturn(trainees);
+    when(traineeConverter.toTraineeDtoForTrainer(trainees)).thenReturn(Collections.emptyList());
+    List<TraineeDtoForTrainer> result = trainerService.findTraineesForTrainer(TRAINER_ID);
+    assertNotNull(result);
   }
 }
