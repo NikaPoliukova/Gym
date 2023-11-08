@@ -11,7 +11,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,10 +31,10 @@ public class RegistrationController {
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Register a new trainee")
   public Principal traineeRegistration(@RequestParam("firstName") @NotBlank String firstName,
-                                                       @RequestParam("lastName") @NotBlank String lastName,
-                                                       @RequestParam(required = false) String address,
-                                                       @RequestParam(required = false)
-                                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateOfBirth) {
+                                       @RequestParam("lastName") @NotBlank String lastName,
+                                       @RequestParam(required = false) String address,
+                                       @RequestParam(required = false)
+                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateOfBirth) {
     try {
       TraineeRegistration traineeRegistration = new TraineeRegistration(firstName, lastName, address, dateOfBirth);
       var trainee = traineeService.saveTrainee(traineeRegistration);
@@ -49,8 +48,8 @@ public class RegistrationController {
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Register a new trainer")
   public Principal trainerRegistration(@RequestParam("firstName") @NotBlank String firstName,
-                                                       @RequestParam("lastName") @NotBlank String lastName,
-                                                       @RequestParam("specialization") @NotBlank String specialization) {
+                                       @RequestParam("lastName") @NotBlank String lastName,
+                                       @RequestParam("specialization") @NotBlank String specialization) {
     try {
       TrainerRegistration trainerRegistration = new TrainerRegistration(firstName, lastName, specialization);
       var trainer = trainerService.saveTrainer(trainerRegistration);

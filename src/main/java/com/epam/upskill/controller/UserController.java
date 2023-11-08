@@ -6,7 +6,6 @@ import com.epam.upskill.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +30,7 @@ public class UserController {
       String newPassword) {
     try {
       if (oldPassword.equals(newPassword)) {
-      throw new UserUpdateException("New password cannot be the same as the old password");
+        throw new UserUpdateException("New password cannot be the same as the old password");
       }
       userService.updatePassword(new UserUpdatePass(username, oldPassword, newPassword));
     } catch (UserUpdateException ex) {

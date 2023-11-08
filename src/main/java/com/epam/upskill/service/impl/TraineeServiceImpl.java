@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -30,6 +31,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 @Service
+@Validated
 public class TraineeServiceImpl implements TraineeService {
 
   public static final String TRANSACTION_ID = "transactionId";
@@ -42,47 +44,38 @@ public class TraineeServiceImpl implements TraineeService {
   private final OperationLogger operationLogger;
 
   @Override
+  @Transactional
   public Trainee findById(@NotNull long traineeId) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put(TRANSACTION_ID, transactionId);
-    transactionLogger.logTransaction(transactionId, "Performing transaction..." + transactionId);
-    // Perform the transaction
-    operationLogger.logOperation(transactionId, "findById", "operation findById цфы started");
-    //log.debug("Transaction ID: {} | Fetching Trainee by ID: {}", transactionId, traineeId);
-    try {
-      return traineeRepository.findById(traineeId).orElseThrow(()
-          -> new TraineeNotFoundException("Trainee not found with id: " + traineeId));
-    } finally {
-      operationLogger.logOperation(transactionId, "findById", "the operation was completed");
-     //MDC.remove(TRANSACTION_ID);
-    }
+    return traineeRepository.findById(traineeId).orElseThrow(()
+        -> new TraineeNotFoundException("Trainee not found with id: " + traineeId));
+
   }
 
   @Override
+  @Transactional
   public Trainee findByUsername(@NotBlank String username) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put(TRANSACTION_ID, transactionId);
 
     log.info("Transaction ID: {} | Fetching with username: {}", transactionId, username);
-    try {
-      return traineeRepository.findByUsername(username).orElseThrow(()
-          -> new TraineeNotFoundException("Trainee not found with username: " + username));
-    } finally {
-      MDC.remove(TRANSACTION_ID);
-    }
+
+    return traineeRepository.findByUsername(username).orElseThrow(()
+        -> new TraineeNotFoundException("Trainee not found with username: " + username));
+
   }
 
   @Override
+  @Transactional
   public Trainee findByUsernameAndPassword(String username, String password) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put(TRANSACTION_ID, transactionId);
     log.info("Transaction ID: {} | Fetching with username: {} and password = {}", transactionId, username, password);
-    try {
-      return traineeRepository.findByUsernameAndPassword(username, password).orElseThrow(()
-          -> new TraineeNotFoundException("Trainee not found with username: " + username + " and password = " + password));
-    } finally {
-      MDC.remove(TRANSACTION_ID);
-    }
+
+    return traineeRepository.findByUsernameAndPassword(username, password).orElseThrow(()
+        -> new TraineeNotFoundException("Trainee not found with username: " + username + " and password = " + password));
+
   }
 
   @Override
@@ -148,31 +141,25 @@ public class TraineeServiceImpl implements TraineeService {
     MDC.put(TRANSACTION_ID, transactionId);
     log.info("Transaction ID: {} | Toggling profile activation for Trainee with ID: {}", transactionId,
         traineeId);
-    try {
-      var trainee = findById(traineeId);
-      if (trainee.isActive() != isActive) {
-        trainee.setActive(isActive);
-        traineeRepository.toggleProfileActivation(trainee);
-      }
-    } finally {
-      MDC.remove(TRANSACTION_ID);
+    var trainee = findById(traineeId);
+    if (trainee.isActive() != isActive) {
+      trainee.setActive(isActive);
+      traineeRepository.toggleProfileActivation(trainee);
     }
   }
 
+
   @Override
+  @Transactional
   public List<TrainerDtoForTrainee> findTrainersForTrainee(long id) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put(TRANSACTION_ID, transactionId);
     log.debug("Transaction ID: {} | Fetching trainers for Trainee with ID: {}", transactionId, id);
-    try {
-      var listTrainers = traineeRepository.findTrainersForTrainee(id);
-      if (listTrainers.isEmpty()) {
-        return Collections.emptyList();
-      } else {
-        return trainerConverter.toTrainerDtoForTrainee(listTrainers);
-      }
-    } finally {
-      MDC.remove(TRANSACTION_ID);
+    var listTrainers = traineeRepository.findTrainersForTrainee(id);
+    if (listTrainers.isEmpty()) {
+      return Collections.emptyList();
+    } else {
+      return trainerConverter.toTrainerDtoForTrainee(listTrainers);
     }
   }
 

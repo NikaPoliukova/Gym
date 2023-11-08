@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  */
 @RequiredArgsConstructor
 @Service
-@Deprecated(forRemoval = false,since = "2.0")
+@Deprecated(forRemoval = false, since = "2.0")
 public class RegistrationFacade {
   private final TraineeService traineeService;
   private final TrainerService trainerService;

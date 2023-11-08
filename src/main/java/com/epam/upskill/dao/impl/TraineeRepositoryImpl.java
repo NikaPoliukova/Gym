@@ -18,6 +18,8 @@ import java.util.Optional;
 @Repository
 public class TraineeRepositoryImpl implements TraineeRepository {
 
+  public static final String USERNAME = "username";
+
   @PersistenceContext
   private EntityManager entityManager;
 
@@ -33,7 +35,7 @@ public class TraineeRepositoryImpl implements TraineeRepository {
   public Optional<Trainee> findByUsername(String username) {
     return Optional.of(entityManager.createQuery("SELECT t FROM Trainee t  WHERE t.username = :username",
             Trainee.class)
-        .setParameter("username", username)
+        .setParameter(USERNAME, username)
         .getSingleResult());
   }
 
@@ -41,7 +43,7 @@ public class TraineeRepositoryImpl implements TraineeRepository {
   public Optional<Trainee> findByUsernameAndPassword(String username, String password) {
     return Optional.of(entityManager.createQuery("SELECT t FROM Trainee t  WHERE " +
             "t.username = :username AND t.password = :password", Trainee.class)
-        .setParameter("username", username)
+        .setParameter(USERNAME, username)
         .setParameter("password", password)
         .getSingleResult());
   }

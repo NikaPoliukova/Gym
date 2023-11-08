@@ -2,10 +2,7 @@ package com.epam.upskill.controller;
 
 import com.epam.upskill.converter.TrainerConverter;
 import com.epam.upskill.converter.TrainingConverter;
-import com.epam.upskill.dto.TrainerResponse;
-import com.epam.upskill.dto.TrainerUpdateRequest;
-import com.epam.upskill.dto.TrainerUpdateResponse;
-import com.epam.upskill.dto.TrainingTrainerResponse;
+import com.epam.upskill.dto.*;
 import com.epam.upskill.entity.Training;
 import com.epam.upskill.exception.TrainerNotFoundException;
 import com.epam.upskill.exception.UpdateTrainerException;
@@ -66,13 +63,15 @@ public class TrainerController {
 
   @GetMapping("/trainings")
   @ApiOperation("Find Trainer's trainings")
-  public ResponseEntity<List<TrainingTrainerResponse>> findTrainerTrainingsList(@RequestParam("username") @NotBlank String username,
-                                                                                @RequestParam(required = false)
-                                                                                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodFrom,
-                                                                                @RequestParam(required = false)
-                                                                                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodTo,
-                                                                                @RequestParam(required = false) String traineeName) {
-    List<Training> trainingsList = trainingService.findTrainerTrainings(username, periodFrom, periodTo, traineeName);
+  public ResponseEntity<List<TrainingTrainerResponse>> findTrainerTrainingsList
+      (@RequestParam("username") @NotBlank String username,
+       @RequestParam(required = false)
+       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodFrom,
+       @RequestParam(required = false)
+       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodTo,
+       @RequestParam(required = false) String traineeName) {
+    List<Training> trainingsList = trainingService.findTrainerTrainings(new TrainingTrainerRequest
+        (username, periodFrom, periodTo, traineeName));
     return ResponseEntity.ok(trainingConverter.toTrainerTrainingResponse(trainingsList));
   }
 

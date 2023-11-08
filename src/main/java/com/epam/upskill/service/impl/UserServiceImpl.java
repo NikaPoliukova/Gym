@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -23,20 +24,19 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 @Service
+@Validated
 public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
 
   @Override
+  @Transactional
   public User findById(long userId) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put("transactionId", transactionId);
 
     log.info("Transaction ID: {} | Fetching User by ID: {}", transactionId, userId);
-    try {
-      return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("userId = " + userId));
-    } finally {
-      MDC.remove("transactionId");
-    }
+    return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("userId = " + userId));
+
   }
 
   @Override
@@ -46,12 +46,9 @@ public class UserServiceImpl implements UserService {
     MDC.put("transactionId", transactionId);
 
     log.info("Transaction ID: {} | Fetching all Users", transactionId);
-    try {
-      var users = userRepository.findAll();
-      return users != null ? users : Collections.emptyList();
-    } finally {
-      MDC.remove("transactionId");
-    }
+
+    var users = userRepository.findAll();
+    return users != null ? users : Collections.emptyList();
   }
 
   @Override
@@ -61,11 +58,8 @@ public class UserServiceImpl implements UserService {
     MDC.put("transactionId", transactionId);
 
     log.info("Transaction ID: {} | Fetching User by username: {}", transactionId, username);
-    try {
-      return userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
-    } finally {
-      MDC.remove("transactionId");
-    }
+    return userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
+
   }
 
   @Override
@@ -73,32 +67,27 @@ public class UserServiceImpl implements UserService {
   public void updatePassword(@Valid UserUpdatePass userUpdatePass) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put("transactionId", transactionId);
-
     log.info("Transaction ID: {} | Updating password for User with username: {}", transactionId, userUpdatePass.username());
-    try {
-      var user = findByUsernameAndPassword(userUpdatePass.username(), userUpdatePass.oldPassword());
-      user.setPassword(userUpdatePass.newPassword());
-      userRepository.update(user);
-    } finally {
-      MDC.remove("transactionId");
-    }
+
+    var user = findByUsernameAndPassword(userUpdatePass.username(), userUpdatePass.oldPassword());
+    user.setPassword(userUpdatePass.newPassword());
+    userRepository.update(user);
   }
 
   @Override
+  @Transactional
   public User findByUsernameAndPassword(@NotBlank String username, @NotBlank String password) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put("transactionId", transactionId);
 
     log.info("Transaction ID: {} | Fetching User by username: {} and password", transactionId, username);
-    try {
-      return userRepository.findByUsernameAndPassword(username, password)
-          .orElseThrow(() -> new UserNotFoundException("User not found"));
-    } finally {
-      MDC.remove("transactionId");
-    }
+
+    return userRepository.findByUsernameAndPassword(username, password)
+        .orElseThrow(() -> new UserNotFoundException("User not found"));
   }
 
   @Override
+  @Transactional
   public void updateLogin(@Valid UserDto userDto) {
     String transactionId = UUID.randomUUID().toString();
     MDC.put("transactionId", transactionId);
@@ -108,11 +97,9 @@ public class UserServiceImpl implements UserService {
       var user = findById(userDto.id());
       user.setUsername(userDto.username());
       userRepository.update(user);
-    } catch (Exception ex) {
+    } catch (UserNotFoundException ex) {
       log.warn("Transaction ID: {} | User not found with ID: {}", transactionId, userDto.id());
       throw new UserNotFoundException("User not found with ID: " + userDto.id());
-    } finally {
-      MDC.remove("transactionId");
     }
   }
 
@@ -125,11 +112,9 @@ public class UserServiceImpl implements UserService {
     try {
       findById(userId);
       userRepository.delete(userId);
-    } catch (Exception ex) {
+    } catch (UserNotFoundException ex) {
       log.warn("Transaction ID: {} | User not found with ID: {}", transactionId, userId);
       throw new UserNotFoundException("User not found with ID: " + userId);
-    } finally {
-      MDC.remove("transactionId");
     }
   }
 }

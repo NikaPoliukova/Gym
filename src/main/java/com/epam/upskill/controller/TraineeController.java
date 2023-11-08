@@ -53,12 +53,12 @@ public class TraineeController {
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Update Trainee profile")
   public TraineeUpdateResponse updateTrainee(@RequestParam("username") @NotBlank String username,
-                                                             @RequestParam("firstName") String firstName,
-                                                             @RequestParam("lastName") String lastName,
-                                                             @RequestParam(required = false)
-                                                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateOfBirth,
-                                                             @RequestParam(value = "address", required = false) String address,
-                                                             @RequestParam("isActive") boolean isActive) {
+                                             @RequestParam("firstName") String firstName,
+                                             @RequestParam("lastName") String lastName,
+                                             @RequestParam(required = false)
+                                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateOfBirth,
+                                             @RequestParam(value = "address", required = false) String address,
+                                             @RequestParam("isActive") boolean isActive) {
     try {
       TraineeUpdateRequest traineeUpdateRequest = new TraineeUpdateRequest(username, firstName, lastName, dateOfBirth, address, isActive);
       var trainee = traineeService.updateTrainee(traineeUpdateRequest);
@@ -97,7 +97,7 @@ public class TraineeController {
       @RequestParam("trainingName") @NotBlank String trainingName,
       @RequestBody @NotEmpty List<TrainersDtoList> list) {
     try {
-      return trainingService.updateTraineeTrainerList(username, trainingDate, trainingName, list);
+      return trainingService.updateTraineeTrainerList(new UpdateTraineeTrainerDto(username, trainingDate, trainingName, list));
     } catch (UpdateTrainerListException ex) {
       throw new UpdateTrainerListException(username);
     }
@@ -116,7 +116,9 @@ public class TraineeController {
     if (periodFrom != null && periodTo != null && periodFrom.isAfter(periodTo)) {
       throw new IllegalArgumentException("periodFrom must be before or equal to periodTo");
     }
-    List<Training> trainingsList = trainingService.findTrainingsByUsernameAndCriteria(username, periodFrom, periodTo, trainerName, trainingType);
+
+    List<Training> trainingsList = trainingService.findTrainingsByUsernameAndCriteria(new TrainingTraineeRequest
+        (username, periodFrom, periodTo, trainerName, trainingType));
     return trainingConverter.toTrainingResponse(trainingsList);
   }
 

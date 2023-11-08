@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.epam.upskill.service.impl.TraineeServiceImpl.TRANSACTION_ID;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -39,145 +41,107 @@ public class TrainerServiceImpl implements TrainerService {
   @Transactional
   public Trainer findById(long trainerId) {
     String transactionId = UUID.randomUUID().toString();
-    MDC.put("transactionId", transactionId);
-
+    MDC.put(TRANSACTION_ID, transactionId);
     log.info("Transaction ID: {} | Fetching Trainer by ID: {}", transactionId, trainerId);
-    try {
-      return trainerRepository.findById(trainerId).orElseThrow(()
-          -> new TrainerNotFoundException("Trainer not found with id: " + trainerId));
-    } finally {
-      MDC.remove("transactionId");
-    }
+    return trainerRepository.findById(trainerId).orElseThrow(()
+        -> new TrainerNotFoundException("Trainer not found with id: " + trainerId));
   }
 
   @Override
   @Transactional(readOnly = true)
   public Trainer findByUsername(String username) {
     String transactionId = UUID.randomUUID().toString();
-    MDC.put("transactionId", transactionId);
-
+    MDC.put(TRANSACTION_ID, transactionId);
     log.info("Transaction ID: {} | Fetching Trainer by username: {}", transactionId, username);
-    try {
-      return trainerRepository.findByUsername(username).orElseThrow(()
-          -> new TrainerNotFoundException("Trainer not found with username: " + username));
-    } finally {
-      MDC.remove("transactionId");
-    }
+    return trainerRepository.findByUsername(username).orElseThrow(()
+        -> new TrainerNotFoundException("Trainer not found with username: " + username));
   }
 
   @Override
+  @Transactional
   public Trainer findByUsernameAndPassword(String username, String password) {
     String transactionId = UUID.randomUUID().toString();
-    MDC.put("transactionId", transactionId);
-
+    MDC.put(TRANSACTION_ID, transactionId);
     log.info("Transaction ID: {} | Fetching with username: {} and password = {}", transactionId, username, password);
-    try {
-      return trainerRepository.findByUsernameAndPassword(username, password).orElseThrow(()
-          -> new TraineeNotFoundException("Trainee not found with username: " + username + " and password = " + password));
-    } finally {
-      MDC.remove("transactionId");
-    }
+    return trainerRepository.findByUsernameAndPassword(username, password).orElseThrow(()
+        -> new TraineeNotFoundException("Trainee not found with username: " + username + " and password = " + password));
+
   }
 
   @Override
+  @Transactional
   public List<Trainer> findAll() {
     String transactionId = UUID.randomUUID().toString();
-    MDC.put("transactionId", transactionId);
-
+    MDC.put(TRANSACTION_ID, transactionId);
     log.debug("Transaction ID: {} | Fetching all Trainers", transactionId);
-    try {
-      List<Trainer> trainerMap = trainerRepository.findAll();
-      return trainerMap != null ? trainerMap : Collections.emptyList();
-    } finally {
-      MDC.remove("transactionId");
-    }
+    List<Trainer> trainerMap = trainerRepository.findAll();
+    return trainerMap != null ? trainerMap : Collections.emptyList();
   }
 
   @Override
   @Transactional
   public Trainer saveTrainer(TrainerRegistration trainerRegistration) {
     String transactionId = UUID.randomUUID().toString();
-    MDC.put("transactionId", transactionId);
-
+    MDC.put(TRANSACTION_ID, transactionId);
     log.info("Transaction ID: {} | Creating Trainer from TrainerRegistration: {}", transactionId, trainerRegistration);
-    try {
-      var username = UserUtils.createUsername(trainerRegistration.firstName(), trainerRegistration.lastName(),
-          userService.findAll());
-      var password = UserUtils.generateRandomPassword();
-      Trainer trainer = new Trainer();
-      TrainingType trainingType = trainingRepository.findTrainingTypeByName(trainerRegistration.specialization());
-      fillInTheTrainer(trainerRegistration, username, password, trainer, trainingType);
-      return trainerRepository.save(trainer);
-    } finally {
-      MDC.remove("transactionId");
-    }
+    var username = UserUtils.createUsername(trainerRegistration.firstName(), trainerRegistration.lastName(),
+        userService.findAll());
+    var password = UserUtils.generateRandomPassword();
+    Trainer trainer = new Trainer();
+    TrainingType trainingType = trainingRepository.findTrainingTypeByName(trainerRegistration.specialization());
+    fillInTheTrainer(trainerRegistration, username, password, trainer, trainingType);
+    return trainerRepository.save(trainer);
   }
 
   @Override
   @Transactional
   public Trainer update(TrainerUpdateRequest request) {
     String transactionId = UUID.randomUUID().toString();
-    MDC.put("transactionId", transactionId);
-
+    MDC.put(TRANSACTION_ID, transactionId);
     log.info("Transaction ID: {} | Updating Trainer with TrainerDto: {}", transactionId, request);
-    try {
-      var trainer = findByUsername(request.username());
-      Optional.ofNullable(request.firstName()).filter(firstName -> !firstName.isEmpty())
-          .ifPresent(trainer::setFirstName);
-      if (request.isActive() != trainer.isActive()) {
-        trainer.setActive(request.isActive());
-      }
-      return trainerRepository.update(trainer).get();
-    } finally {
-      MDC.remove("transactionId");
+    var trainer = findByUsername(request.username());
+    Optional.ofNullable(request.firstName()).filter(firstName -> !firstName.isEmpty())
+        .ifPresent(trainer::setFirstName);
+    if (request.isActive() != trainer.isActive()) {
+      trainer.setActive(request.isActive());
     }
+    return trainerRepository.update(trainer).get();
   }
 
   @Override
+  @Transactional
   public List<Trainer> findByIsActive() {
     String transactionId = UUID.randomUUID().toString();
-    MDC.put("transactionId", transactionId);
-
+    MDC.put(TRANSACTION_ID, transactionId);
     log.info("Transaction ID: {} | Fetching active Trainers", transactionId);
-    try {
-      List<Trainer> activeTrainers = trainerRepository.findByIsActive();
-      return activeTrainers.isEmpty() ? Collections.emptyList() : activeTrainers;
-    } finally {
-      MDC.remove("transactionId");
-    }
+    List<Trainer> activeTrainers = trainerRepository.findByIsActive();
+    return activeTrainers.isEmpty() ? Collections.emptyList() : activeTrainers;
+
   }
 
   @Override
   @Transactional
   public void toggleProfileActivation(long trainerId, boolean isActive) {
     String transactionId = UUID.randomUUID().toString();
-    MDC.put("transactionId", transactionId);
-
+    MDC.put(TRANSACTION_ID, transactionId);
     log.info("Transaction ID: {} | Toggling profile activation for Trainer with ID: {}", transactionId, trainerId);
-    try {
-      var trainer = findById(trainerId);
-      trainer.setActive(isActive);
-      trainerRepository.toggleProfileActivation(trainer);
-    } finally {
-      MDC.remove("transactionId");
-    }
+    var trainer = findById(trainerId);
+    trainer.setActive(isActive);
+    trainerRepository.toggleProfileActivation(trainer);
+
   }
 
   @Override
+  @Transactional
   public List<TraineeDtoForTrainer> findTraineesForTrainer(long id) {
     String transactionId = UUID.randomUUID().toString();
-    MDC.put("transactionId", transactionId);
-
+    MDC.put(TRANSACTION_ID, transactionId);
     log.info("Transaction ID: {} | Fetching Trainees for Trainer with ID: {}", transactionId, id);
-    try {
-      List<Trainee> listTrainees = trainerRepository.findTraineesForTrainer(id);
-      if (listTrainees.isEmpty()) {
-        return Collections.emptyList();
-      } else {
-        return traineeConverter.toTraineeDtoForTrainer(listTrainees);
-      }
-    } finally {
-      MDC.remove("transactionId");
+    List<Trainee> listTrainees = trainerRepository.findTraineesForTrainer(id);
+    if (listTrainees.isEmpty()) {
+      return Collections.emptyList();
+    } else {
+      return traineeConverter.toTraineeDtoForTrainer(listTrainees);
     }
   }
 

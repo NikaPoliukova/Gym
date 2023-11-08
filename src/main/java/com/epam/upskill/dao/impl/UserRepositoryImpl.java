@@ -17,6 +17,7 @@ import java.util.Optional;
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
+  public static final String USERNAME = "username";
   @PersistenceContext
   private EntityManager entityManager;
 
@@ -54,9 +55,8 @@ public class UserRepositoryImpl implements UserRepository {
 
   @Override
   public Optional<User> findByUsername(String username) {
-    TypedQuery<User> query = entityManager
-        .createQuery("SELECT u FROM User u WHERE u.username = :username", User.class);
-    query.setParameter("username", username);
+    TypedQuery<User> query = entityManager.createQuery("SELECT u FROM User u WHERE u.username = :username", User.class);
+    query.setParameter(USERNAME, username);
     try {
       return Optional.ofNullable(query.getSingleResult());
     } catch (NoResultException e) {
@@ -69,18 +69,10 @@ public class UserRepositoryImpl implements UserRepository {
   }
 
   @Override
-  public Optional<User> findUserById(long id) {
-    String jpql = "SELECT u FROM User u WHERE u.id = :id";
-    TypedQuery<User> query = entityManager.createQuery(jpql, User.class);
-    query.setParameter("userId", id);
-    return Optional.ofNullable(query.getSingleResult());
-  }
-
-  @Override
   public Optional<User> findByUsernameAndPassword(String username, String oldPassword) {
     TypedQuery<User> query = entityManager
         .createQuery("SELECT u FROM User u WHERE u.username = :username AND u.password = : password", User.class);
-    query.setParameter("username", username);
+    query.setParameter(USERNAME, username);
     query.setParameter("password", oldPassword);
     try {
       return Optional.ofNullable(query.getSingleResult());

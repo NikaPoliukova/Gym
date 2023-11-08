@@ -15,6 +15,9 @@ import java.util.Optional;
 @Slf4j
 @Repository
 public class TrainerRepositoryImpl implements TrainerRepository {
+
+  public static final String USERNAME = "username";
+
   @PersistenceContext
   private EntityManager entityManager;
 
@@ -64,7 +67,7 @@ public class TrainerRepositoryImpl implements TrainerRepository {
   public Optional<Trainer> findByUsername(String username) {
     return Optional.ofNullable(entityManager.createQuery("SELECT t FROM Trainer t  WHERE t.username = :username",
             Trainer.class)
-        .setParameter("username", username)
+        .setParameter(USERNAME, username)
         .getSingleResult());
   }
 
@@ -72,7 +75,7 @@ public class TrainerRepositoryImpl implements TrainerRepository {
   public Optional<Trainer> findByUsernameAndPassword(String username, String password) {
     return Optional.of(entityManager.createQuery("SELECT t FROM Trainer t  WHERE " +
             "t.username = :username AND t.password = :password", Trainer.class)
-        .setParameter("username", username)
+        .setParameter(USERNAME, username)
         .setParameter("password", password)
         .getSingleResult());
   }

@@ -1,18 +1,22 @@
 package com.epam.upskill.dao.impl;
 
 import com.epam.upskill.dao.TrainingRepository;
+import com.epam.upskill.dto.TrainingDtoRequest;
+import com.epam.upskill.dto.TrainingTrainerDto;
 import com.epam.upskill.dto.TrainingTypeEnum;
 import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.Training;
 import com.epam.upskill.entity.TrainingType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +26,14 @@ import static com.epam.upskill.util.UserUtils.getLocalDate;
 
 @Slf4j
 @Repository
+@Validated
 public class TrainingRepositoryImpl implements TrainingRepository {
+  public static final String USERNAME = "username";
+  public static final String TRAINEE = "trainee";
+  public static final String TRAINING_DATE = "trainingDate";
+  public static final String ID = "id";
+  public static final String TRAINER = "trainer";
+
   @PersistenceContext
   private EntityManager entityManager;
 
@@ -46,28 +57,18 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     return entityManager.createQuery("SELECT e FROM training e", Training.class).getResultList();
   }
 
-//TODO DTO
+
   @Override
-  public List<Training> findTraineeTrainingsList(String username, LocalDate periodFrom, LocalDate periodTo,
-                                                 String trainerName, TrainingTypeEnum myEnum) {
+  public List<Training> findTraineeTrainingsList(@Valid TrainingDtoRequest request) {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     CriteriaQuery<Training> query = cb.createQuery(Training.class);
     Root<Training> trainingRoot = query.from(Training.class);
-    List<Predicate> predicates = new ArrayList<>();
-    predicates.add(cb.equal(trainingRoot.get("trainee").get("username"), username));
-    if (trainerName != null && !trainerName.isEmpty()) {
-      predicates.add(cb.equal(trainingRoot.get("trainer").get("username"), trainerName));
-    }
-    if (myEnum != null) {
-      predicates.add(cb.equal(trainingRoot.get("trainingType").get("trainingTypeName"), myEnum));
-    }
-    if (periodFrom != null && periodTo != null) {
-      predicates.add(cb.between(trainingRoot.get("trainingDate"), periodFrom, periodTo));
-    }
+    List<Predicate> predicates = getPredicates(request, cb, trainingRoot);
     query.select(trainingRoot).where(predicates.toArray(new Predicate[0]));
     TypedQuery<Training> typedQuery = entityManager.createQuery(query);
     return typedQuery.getResultList();
   }
+
 
   @Override
   public List<Training> findTraineeTrainingsList(long traineeId, String trainingDate, String trainingName) {
@@ -75,45 +76,23 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     CriteriaQuery<Training> query = cb.createQuery(Training.class);
     Root<Training> trainingRoot = query.from(Training.class);
-    List<Predicate> predicates = new ArrayList<>();
-    predicates.add(cb.equal(trainingRoot.get("trainee").get("id"), traineeId));
-    predicates.add(cb.equal(trainingRoot.get("trainingDate"), date));
-    predicates.add(cb.equal(trainingRoot.get("trainingName"), trainingName));
+    List<Predicate> predicates = getPredicates(traineeId, trainingName, date, cb, trainingRoot);
     query.select(trainingRoot).where(predicates.toArray(new Predicate[0]));
     TypedQuery<Training> typedQuery = entityManager.createQuery(query);
     return typedQuery.getResultList();
-
   }
-//TODO constants
+
   @Override
-  public List<Training> findTrainerTrainings(long trainerId, LocalDate periodFrom, LocalDate periodTo, String traineeName) {
+  public List<Training> findTrainerTrainings(@Valid TrainingTrainerDto dto) {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     CriteriaQuery<Training> query = cb.createQuery(Training.class);
     Root<Training> trainingRoot = query.from(Training.class);
-    List<Predicate> predicates = new ArrayList<>();
-    predicates.add(cb.equal(trainingRoot.get("trainer").get("id"), trainerId));
-    if (traineeName != null && !traineeName.isEmpty()) {
-      predicates.add(cb.equal(trainingRoot.get("trainee").get("username"), traineeName));
-    }
-    if (periodFrom != null && periodTo != null) {
-      predicates.add(cb.between(trainingRoot.get("trainingDate"), periodFrom, periodTo));
-    }
+    List<Predicate> predicates = getPredicates(dto, cb, trainingRoot);
     query.select(trainingRoot).where(predicates.toArray(new Predicate[0]));
     TypedQuery<Training> typedQuery = entityManager.createQuery(query);
     return typedQuery.getResultList();
   }
 
-  @Override
-  public TrainingType findTrainingTypeById(int id) {
-    TypedQuery<TrainingType> query = entityManager.createQuery(
-        "SELECT tt FROM TrainingType tt WHERE tt.id = :id", TrainingType.class);
-    query.setParameter("id", id);
-    try {
-      return query.getSingleResult();
-    } catch (NoResultException e) {
-      throw new EntityNotFoundException("TrainingType not found with id: " + id);
-    }
-  }
 
   @Override
   public TrainingType findTrainingTypeByName(String name) {
@@ -144,6 +123,41 @@ public class TrainingRepositoryImpl implements TrainingRepository {
   public void delete(Training training) {
     log.debug("Deleting user by ID: " + training);
     entityManager.remove(training);
+  }
+
+  private static List<Predicate> getPredicates(TrainingDtoRequest request, CriteriaBuilder cb, Root<Training> trainingRoot) {
+    List<Predicate> predicates = new ArrayList<>();
+    predicates.add(cb.equal(trainingRoot.get(TRAINEE).get(USERNAME), request.username()));
+    if (request.trainerName() != null) {
+      predicates.add(cb.equal(trainingRoot.get(TRAINER).get(USERNAME), request.trainerName()));
+    }
+    if (request.trainingType() != null) {
+      predicates.add(cb.equal(trainingRoot.get("trainingType").get("trainingTypeName"), request.trainingType()));
+    }
+    if (request.periodFrom() != null && request.periodTo() != null) {
+      predicates.add(cb.between(trainingRoot.get(TRAINING_DATE), request.periodFrom(), request.periodTo()));
+    }
+    return predicates;
+  }
+
+  private static List<Predicate> getPredicates(long traineeId, String trainingName, LocalDate date, CriteriaBuilder cb, Root<Training> trainingRoot) {
+    List<Predicate> predicates = new ArrayList<>();
+    predicates.add(cb.equal(trainingRoot.get(TRAINEE).get(ID), traineeId));
+    predicates.add(cb.equal(trainingRoot.get(TRAINING_DATE), date));
+    predicates.add(cb.equal(trainingRoot.get("trainingName"), trainingName));
+    return predicates;
+  }
+
+  private static List<Predicate> getPredicates(TrainingTrainerDto dto, CriteriaBuilder cb, Root<Training> trainingRoot) {
+    List<Predicate> predicates = new ArrayList<>();
+    predicates.add(cb.equal(trainingRoot.get(TRAINER).get(ID), dto.trainerId()));
+    if (dto.traineeName() != null && !dto.traineeName().isEmpty()) {
+      predicates.add(cb.equal(trainingRoot.get(TRAINEE).get(USERNAME), dto.traineeName()));
+    }
+    if (dto.periodFrom() != null && dto.periodTo() != null) {
+      predicates.add(cb.between(trainingRoot.get(TRAINING_DATE), dto.periodFrom(), dto.periodTo()));
+    }
+    return predicates;
   }
 }
 
