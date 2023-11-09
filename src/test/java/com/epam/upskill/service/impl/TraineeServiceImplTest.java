@@ -16,7 +16,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.slf4j.MDC;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -54,16 +53,10 @@ class TraineeServiceImplTest {
 
   @Test
   void testFindById_ExistingTrainee() {
-    String originalTransactionId = MDC.get(TraineeServiceImpl.TRANSACTION_ID);
-    MDC.put(TraineeServiceImpl.TRANSACTION_ID, "transactionId");
-    try {
-      Trainee trainee = new Trainee(); // Создайте тестового Trainee
-      when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.of(trainee));
-      Trainee result = traineeService.findById(TRAINEE_ID);
-      assertEquals(trainee, result);
-    } finally {
-      MDC.put(TraineeServiceImpl.TRANSACTION_ID, originalTransactionId);
-    }
+    Trainee trainee = new Trainee();
+    when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.of(trainee));
+    Trainee result = traineeService.findById(TRAINEE_ID);
+    assertEquals(trainee, result);
   }
 
 
@@ -75,16 +68,10 @@ class TraineeServiceImplTest {
 
   @Test
   void testFindByUsername_ExistingTrainee() {
-    String originalTransactionId = MDC.get(TraineeServiceImpl.TRANSACTION_ID);
-    MDC.put(TraineeServiceImpl.TRANSACTION_ID, "transactionId");
-    try {
-      Trainee trainee = new Trainee(); // Создайте тестового Trainee
-      when(traineeRepository.findByUsername(USERNAME)).thenReturn(Optional.of(trainee));
-      Trainee result = traineeService.findByUsername(USERNAME);
-      assertEquals(trainee, result);
-    } finally {
-      MDC.put(TraineeServiceImpl.TRANSACTION_ID, originalTransactionId);
-    }
+    Trainee trainee = new Trainee(); // Создайте тестового Trainee
+    when(traineeRepository.findByUsername(USERNAME)).thenReturn(Optional.of(trainee));
+    Trainee result = traineeService.findByUsername(USERNAME);
+    assertEquals(trainee, result);
   }
 
 
@@ -96,16 +83,10 @@ class TraineeServiceImplTest {
 
   @Test
   void testFindByUsernameAndPassword_ExistingTrainee() {
-    String originalTransactionId = MDC.get(TraineeServiceImpl.TRANSACTION_ID);
-    MDC.put(TraineeServiceImpl.TRANSACTION_ID, "transactionId");
-    try {
-      Trainee trainee = new Trainee(); // Создайте тестового Trainee
-      when(traineeRepository.findByUsernameAndPassword(USERNAME, PASSWORD)).thenReturn(Optional.of(trainee));
-      Trainee result = traineeService.findByUsernameAndPassword(USERNAME, PASSWORD);
-      assertEquals(trainee, result);
-    } finally {
-      MDC.put(TraineeServiceImpl.TRANSACTION_ID, originalTransactionId); // Восстановите исходное значение
-    }
+    Trainee trainee = new Trainee();
+    when(traineeRepository.findByUsernameAndPassword(USERNAME, PASSWORD)).thenReturn(Optional.of(trainee));
+    Trainee result = traineeService.findByUsernameAndPassword(USERNAME, PASSWORD);
+    assertEquals(trainee, result);
   }
 
   @Test
@@ -116,64 +97,42 @@ class TraineeServiceImplTest {
 
   @Test
   void testFindAll() {
-    String originalTransactionId = MDC.get(TraineeServiceImpl.TRANSACTION_ID);
-    MDC.put(TraineeServiceImpl.TRANSACTION_ID, "transactionId");
-    try {
-      List<Trainee> traineeList = Collections.singletonList(new Trainee());
-      when(traineeRepository.findAll()).thenReturn(traineeList);
-      List<Trainee> result = traineeService.findAll();
-      assertEquals(traineeList, result);
-    } finally {
-      MDC.put(TraineeServiceImpl.TRANSACTION_ID, originalTransactionId);
-    }
+    List<Trainee> traineeList = Collections.singletonList(new Trainee());
+    when(traineeRepository.findAll()).thenReturn(traineeList);
+    List<Trainee> result = traineeService.findAll();
+    assertEquals(traineeList, result);
   }
 
   @Test
   void testSaveTrainee() {
-    String originalTransactionId = MDC.get(TraineeServiceImpl.TRANSACTION_ID);
-    MDC.put(TraineeServiceImpl.TRANSACTION_ID, "transactionId");
-    try {
-      TraineeRegistration traineeDto = Mockito.mock(TraineeRegistration.class);
-      when(traineeDto.firstName()).thenReturn("John");
-      when(traineeDto.lastName()).thenReturn("Doe");
-      Trainee trainee = new Trainee();
-      when(userService.findAll()).thenReturn(Collections.emptyList());
-      when(traineeConverter.toTrainee(traineeDto)).thenReturn(trainee);
-      when(traineeRepository.save(trainee)).thenReturn(trainee);
-      Trainee result = traineeService.saveTrainee(traineeDto);
-      assertEquals(trainee, result);
-    } finally {
-      MDC.put(TraineeServiceImpl.TRANSACTION_ID, originalTransactionId);
-    }
+    TraineeRegistration traineeDto = Mockito.mock(TraineeRegistration.class);
+    when(traineeDto.firstName()).thenReturn("John");
+    when(traineeDto.lastName()).thenReturn("Doe");
+    Trainee trainee = new Trainee();
+    when(userService.findAll()).thenReturn(Collections.emptyList());
+    when(traineeConverter.toTrainee(traineeDto)).thenReturn(trainee);
+    when(traineeRepository.save(trainee)).thenReturn(trainee);
+    Trainee result = traineeService.saveTrainee(traineeDto);
+    assertEquals(trainee, result);
   }
 
 
   @Test
   void testUpdateTrainee() {
-    String originalTransactionId = MDC.get(TraineeServiceImpl.TRANSACTION_ID);
-    MDC.put(TraineeServiceImpl.TRANSACTION_ID, "transactionId");
-    try {
-      TraineeUpdateRequest request = new TraineeUpdateRequest(USERNAME,"Nika", "Poli", LocalDate.now(),
-          "address", true);
-      Trainee trainee = new Trainee();
-      trainee.setUsername(USERNAME);
-      when(traineeRepository.findByUsername(any())).thenReturn(Optional.of(trainee));
-      when(traineeRepository.update(any())).thenReturn(Optional.of(trainee));
-
-
-      Trainee result = traineeService.updateTrainee(request);
-      assertEquals(trainee, result);
-    } finally {
-      MDC.put(TraineeServiceImpl.TRANSACTION_ID, originalTransactionId);
-    }
+    TraineeUpdateRequest request = new TraineeUpdateRequest(USERNAME, "Nika", "Poli", LocalDate.now(),
+        "address", true);
+    Trainee trainee = new Trainee();
+    trainee.setUsername(USERNAME);
+    when(traineeRepository.findByUsername(any())).thenReturn(Optional.of(trainee));
+    when(traineeRepository.update(any())).thenReturn(Optional.of(trainee));
+    Trainee result = traineeService.updateTrainee(request);
+    assertEquals(trainee, result);
   }
 
 
   @Test
   void testToggleProfileActivation() {
-    String originalTransactionId = MDC.get(TraineeServiceImpl.TRANSACTION_ID);
-    MDC.put(TraineeServiceImpl.TRANSACTION_ID, "transactionId");
-   boolean isActive = true;
+    boolean isActive = true;
     Trainee trainee = new Trainee();
     trainee.setId(TRAINEE_ID);
     when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.of(trainee));
@@ -182,19 +141,14 @@ class TraineeServiceImplTest {
     assertTrue(trainee.isActive());
     verify(traineeRepository).findById(TRAINEE_ID);
     verify(traineeRepository).toggleProfileActivation(trainee);
-    MDC.put(TraineeServiceImpl.TRANSACTION_ID, originalTransactionId);
   }
-
 
   @Test
   void testFindTrainersForTrainee() {
-    String originalTransactionId = MDC.get(TraineeServiceImpl.TRANSACTION_ID);
-    MDC.put(TraineeServiceImpl.TRANSACTION_ID, "transactionId");
     List<Trainer> trainerList = Collections.singletonList(new Trainer());
     when(traineeRepository.findTrainersForTrainee(TRAINEE_ID)).thenReturn(trainerList);
     when(trainerConverter.toTrainerDtoForTrainee(trainerList)).thenReturn(Collections.emptyList());
     List<TrainerDtoForTrainee> result = traineeService.findTrainersForTrainee(TRAINEE_ID);
     assertEquals(Collections.emptyList(), result);
-    MDC.put(TraineeServiceImpl.TRANSACTION_ID, originalTransactionId);
   }
 }

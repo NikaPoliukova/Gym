@@ -1,30 +1,44 @@
 package com.epam.upskill.logger;
 
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.AfterThrowing;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
+@Slf4j
 @Aspect
 @Component
 public class OperationLoggerAspect {
   private static final Logger logger = LoggerFactory.getLogger("com.epam.upskill.logger");
+  private final ThreadLocal<String> transactionIdThreadLocal = new ThreadLocal<>();
+  Object myResult;
 
-  @Before("execution(* com.epam.upskill.service.impl.*.*(..)) && args(.., transactionId)")
-  public void logOperationStart(String transactionId) {
-    logger.info("Transaction ID: {} | Operation started", transactionId);
+  @SneakyThrows
+  @Around("execution(* com.epam.upskill.service.impl.*.*(..))")
+  public Object logOperationStart(ProceedingJoinPoint aspect) {
+    String name = aspect.getSignature().getName();
+    log.debug("generate transactionId  for operation: " + name);
+    String transactionId = UUID.randomUUID().toString();
+    MDC.put("transactionId", transactionId);
+    transactionIdThreadLocal.set(transactionId);
+    try {
+      myResult = aspect.proceed();
+      return myResult;
+    } finally {
+      logger.info("Transaction ID: " + transactionId + " | Operation completed with result = " + myResult);
+      transactionIdThreadLocal.remove();
+    }
   }
 
-  @AfterReturning(pointcut = "execution(* com.epam.upskill.service.impl.*.*(..)) && args(.., transactionId)", returning = "result")
-  public void logOperationSuccess(String transactionId, Object result) {
-    logger.info("Transaction ID: {} | Operation succeeded with result: {}", transactionId, result);
-  }
-
-  @AfterThrowing(pointcut = "execution(* com.epam.upskill.service.impl.*.*(..)) && args(.., transactionId)", throwing = "exception")
-  public void logOperationError(String transactionId, Exception exception) {
-    logger.error("Transaction ID: {} | Operation failed with exception: {}", transactionId, exception.getMessage());
+  public String getTransactionId() {
+    return transactionIdThreadLocal.get();
   }
 }
+

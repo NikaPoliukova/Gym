@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.util.List;
@@ -33,10 +34,15 @@ public class TraineeRepositoryImpl implements TraineeRepository {
 
   @Override
   public Optional<Trainee> findByUsername(String username) {
-    return Optional.of(entityManager.createQuery("SELECT t FROM Trainee t  WHERE t.username = :username",
-            Trainee.class)
-        .setParameter(USERNAME, username)
-        .getSingleResult());
+    try {
+      return Optional.of(entityManager.createQuery("SELECT t FROM Trainee t  WHERE t.username = :username",
+              Trainee.class)
+          .setParameter(USERNAME, username)
+          .getSingleResult());
+    } catch (NoResultException ex) {
+      log.debug("trainee was not found");
+      return Optional.empty();
+    }
   }
 
   @Override

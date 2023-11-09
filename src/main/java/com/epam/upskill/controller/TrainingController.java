@@ -4,7 +4,6 @@ import com.epam.upskill.converter.TrainingTypeConverter;
 import com.epam.upskill.dto.TrainingRequest;
 import com.epam.upskill.dto.TrainingTypeResponse;
 import com.epam.upskill.entity.TrainingType;
-import com.epam.upskill.exception.OperationFailedException;
 import com.epam.upskill.service.TrainingService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -37,13 +36,9 @@ public class TrainingController {
                            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
                            @RequestParam("trainingType") @NotBlank String type,
                            @RequestParam("trainingDuration") @NotBlank int duration) {
-    try {
-      TrainingRequest trainingRequest = new TrainingRequest(traineeUsername, trainerUsername, trainingName,
-          date, type, duration);
-      trainingService.saveTraining(trainingRequest);
-    } catch (OperationFailedException ex) {
-      throw new OperationFailedException(trainingName + "with date " + date, "Save training");
-    }
+    TrainingRequest trainingRequest = new TrainingRequest(traineeUsername, trainerUsername, trainingName,
+        date, type, duration);
+    trainingService.saveTraining(trainingRequest);
   }
 
   @ApiOperation("Get a list of training types")

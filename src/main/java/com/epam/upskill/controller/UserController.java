@@ -23,18 +23,16 @@ public class UserController {
   @PutMapping("/setting/login")
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Change login")
-  public void changeLogin(
-      @RequestParam("username") @NotBlank String username,
-      @RequestParam("oldPassword") @NotBlank String oldPassword,
-      @RequestParam("newPassword") @NotBlank @Size(min = 10, max = 10, message = "New password must be 10 characters")
-      String newPassword) {
-    try {
-      if (oldPassword.equals(newPassword)) {
-        throw new OperationFailedException(" user because new password cannot be the same as the old password", "change login");
-      }
-      userService.updatePassword(new UserUpdatePass(username, oldPassword, newPassword));
-    } catch (OperationFailedException ex) {
-      throw new OperationFailedException(username, "change login");
+  public void changeLogin(@RequestParam("username") @NotBlank String username,
+                          @RequestParam("oldPassword") @NotBlank String oldPassword,
+                          @RequestParam("newPassword") @NotBlank @Size(min = 10, max = 10, message = "New password must" +
+                              " be 10 characters")
+                          String newPassword) {
+
+    if (oldPassword.equals(newPassword)) {
+      throw new OperationFailedException(" user because new password cannot be the same as the old password",
+          "change login");
     }
+    userService.updatePassword(new UserUpdatePass(username, oldPassword, newPassword));
   }
 }

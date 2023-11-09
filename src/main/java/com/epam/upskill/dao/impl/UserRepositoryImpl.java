@@ -60,7 +60,7 @@ public class UserRepositoryImpl implements UserRepository {
     try {
       return Optional.ofNullable(query.getSingleResult());
     } catch (NoResultException e) {
-      throw new UserNotFoundException (username);
+      throw new UserNotFoundException(username);
     }
   }
 

@@ -42,7 +42,6 @@ class UserServiceImplTest {
         User user = new User();
     when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
     User result = userService.findById(USER_ID);
-
     assertNotNull(result);
     assertSame(user, result);
   }
@@ -82,7 +81,6 @@ class UserServiceImplTest {
   @Test
   void testFindByUsername_UserNotFound() {
     when(userRepository.findByUsername(USERNAME)).thenReturn(Optional.empty());
-
     assertThrows(UserNotFoundException.class, () -> userService.findByUsername(USERNAME));
   }
 
@@ -92,7 +90,6 @@ class UserServiceImplTest {
     User user = new User();
     when(userRepository.findByUsernameAndPassword(updatePass.username(), updatePass.oldPassword()))
         .thenReturn(Optional.of(user));
-
     assertDoesNotThrow(() -> userService.updatePassword(updatePass));
   }
 
@@ -101,7 +98,6 @@ class UserServiceImplTest {
     UserUpdatePass updatePass = new UserUpdatePass(USERNAME, PASSWORD, "newPassword");
     when(userRepository.findByUsernameAndPassword(updatePass.username(), updatePass.oldPassword()))
         .thenReturn(Optional.empty());
-
     assertThrows(UserNotFoundException.class, () -> userService.updatePassword(updatePass));
   }
 
@@ -109,9 +105,7 @@ class UserServiceImplTest {
   void testFindByUsernameAndPassword_UserFound() {
     User user = new User();
     when(userRepository.findByUsernameAndPassword(USERNAME, PASSWORD)).thenReturn(Optional.of(user));
-
     User result = userService.findByUsernameAndPassword(USERNAME, PASSWORD);
-
     assertNotNull(result);
     assertSame(user, result);
   }
@@ -143,7 +137,6 @@ class UserServiceImplTest {
   void testDelete() {
       User user = new User();
     when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
-
     assertDoesNotThrow(() -> userService.delete(USER_ID));
     verify(userRepository).delete(USER_ID);
   }
@@ -153,5 +146,4 @@ class UserServiceImplTest {
     when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
     assertThrows(UserNotFoundException.class, () -> userService.delete(USER_ID));
   }
-
 }

@@ -4,9 +4,11 @@ import com.epam.upskill.dao.TrainerRepository;
 import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.entity.Trainer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.util.List;
@@ -65,10 +67,16 @@ public class TrainerRepositoryImpl implements TrainerRepository {
 
   @Override
   public Optional<Trainer> findByUsername(String username) {
-    return Optional.ofNullable(entityManager.createQuery("SELECT t FROM Trainer t  WHERE t.username = :username",
-            Trainer.class)
-        .setParameter(USERNAME, username)
-        .getSingleResult());
+    try {
+      return Optional.ofNullable(entityManager.createQuery("SELECT t FROM Trainer t  WHERE t.username = :username",
+              Trainer.class)
+          .setParameter(USERNAME, username)
+          .getSingleResult());
+    }
+    catch (NoResultException ex){
+      log.debug("trainer was not found");
+      return Optional.empty();
+    }
   }
 
   @Override

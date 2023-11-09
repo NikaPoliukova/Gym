@@ -13,26 +13,17 @@ import com.epam.upskill.service.UserService;
 import com.epam.upskill.util.UserUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Slf4j
 @Service
-@Validated
 public class TraineeServiceImpl implements TraineeService {
-
-  public static final String TRANSACTION_ID = "transactionId";
 
   private final TraineeRepository traineeRepository;
   private final UserService userService;
@@ -41,19 +32,14 @@ public class TraineeServiceImpl implements TraineeService {
 
   @Override
   @Transactional
-  public Trainee findById(@NotNull long traineeId) {
-    String transactionId = UUID.randomUUID().toString();
-    MDC.put(TRANSACTION_ID, transactionId);
+  public Trainee findById(long traineeId) {
     return traineeRepository.findById(traineeId).orElseThrow(()
         -> new UserNotFoundException("trainee with id = " + traineeId));
-
   }
 
   @Override
   @Transactional
-  public Trainee findByUsername(@NotBlank String username) {
-    String transactionId = UUID.randomUUID().toString();
-    MDC.put(TRANSACTION_ID, transactionId);
+  public Trainee findByUsername(String username) {
     return traineeRepository.findByUsername(username).orElseThrow(()
         -> new UserNotFoundException(username));
 
@@ -62,8 +48,6 @@ public class TraineeServiceImpl implements TraineeService {
   @Override
   @Transactional
   public Trainee findByUsernameAndPassword(String username, String password) {
-    String transactionId = UUID.randomUUID().toString();
-    MDC.put(TRANSACTION_ID, transactionId);
     return traineeRepository.findByUsernameAndPassword(username, password).orElseThrow(()
         -> new UserNotFoundException(username));
   }
@@ -71,18 +55,13 @@ public class TraineeServiceImpl implements TraineeService {
   @Override
   @Transactional(readOnly = true)
   public List<Trainee> findAll() {
-    String transactionId = UUID.randomUUID().toString();
-    MDC.put(TRANSACTION_ID, transactionId);
     List<Trainee> trainees = traineeRepository.findAll();
     return trainees != null ? trainees : Collections.emptyList();
   }
 
   @Override
   @Transactional
-  public Trainee saveTrainee(@Valid TraineeRegistration traineeDto) {
-    String transactionId = UUID.randomUUID().toString();
-    MDC.put(TRANSACTION_ID, transactionId);
-
+  public Trainee saveTrainee(TraineeRegistration traineeDto) {
     var username = UserUtils.createUsername(traineeDto.firstName(), traineeDto.lastName(),
         userService.findAll());
     var password = UserUtils.generateRandomPassword();
@@ -93,9 +72,7 @@ public class TraineeServiceImpl implements TraineeService {
 
   @Override
   @Transactional
-  public Trainee updateTrainee(@Valid TraineeUpdateRequest request) {
-    String transactionId = UUID.randomUUID().toString();
-    MDC.put(TRANSACTION_ID, transactionId);
+  public Trainee updateTrainee(TraineeUpdateRequest request) {
     var trainee = findByUsername(request.username());
     fillTrainee(request, trainee);
     if (request.isActive() != trainee.isActive()) {
@@ -108,8 +85,6 @@ public class TraineeServiceImpl implements TraineeService {
   @Override
   @Transactional
   public void toggleProfileActivation(long traineeId, boolean isActive) {
-    String transactionId = UUID.randomUUID().toString();
-    MDC.put(TRANSACTION_ID, transactionId);
     var trainee = findById(traineeId);
     if (trainee.isActive() != isActive) {
       trainee.setActive(isActive);
@@ -121,8 +96,6 @@ public class TraineeServiceImpl implements TraineeService {
   @Override
   @Transactional
   public List<TrainerDtoForTrainee> findTrainersForTrainee(long id) {
-    String transactionId = UUID.randomUUID().toString();
-    MDC.put(TRANSACTION_ID, transactionId);
     var listTrainers = traineeRepository.findTrainersForTrainee(id);
     if (listTrainers.isEmpty()) {
       return Collections.emptyList();

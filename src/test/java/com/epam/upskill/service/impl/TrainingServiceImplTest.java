@@ -29,10 +29,10 @@ class TrainingServiceImplTest {
 
   public static final LocalDate PERIOD_FROM = LocalDate.parse("2023-01-01");
   public static final LocalDate PERIOD_TO = LocalDate.parse("2023-11-01");
-  ;
-  public static final String TRAINEE_USERNAME = "trainee_username";
+    public static final String TRAINEE_USERNAME = "trainee_username";
   public static final String TRAINER_USERNAME = "trainer_username";
   public static final String TRAINING_NAME = "training_name";
+
   @InjectMocks
   private TrainingServiceImpl trainingService;
 
@@ -58,9 +58,7 @@ class TrainingServiceImplTest {
     long trainingId = 1L;
     Training expectedTraining = new Training();
     when(trainingRepository.findById(trainingId)).thenReturn(Optional.of(expectedTraining));
-
     Training result = trainingService.findTrainingById(trainingId);
-
     assertNotNull(result);
     assertEquals(expectedTraining, result);
   }
@@ -68,23 +66,19 @@ class TrainingServiceImplTest {
   @Test
   void testSaveTraining() {
     TrainingRequest request = new TrainingRequest(TRAINEE_USERNAME, TRAINER_USERNAME,
-        "Gymnastics", PERIOD_TO, "STRETCHING", 50);
-
+        TRAINING_NAME, PERIOD_TO, "STRETCHING", 50);
     Trainee trainee = new Trainee();
     trainee.setUsername(TRAINEE_USERNAME);
     Trainer trainer = new Trainer();
     trainer.setUsername(TRAINER_USERNAME);
     TrainingType trainingType = new TrainingType();
     trainingType.setTrainingTypeName(TrainingTypeEnum.STRENGTH);
-
     when(traineeService.findByUsername(TRAINEE_USERNAME)).thenReturn(trainee);
     when(trainerService.findByUsername(TRAINER_USERNAME)).thenReturn(trainer);
     when(trainingRepository.findTrainingTypeByName("STRETCHING")).thenReturn(trainingType);
     when(trainingConverter.toTraining(any(TrainingRequest.class), any(Training.class))).thenReturn(new Training());
     when(trainingRepository.save(any(Training.class))).thenReturn(new Training());
-
     Training result = trainingService.saveTraining(request);
-
     assertNotNull(result);
   }
 
@@ -93,10 +87,8 @@ class TrainingServiceImplTest {
     TrainingTypeEnum trainingType = TrainingTypeEnum.STRENGTH;
     List<Training> expectedTrainings = Collections.singletonList(new Training());
     when(trainingRepository.findTraineeTrainingsList(any(TrainingDtoRequest.class))).thenReturn(expectedTrainings);
-
     TrainingTraineeRequest request = new TrainingTraineeRequest(TRAINEE_USERNAME, PERIOD_FROM, PERIOD_TO, TRAINING_NAME, trainingType.name());
     List<Training> result = trainingService.findTrainingsByUsernameAndCriteria(request);
-
     assertNotNull(result);
     assertFalse(result.isEmpty());
     assertEquals(expectedTrainings, result);
@@ -107,10 +99,8 @@ class TrainingServiceImplTest {
     List<Training> expectedTrainings = Collections.singletonList(new Training());
     when(trainerService.findByUsername(TRAINER_USERNAME)).thenReturn(new Trainer());
     when(trainingRepository.findTrainerTrainings(any(TrainingTrainerDto.class))).thenReturn(expectedTrainings);
-
     TrainingTrainerRequest request = new TrainingTrainerRequest(TRAINER_USERNAME, PERIOD_FROM, PERIOD_TO, TRAINEE_USERNAME);
     List<Training> result = trainingService.findTrainerTrainings(request);
-
     assertNotNull(result);
     assertFalse(result.isEmpty());
     assertEquals(expectedTrainings, result);
@@ -123,7 +113,6 @@ class TrainingServiceImplTest {
     Trainer trainer = new Trainer();
     trainer.setId(2L);
     when(traineeService.findByUsername(TRAINEE_USERNAME)).thenReturn(trainee);
-
     List<Trainer> activeTrainers = Collections.singletonList(trainer);
     when(trainingRepository.getAssignedActiveTrainersToTrainee(trainee.getId())).thenReturn(activeTrainers);
     List<Trainer> trainersList = Collections.singletonList(new Trainer());
@@ -135,25 +124,21 @@ class TrainingServiceImplTest {
 
   @Test
   void testDelete() {
-    // Подготовьте необходимые данные и проверьте, что метод выполняется без ошибок.
     Training training = new Training();
     doNothing().when(trainingRepository).delete(training);
-
     assertDoesNotThrow(() -> trainingService.delete(training));
   }
 
   @Test
   void testUpdateTraineeTrainerList() {
-    // Подготовьте необходимые данные и проверьте, что метод возвращает ожидаемый результат.
-    String traineeUsername = "trainee_username";
     String trainingDate = "2023-01-01";
-    UpdateTraineeTrainerDto dto = new UpdateTraineeTrainerDto(traineeUsername, trainingDate, TRAINING_NAME, Collections.emptyList());
-
+    UpdateTraineeTrainerDto dto = new UpdateTraineeTrainerDto(TRAINEE_USERNAME, trainingDate, TRAINING_NAME,
+        Collections.emptyList());
     Trainee trainee = new Trainee();
-    trainee.setUsername(traineeUsername);
+    trainee.setUsername(TRAINEE_USERNAME);
     Training training = new Training();
     training.setTrainingName(TRAINING_NAME);
-    when(traineeService.findByUsername(traineeUsername)).thenReturn(trainee);
+    when(traineeService.findByUsername(TRAINEE_USERNAME)).thenReturn(trainee);
     when(trainingRepository.findTraineeTrainingsList(trainee.getId(), trainingDate, TRAINING_NAME)).thenReturn(Collections.singletonList(training));
     when(trainingConverter.toTraining(any(TrainingRequest.class), any(Training.class))).thenReturn(new Training());
     when(trainingRepository.save(any(Training.class))).thenReturn(new Training());
@@ -168,7 +153,6 @@ class TrainingServiceImplTest {
   void testFindTrainingById_WhenTrainingNotFound() {
     long trainingId = 1L;
     when(trainingRepository.findById(trainingId)).thenReturn(Optional.empty());
-
     assertThrows(OperationFailedException.class, () -> {
       trainingService.findTrainingById(trainingId);
     });
@@ -177,8 +161,8 @@ class TrainingServiceImplTest {
 
   @Test
   void testSaveTraining_WhenTraineeNotFound() {
-    TrainingRequest request = new TrainingRequest("non_existent_trainee_username", "trainer_username", "Gymnastics", PERIOD_FROM, TRAINING_NAME, 60);
-
+    TrainingRequest request = new TrainingRequest(TRAINEE_USERNAME, TRAINER_USERNAME, TRAINING_NAME,
+        PERIOD_FROM, TRAINING_NAME, 60);
     when(traineeService.findByUsername(request.traineeUsername())).thenReturn(null);
     when(trainerService.findByUsername(request.trainerUsername())).thenReturn(new Trainer());
     when(trainingRepository.findTrainingTypeByName(request.trainingType())).thenReturn(new TrainingType());
@@ -190,9 +174,8 @@ class TrainingServiceImplTest {
 
   @Test
   void testSaveTraining_WhenTrainerNotFound() {
-    TrainingRequest request = new TrainingRequest("trainee_username",
-        "non_existent_trainer_username", "Gymnastics", PERIOD_FROM, TRAINING_NAME, 60);
-
+    TrainingRequest request = new TrainingRequest(TRAINEE_USERNAME,
+        TRAINER_USERNAME, TRAINING_NAME, PERIOD_FROM, TRAINING_NAME, 60);
     when(traineeService.findByUsername(request.traineeUsername())).thenReturn(new Trainee());
     when(trainerService.findByUsername(request.trainerUsername())).thenReturn(null);
     when(trainingConverter.toTraining(any(TrainingRequest.class), any(Training.class))).thenAnswer(invocation -> {
@@ -208,11 +191,9 @@ class TrainingServiceImplTest {
       Training training = invocation.getArgument(0);
       return training;
     });
-
     Training result = trainingService.saveTraining(request);
-
     assertNotNull(result);
-    // Добавьте проверки по вашей логике
+
   }
 
 

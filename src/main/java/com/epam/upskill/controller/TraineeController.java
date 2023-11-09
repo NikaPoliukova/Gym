@@ -6,8 +6,6 @@ import com.epam.upskill.converter.TrainingConverter;
 import com.epam.upskill.dto.*;
 import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.Training;
-import com.epam.upskill.exception.OperationFailedException;
-import com.epam.upskill.exception.UserNotFoundException;
 import com.epam.upskill.service.TraineeService;
 import com.epam.upskill.service.TrainingService;
 import com.epam.upskill.service.UserService;
@@ -40,12 +38,8 @@ public class TraineeController {
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Get Trainee by username")
   public TraineeResponse getTrainee(@RequestParam("username") @NotBlank String username) {
-    try {
-      var trainee = traineeService.findByUsername(username);
-      return converter.toTraineeResponse(trainee, traineeService);
-    } catch (UserNotFoundException ex) {
-      throw new UserNotFoundException(username);
-    }
+    var trainee = traineeService.findByUsername(username);
+    return converter.toTraineeResponse(trainee, traineeService);
   }
 
   @PutMapping("/trainee/setting/profile")
@@ -58,25 +52,19 @@ public class TraineeController {
                                              @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateOfBirth,
                                              @RequestParam(value = "address", required = false) String address,
                                              @RequestParam("isActive") boolean isActive) {
-    try {
-      TraineeUpdateRequest traineeUpdateRequest = new TraineeUpdateRequest(username, firstName, lastName, dateOfBirth, address, isActive);
-      var trainee = traineeService.updateTrainee(traineeUpdateRequest);
-      return converter.toTraineeUpdateResponse(trainee, traineeService);
-    } catch (OperationFailedException ex) {
-      throw new OperationFailedException(username, "update trainee");
-    }
+    TraineeUpdateRequest traineeUpdateRequest = new TraineeUpdateRequest(username, firstName, lastName, dateOfBirth,
+        address, isActive);
+    var trainee = traineeService.updateTrainee(traineeUpdateRequest);
+    return converter.toTraineeUpdateResponse(trainee, traineeService);
+
   }
 
   @DeleteMapping
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Delete Trainee by username")
   public void deleteTrainee(@RequestParam("username") @NotBlank String username) {
-    try {
-      var trainee = traineeService.findByUsername(username);
-      userService.delete(trainee.getId());
-    } catch (OperationFailedException ex) {
-      throw new OperationFailedException(username,"delete trainee" );
-    }
+    var trainee = traineeService.findByUsername(username);
+    userService.delete(trainee.getId());
   }
 
   @GetMapping("/not-active-trainers")
@@ -90,16 +78,13 @@ public class TraineeController {
   @PutMapping("/trainers")
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Update Trainee's trainers")
-  public List<TrainerDtoForTrainee> updateTrainerList(
-      @RequestParam("username") @NotBlank String username,
-      @RequestParam("trainingDate") @NotBlank String trainingDate,
-      @RequestParam("trainingName") @NotBlank String trainingName,
-      @RequestBody @NotEmpty List<TrainersDtoList> list) {
-    try {
-      return trainingService.updateTraineeTrainerList(new UpdateTraineeTrainerDto(username, trainingDate, trainingName, list));
-    } catch (OperationFailedException ex) {
-      throw new OperationFailedException(username, "update trainee's trainers");
-    }
+  public List<TrainerDtoForTrainee> updateTrainerList(@RequestParam("username") @NotBlank String username,
+                                                      @RequestParam("trainingDate") @NotBlank String trainingDate,
+                                                      @RequestParam("trainingName") @NotBlank String trainingName,
+                                                      @RequestBody @NotEmpty List<TrainersDtoList> list) {
+    return trainingService.updateTraineeTrainerList(new UpdateTraineeTrainerDto(username, trainingDate,
+        trainingName, list));
+
   }
 
   @GetMapping("/trainings")
@@ -125,11 +110,7 @@ public class TraineeController {
   @ApiOperation("Activate or deactivate a Trainee's profile")
   public void toggleActivation(@RequestParam("username") @NotBlank String username,
                                @RequestParam("active") @NotBlank boolean isActive) {
-    try {
-      var trainee = traineeService.findByUsername(username);
-      traineeService.toggleProfileActivation(trainee.getId(), isActive);
-    } catch (OperationFailedException ex) {
-      throw new OperationFailedException(username,"activate or deactivate a trainee ");
-    }
+    var trainee = traineeService.findByUsername(username);
+    traineeService.toggleProfileActivation(trainee.getId(), isActive);
   }
 }

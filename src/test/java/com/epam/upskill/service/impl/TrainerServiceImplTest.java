@@ -97,12 +97,13 @@ public class TrainerServiceImplTest {
     List<Trainer> result = trainerService.findAll();
     assertEquals(trainers, result);
   }
+
   @Test
   void testSaveTrainer() {
     TrainerRegistration registration = new TrainerRegistration(FIRST_NAME, LAST_NAME, SPECIALIZATION);
     TrainingType trainingType = new TrainingType();
     trainingType.setTrainingTypeName(TrainingTypeEnum.YOGA);
-     when(trainingRepository.findTrainingTypeByName(registration.specialization())).thenReturn(trainingType);
+    when(trainingRepository.findTrainingTypeByName(registration.specialization())).thenReturn(trainingType);
     when(userService.findAll()).thenReturn(Collections.emptyList());
     when(trainerRepository.save(any(Trainer.class))).thenReturn(new Trainer());
     Trainer result = trainerService.saveTrainer(registration);
@@ -111,8 +112,8 @@ public class TrainerServiceImplTest {
     result.setPassword(PASSWORD);
     result.setActive(true);
     assertNotNull(result);
-    assertEquals(registration.firstName(), "John");
-    assertEquals(registration.lastName(), "Doe");
+    assertEquals(registration.firstName(), FIRST_NAME);
+    assertEquals(registration.lastName(), LAST_NAME);
     assertEquals(USERNAME, result.getUsername());
     assertEquals(PASSWORD, result.getPassword());
     assertTrue(result.isActive());

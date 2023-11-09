@@ -13,7 +13,6 @@ import com.epam.upskill.service.TrainerService;
 import com.epam.upskill.service.TrainingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,9 +22,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
-
-import static com.epam.upskill.service.impl.TraineeServiceImpl.TRANSACTION_ID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -42,9 +38,6 @@ public class TrainingServiceImpl implements TrainingService {
   @Override
   @Transactional(readOnly = true)
   public Training findTrainingById(long trainingId) {
-    String transactionId = UUID.randomUUID().toString();
-    MDC.put(TRANSACTION_ID, transactionId);
-    log.info("Transaction ID: {} | Fetching Training by ID: {}", transactionId, trainingId);
     return trainingRepository.findById(trainingId).orElseThrow(()
         -> new OperationFailedException(" training id", "find training by id"));
 
@@ -53,10 +46,6 @@ public class TrainingServiceImpl implements TrainingService {
   @Override
   @Transactional(propagation = Propagation.REQUIRED)
   public Training saveTraining(@Valid TrainingRequest request) {
-    String transactionId = UUID.randomUUID().toString();
-    MDC.put(TRANSACTION_ID, transactionId);
-    log.info("Transaction ID: {} | Creating Training: {}", transactionId, request);
-
     var trainee = traineeService.findByUsername(request.traineeUsername());
     var trainer = trainerService.findByUsername(request.trainerUsername());
     var trainingType = trainingRepository.findTrainingTypeByName(request.trainingType());
@@ -70,8 +59,6 @@ public class TrainingServiceImpl implements TrainingService {
 
   @Override
   public List<Training> findTrainingsByUsernameAndCriteria(@Valid TrainingTraineeRequest request) {
-    String transactionId = UUID.randomUUID().toString();
-    MDC.put(TRANSACTION_ID, transactionId);
     TrainingTypeEnum myEnum = TrainingTypeEnum.valueOf(request.trainingType());
     return trainingRepository.findTraineeTrainingsList(new TrainingDtoRequest(request.username(),
         request.periodFrom(), request.periodTo(), request.trainerName(), myEnum));
@@ -80,8 +67,6 @@ public class TrainingServiceImpl implements TrainingService {
   @Override
   @Transactional
   public List<Training> findTrainingsByUsernameAndCriteria(long traineeId, String trainingDate, String trainingName) {
-    String transactionId = UUID.randomUUID().toString();
-    MDC.put(TRANSACTION_ID, transactionId);
     List<Training> trainings = trainingRepository.findTraineeTrainingsList(traineeId, trainingDate, trainingName);
     if (trainings.isEmpty()) {
       return Collections.emptyList();
@@ -92,9 +77,6 @@ public class TrainingServiceImpl implements TrainingService {
   @Override
   @Transactional
   public List<Training> findTrainerTrainings(@Valid TrainingTrainerRequest request) {
-    String transactionId = UUID.randomUUID().toString();
-    MDC.put(TRANSACTION_ID, transactionId);
-
     var trainerId = trainerService.findByUsername(request.username()).getId();
     List<Training> trainings = trainingRepository.findTrainerTrainings
         (new TrainingTrainerDto(trainerId, request.periodFrom(), request.periodTo(), request.traineeName()));
@@ -107,8 +89,6 @@ public class TrainingServiceImpl implements TrainingService {
   @Override
   @Transactional
   public List<Trainer> findNotAssignedActiveTrainersToTrainee(String username) {
-    String transactionId = UUID.randomUUID().toString();
-    MDC.put(TRANSACTION_ID, transactionId);
     var traineeId = traineeService.findByUsername(username).getId();
     List<Trainer> activeTrainers = trainingRepository.getAssignedActiveTrainersToTrainee(traineeId);
     List<Trainer> trainersList = trainerService.findAll();
@@ -120,24 +100,18 @@ public class TrainingServiceImpl implements TrainingService {
   @Override
   @Transactional
   public List<TrainingType> findTrainingTypes() {
-    String transactionId = UUID.randomUUID().toString();
-    MDC.put(TRANSACTION_ID, transactionId);
     return trainingRepository.findTrainingTypes();
   }
 
   @Override
   @Transactional
   public void delete(@NotNull Training training) {
-    String transactionId = UUID.randomUUID().toString();
-    MDC.put(TRANSACTION_ID, transactionId);
     trainingRepository.delete(training);
   }
 
   @Override
   @Transactional
   public List<TrainerDtoForTrainee> updateTraineeTrainerList(@Valid UpdateTraineeTrainerDto dto) {
-    String transactionId = UUID.randomUUID().toString();
-    MDC.put(TRANSACTION_ID, transactionId);
     Trainee trainee = traineeService.findByUsername(dto.username());
     List<Training> trainings = findTrainingsByUsernameAndCriteria(trainee.getId(), dto.trainingDate(), dto.trainingName());
     Training patternTraining = trainings.get(0);
