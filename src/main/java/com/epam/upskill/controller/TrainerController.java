@@ -54,7 +54,7 @@ public class TrainerController {
   @GetMapping("/trainings")
   @ApiOperation("Find Trainer's trainings")
   public List<TrainingTrainerResponse> findTrainerTrainingsList(@RequestParam("username") @NotBlank
-                                                                  @Size(min = 2, max = 60)String username,
+                                                                @Size(min = 2, max = 60) String username,
                                                                 @RequestParam(required = false)
                                                                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                                                                 LocalDate periodFrom,
@@ -62,15 +62,15 @@ public class TrainerController {
                                                                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                                                                 LocalDate periodTo,
                                                                 @RequestParam(required = false) String traineeName) {
-    List<Training> trainingsList = trainingService.findTrainerTrainings(new TrainingTrainerRequest
-        (username, periodFrom, periodTo, traineeName));
+    TrainingTrainerRequest request = new TrainingTrainerRequest(username, periodFrom, periodTo, traineeName);
+    List<Training> trainingsList = trainingService.findTrainerTrainings(request);
     return trainingConverter.toTrainerTrainingResponse(trainingsList);
   }
 
   @PatchMapping("/toggle-activation")
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Activate or deactivate Trainer's profile")
-  public void toggleActivation(@RequestParam("username") @NotBlank @Size(min = 2, max = 60)String username,
+  public void toggleActivation(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username,
                                @RequestParam("active") @NotNull boolean isActive) {
     var trainer = trainerService.findByUsername(username);
     trainerService.toggleProfileActivation(trainer.getId(), isActive);

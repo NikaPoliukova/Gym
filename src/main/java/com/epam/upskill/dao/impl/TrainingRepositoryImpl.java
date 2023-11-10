@@ -59,7 +59,7 @@ public class TrainingRepositoryImpl implements TrainingRepository {
 
 
   @Override
-  public List<Training> findTraineeTrainingsList(@Valid TrainingDtoRequest request) {
+  public List<Training> findTraineeTrainingsList(TrainingDtoRequest request) {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     CriteriaQuery<Training> query = cb.createQuery(Training.class);
     Root<Training> trainingRoot = query.from(Training.class);
@@ -83,7 +83,7 @@ public class TrainingRepositoryImpl implements TrainingRepository {
   }
 
   @Override
-  public List<Training> findTrainerTrainings(@Valid TrainingTrainerDto dto) {
+  public List<Training> findTrainerTrainings(TrainingTrainerDto dto) {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     CriteriaQuery<Training> query = cb.createQuery(Training.class);
     Root<Training> trainingRoot = query.from(Training.class);

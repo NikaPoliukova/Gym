@@ -12,9 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -48,7 +46,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public void updatePassword(@Valid UserUpdatePass userUpdatePass) {
+  public void updatePassword(UserUpdatePass userUpdatePass) {
     var user = findByUsernameAndPassword(userUpdatePass.username(), userUpdatePass.oldPassword());
     user.setPassword(userUpdatePass.newPassword());
     userRepository.update(user);
@@ -56,14 +54,14 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public User findByUsernameAndPassword(@NotBlank String username, @NotBlank String password) {
+  public User findByUsernameAndPassword(String username, String password) {
     return userRepository.findByUsernameAndPassword(username, password)
         .orElseThrow(() -> new UserNotFoundException(username));
   }
 
   @Override
   @Transactional
-  public void updateLogin(@Valid UserDto userDto) {
+  public void updateLogin(UserDto userDto) {
     try {
       var user = findById(userDto.id());
       user.setUsername(userDto.username());
@@ -75,7 +73,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public void delete(@NotNull long userId) {
+  public void delete(long userId) {
     try {
       findById(userId);
       userRepository.delete(userId);

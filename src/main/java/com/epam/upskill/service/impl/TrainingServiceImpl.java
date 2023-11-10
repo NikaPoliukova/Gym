@@ -26,7 +26,6 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-@Validated
 public class TrainingServiceImpl implements TrainingService {
 
   private final TrainingRepository trainingRepository;
@@ -45,7 +44,7 @@ public class TrainingServiceImpl implements TrainingService {
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED)
-  public Training saveTraining(@Valid TrainingRequest request) {
+  public Training saveTraining(TrainingRequest request) {
     var trainee = traineeService.findByUsername(request.traineeUsername());
     var trainer = trainerService.findByUsername(request.trainerUsername());
     var trainingType = trainingRepository.findTrainingTypeByName(request.trainingType());
@@ -58,7 +57,7 @@ public class TrainingServiceImpl implements TrainingService {
   }
 
   @Override
-  public List<Training> findTrainingsByUsernameAndCriteria(@Valid TrainingTraineeRequest request) {
+  public List<Training> findTrainingsByUsernameAndCriteria( TrainingTraineeRequest request) {
     TrainingTypeEnum myEnum = TrainingTypeEnum.valueOf(request.trainingType());
     return trainingRepository.findTraineeTrainingsList(new TrainingDtoRequest(request.username(),
         request.periodFrom(), request.periodTo(), request.trainerName(), myEnum));
@@ -76,7 +75,7 @@ public class TrainingServiceImpl implements TrainingService {
 
   @Override
   @Transactional
-  public List<Training> findTrainerTrainings(@Valid TrainingTrainerRequest request) {
+  public List<Training> findTrainerTrainings(TrainingTrainerRequest request) {
     var trainerId = trainerService.findByUsername(request.username()).getId();
     List<Training> trainings = trainingRepository.findTrainerTrainings
         (new TrainingTrainerDto(trainerId, request.periodFrom(), request.periodTo(), request.traineeName()));
@@ -111,7 +110,7 @@ public class TrainingServiceImpl implements TrainingService {
 
   @Override
   @Transactional
-  public List<TrainerDtoForTrainee> updateTraineeTrainerList(@Valid UpdateTraineeTrainerDto dto) {
+  public List<TrainerDtoForTrainee> updateTraineeTrainerList(UpdateTraineeTrainerDto dto) {
     Trainee trainee = traineeService.findByUsername(dto.username());
     List<Training> trainings = findTrainingsByUsernameAndCriteria(trainee.getId(), dto.trainingDate(), dto.trainingName());
     Training patternTraining = trainings.get(0);
