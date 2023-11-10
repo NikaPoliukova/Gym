@@ -8,6 +8,7 @@ import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.Training;
 import com.epam.upskill.entity.TrainingType;
 import com.epam.upskill.exception.OperationFailedException;
+import com.epam.upskill.exception.UserNotFoundException;
 import com.epam.upskill.service.TraineeService;
 import com.epam.upskill.service.TrainerService;
 import com.epam.upskill.service.TrainingService;
@@ -112,6 +113,7 @@ public class TrainingServiceImpl implements TrainingService {
   @Transactional
   public List<TrainerDtoForTrainee> updateTraineeTrainerList(UpdateTraineeTrainerDto dto) {
     Trainee trainee = traineeService.findByUsername(dto.username());
+    checkForNewTrainerFor(dto);
     List<Training> trainings = findTrainingsByUsernameAndCriteria(trainee.getId(), dto.trainingDate(), dto.trainingName());
     Training patternTraining = trainings.get(0);
     trainings.forEach(trainingRepository::delete);
@@ -125,7 +127,16 @@ public class TrainingServiceImpl implements TrainingService {
         .toList();
   }
 
-
+  private void checkForNewTrainerFor(UpdateTraineeTrainerDto dto) {
+    List<TrainersDtoList> dtoList = dto.list();
+    for(TrainersDtoList tdl : dtoList){
+      try {
+        trainerService.findByUsername(tdl.username());
+      }catch (UserNotFoundException ex){
+        throw new OperationFailedException("one of the trainer username was not found", "updateTraineeTrainerList");
+      }
+    }
+  }
   private static TrainerDtoForTrainee getTrainerResponse(Training training) {
     return new TrainerDtoForTrainee(
         training.getTrainer().getUsername(),

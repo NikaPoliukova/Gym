@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.validation.ValidationException;
+import java.time.format.DateTimeParseException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -36,6 +37,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @ResponseBody
   public String handleOperationFailedException(OperationFailedException ex) {
     return  ex.getMessage();
+  }
+
+  @ExceptionHandler(DateTimeParseException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ResponseBody
+  public String handleDateTimeParseException(DateTimeParseException ex) {
+    return "Invalid date, enter in the format \"yyyy-mm-dd\"";
+  }
+
+  @ExceptionHandler(IndexOutOfBoundsException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ResponseBody
+  public String handleIndexOutOfBoundsException(IndexOutOfBoundsException ex) {
+    return "List can't be empty ";
   }
 
   @ExceptionHandler(RegistrationException.class)

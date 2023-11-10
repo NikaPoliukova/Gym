@@ -78,7 +78,7 @@ public class TraineeController {
     return trainerConverter.toTrainerDtoForTrainee(trainerList);
   }
 
-  @PutMapping("/trainers")
+  @PutMapping("/setting/trainers")
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Update Trainee's trainers")
   public List<TrainerDtoForTrainee> updateTrainerList(@RequestParam("username") @NotBlank
