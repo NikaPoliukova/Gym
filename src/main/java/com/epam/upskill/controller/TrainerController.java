@@ -14,6 +14,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -32,7 +34,7 @@ public class TrainerController {
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Get Trainer by username")
-  public TrainerResponse getTrainer(@RequestParam("username") @NotBlank String username) {
+  public TrainerResponse getTrainer(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username) {
     var trainer = trainerService.findByUsername(username);
     return converter.toTrainerResponse(trainer, trainerService);
   }
@@ -40,18 +42,19 @@ public class TrainerController {
   @PutMapping("/setting/profile")
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Update Trainer's profile")
-  public TrainerUpdateResponse updateTrainer(@RequestParam("username") @NotBlank String username,
-                                             @RequestParam("firstName") @NotBlank String firstName,
-                                             @RequestParam("lastName") @NotBlank String lastName,
+  public TrainerUpdateResponse updateTrainer(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username,
+                                             @RequestParam("firstName") @NotBlank @Size(min = 2, max = 30) String firstName,
+                                             @RequestParam("lastName") @NotBlank @Size(min = 2, max = 30) String lastName,
                                              @RequestParam("specialization") @NotBlank String specialization,
-                                             @RequestParam("isActive") @NotBlank boolean isActive) {
+                                             @RequestParam("isActive") @NotNull boolean isActive) {
     var trainer = trainerService.update(new TrainerUpdateRequest(username, firstName, lastName, specialization, isActive));
     return converter.toTrainerUpdateResponse(trainer, trainerService);
   }
 
   @GetMapping("/trainings")
   @ApiOperation("Find Trainer's trainings")
-  public List<TrainingTrainerResponse> findTrainerTrainingsList(@RequestParam("username") @NotBlank String username,
+  public List<TrainingTrainerResponse> findTrainerTrainingsList(@RequestParam("username") @NotBlank
+                                                                  @Size(min = 2, max = 60)String username,
                                                                 @RequestParam(required = false)
                                                                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                                                                 LocalDate periodFrom,
@@ -67,8 +70,8 @@ public class TrainerController {
   @PatchMapping("/toggle-activation")
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Activate or deactivate Trainer's profile")
-  public void toggleActivation(@RequestParam("username") @NotBlank String username,
-                               @RequestParam("active") @NotBlank boolean isActive) {
+  public void toggleActivation(@RequestParam("username") @NotBlank @Size(min = 2, max = 60)String username,
+                               @RequestParam("active") @NotNull boolean isActive) {
     var trainer = trainerService.findByUsername(username);
     trainerService.toggleProfileActivation(trainer.getId(), isActive);
   }

@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
 @RequiredArgsConstructor
@@ -29,9 +30,9 @@ public class RegistrationController {
   @PostMapping("/trainee")
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Register a new trainee")
-  public Principal traineeRegistration(@RequestParam("firstName") @NotBlank String firstName,
-                                       @RequestParam("lastName") @NotBlank String lastName,
-                                       @RequestParam(required = false) String address,
+  public Principal traineeRegistration(@RequestParam("firstName") @NotBlank @Size(min = 2, max = 30) String firstName,
+                                       @RequestParam("lastName") @NotBlank @Size(min = 2, max = 30) String lastName,
+                                       @RequestParam(required = false) @Size(min = 2) String address,
                                        @RequestParam(required = false)
                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateOfBirth) {
     TraineeRegistration traineeRegistration = new TraineeRegistration(firstName, lastName, address, dateOfBirth);
@@ -42,8 +43,8 @@ public class RegistrationController {
   @PostMapping("/trainer")
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Register a new trainer")
-  public Principal trainerRegistration(@RequestParam("firstName") @NotBlank String firstName,
-                                       @RequestParam("lastName") @NotBlank String lastName,
+  public Principal trainerRegistration(@RequestParam("firstName") @NotBlank @Size(min = 2, max = 30) String firstName,
+                                       @RequestParam("lastName") @NotBlank @Size(min = 2, max = 30) String lastName,
                                        @RequestParam("specialization") @NotBlank String specialization) {
     TrainerRegistration trainerRegistration = new TrainerRegistration(firstName, lastName, specialization);
     var trainer = trainerService.saveTrainer(trainerRegistration);

@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -45,13 +47,13 @@ public class TraineeController {
   @PutMapping("/trainee/setting/profile")
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Update Trainee profile")
-  public TraineeUpdateResponse updateTrainee(@RequestParam("username") @NotBlank String username,
-                                             @RequestParam("firstName") String firstName,
-                                             @RequestParam("lastName") String lastName,
+  public TraineeUpdateResponse updateTrainee(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username,
+                                             @RequestParam("firstName") @Size(min = 2, max = 30) String firstName,
+                                             @RequestParam("lastName") @Size(min = 2, max = 30) String lastName,
                                              @RequestParam(required = false)
                                              @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateOfBirth,
-                                             @RequestParam(value = "address", required = false) String address,
-                                             @RequestParam("isActive") boolean isActive) {
+                                             @RequestParam(value = "address", required = false) @Size(min = 5) String address,
+                                             @RequestParam("isActive") @NotNull boolean isActive) {
     TraineeUpdateRequest traineeUpdateRequest = new TraineeUpdateRequest(username, firstName, lastName, dateOfBirth,
         address, isActive);
     var trainee = traineeService.updateTrainee(traineeUpdateRequest);
@@ -62,7 +64,7 @@ public class TraineeController {
   @DeleteMapping
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Delete Trainee by username")
-  public void deleteTrainee(@RequestParam("username") @NotBlank String username) {
+  public void deleteTrainee(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username) {
     var trainee = traineeService.findByUsername(username);
     userService.delete(trainee.getId());
   }
@@ -70,7 +72,8 @@ public class TraineeController {
   @GetMapping("/not-active-trainers")
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Find not assigned active trainers for a Trainee")
-  public List<TrainerDtoForTrainee> findNotActiveTrainers(@RequestParam("username") @NotBlank String username) {
+  public List<TrainerDtoForTrainee> findNotActiveTrainers(@RequestParam("username") @NotBlank
+                                                          @Size(min = 2, max = 60) String username) {
     List<Trainer> trainerList = trainingService.findNotAssignedActiveTrainersToTrainee(username);
     return trainerConverter.toTrainerDtoForTrainee(trainerList);
   }
@@ -78,7 +81,8 @@ public class TraineeController {
   @PutMapping("/trainers")
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Update Trainee's trainers")
-  public List<TrainerDtoForTrainee> updateTrainerList(@RequestParam("username") @NotBlank String username,
+  public List<TrainerDtoForTrainee> updateTrainerList(@RequestParam("username") @NotBlank
+                                                      @Size(min = 2, max = 60) String username,
                                                       @RequestParam("trainingDate") @NotBlank String trainingDate,
                                                       @RequestParam("trainingName") @NotBlank String trainingName,
                                                       @RequestBody @NotEmpty List<TrainersDtoList> list) {
@@ -90,7 +94,8 @@ public class TraineeController {
   @GetMapping("/trainings")
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Find Trainee's trainings")
-  public List<TrainingTraineeResponse> findTrainingsList(@RequestParam("username") @NotBlank String username,
+  public List<TrainingTraineeResponse> findTrainingsList(@RequestParam("username") @NotBlank @Size(min = 2, max = 60)
+                                                         String username,
                                                          @RequestParam(required = false)
                                                          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodFrom,
                                                          @RequestParam(required = false)
@@ -108,8 +113,8 @@ public class TraineeController {
   @PatchMapping("/toggle-activation")
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Activate or deactivate a Trainee's profile")
-  public void toggleActivation(@RequestParam("username") @NotBlank String username,
-                               @RequestParam("active") @NotBlank boolean isActive) {
+  public void toggleActivation(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username,
+                               @RequestParam("active") @NotNull boolean isActive) {
     var trainee = traineeService.findByUsername(username);
     traineeService.toggleProfileActivation(trainee.getId(), isActive);
   }
