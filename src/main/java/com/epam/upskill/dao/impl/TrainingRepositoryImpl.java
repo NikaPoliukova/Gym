@@ -16,7 +16,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,6 +68,29 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     return typedQuery.getResultList();
   }
 
+  public List<Training> findTraineeTrainingsList(String username, LocalDate periodFrom, LocalDate periodTo,
+                                                 String trainerName) {
+    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+    CriteriaQuery<Training> query = cb.createQuery(Training.class);
+    Root<Training> trainingRoot = query.from(Training.class);
+    List<Predicate> predicates = getPredicates(username, periodFrom, periodTo, trainerName, cb, trainingRoot);
+    query.select(trainingRoot).where(predicates.toArray(new Predicate[0]));
+    TypedQuery<Training> typedQuery = entityManager.createQuery(query);
+    return typedQuery.getResultList();
+  }
+
+  private List<Predicate> getPredicates(String username, LocalDate periodFrom, LocalDate periodTo,
+                                        String trainerName, CriteriaBuilder cb, Root<Training> trainingRoot) {
+    List<Predicate> predicates = new ArrayList<>();
+    predicates.add(cb.equal(trainingRoot.get(TRAINEE).get(USERNAME), username));
+    if (periodFrom != null && periodTo != null) {
+      predicates.add(cb.between(trainingRoot.get(TRAINING_DATE), periodFrom, periodTo));
+    }
+    if (trainerName != null && !trainerName.isEmpty()) {
+      predicates.add(cb.equal(trainingRoot.get(TRAINER).get(USERNAME), trainerName));
+    }
+    return predicates;
+  }
 
   @Override
   public List<Training> findTraineeTrainingsList(long traineeId, String trainingDate, String trainingName) {

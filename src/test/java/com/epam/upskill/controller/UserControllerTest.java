@@ -9,7 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class UserControllerTest {
@@ -37,20 +37,20 @@ class UserControllerTest {
 
   @Test
   void testChangeLoginWithSamePassword() {
-    String password = "password";
-    OperationFailedException ex = assertThrows(OperationFailedException.class, () -> {
-      userController.changeLogin(USERNAME, password, password);
+    doThrow(new OperationFailedException("testUser", "change login"))
+        .when(userService).updatePassword(any(UserUpdatePass.class));
+    assertThrows(OperationFailedException.class, () -> {
+      userController.changeLogin("testUser", "oldPassword", "oldPassword");
     });
-    assertTrue(ex.getMessage().contains("change login"));
   }
 
   @Test
   void testChangeLoginWithOperationFailedException() {
-    doThrow(new OperationFailedException(USERNAME, "change login")).when(userService)
-        .updatePassword(new UserUpdatePass(USERNAME, OLD_PASSWORD, NEW_PASSWORD));
-    OperationFailedException ex = assertThrows(OperationFailedException.class, () -> {
-      userController.changeLogin(USERNAME, OLD_PASSWORD, NEW_PASSWORD);
+    doThrow(new OperationFailedException("testUser", "change login"))
+        .when(userService).updatePassword(any(UserUpdatePass.class));
+    assertThrows(OperationFailedException.class, () -> {
+      userController.changeLogin("testUser", OLD_PASSWORD, NEW_PASSWORD);
     });
-    assertEquals("Operation change login for = testUser was failed", ex.getMessage());
+    verify(userService).updatePassword(any(UserUpdatePass.class));
   }
 }

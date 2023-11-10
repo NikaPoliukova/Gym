@@ -6,11 +6,14 @@ import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.Training;
 import com.epam.upskill.entity.TrainingType;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface TrainingRepository extends AbstractRepository<Training> {
 
   TrainingType findTrainingTypeByName(String name);
+
+  List<Training> findTraineeTrainingsList(String username, LocalDate periodFrom, LocalDate periodTo, String trainerName);
 
   List<Training> findTraineeTrainingsList(TrainingDtoRequest request);
 

@@ -102,9 +102,7 @@ public class TraineeController {
                                                          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodTo,
                                                          @RequestParam(required = false) String trainerName,
                                                          @RequestParam(required = false) String trainingType) {
-    if (periodFrom != null && periodTo != null && periodFrom.isAfter(periodTo)) {
-      throw new IllegalArgumentException("periodFrom must be before or equal to periodTo");
-    }
+
     List<Training> trainingsList = trainingService.findTrainingsByUsernameAndCriteria(new TrainingTraineeRequest
         (username, periodFrom, periodTo, trainerName, trainingType));
     return trainingConverter.toTrainingResponse(trainingsList);

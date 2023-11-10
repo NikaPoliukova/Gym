@@ -17,9 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
@@ -58,10 +56,16 @@ public class TrainingServiceImpl implements TrainingService {
   }
 
   @Override
-  public List<Training> findTrainingsByUsernameAndCriteria( TrainingTraineeRequest request) {
-    TrainingTypeEnum myEnum = TrainingTypeEnum.valueOf(request.trainingType());
+  public List<Training> findTrainingsByUsernameAndCriteria(TrainingTraineeRequest request) {
+    if (request.periodFrom() != null && request.periodTo() != null && request.periodFrom().isAfter(request.periodTo())) {
+      throw new IllegalArgumentException("periodFrom must be before or equal to periodTo");
+    }
+    if (request.trainingType() == null) {
+      return trainingRepository.findTraineeTrainingsList(request.username(), request.periodFrom(), request.periodTo(),
+          request.trainerName());
+    }
     return trainingRepository.findTraineeTrainingsList(new TrainingDtoRequest(request.username(),
-        request.periodFrom(), request.periodTo(), request.trainerName(), myEnum));
+        request.periodFrom(), request.periodTo(), request.trainerName(), TrainingTypeEnum.valueOf(request.trainingType())));
   }
 
   @Override
@@ -129,14 +133,15 @@ public class TrainingServiceImpl implements TrainingService {
 
   private void checkForNewTrainerFor(UpdateTraineeTrainerDto dto) {
     List<TrainersDtoList> dtoList = dto.list();
-    for(TrainersDtoList tdl : dtoList){
+    for (TrainersDtoList tdl : dtoList) {
       try {
         trainerService.findByUsername(tdl.username());
-      }catch (UserNotFoundException ex){
+      } catch (UserNotFoundException ex) {
         throw new OperationFailedException("one of the trainer username was not found", "updateTraineeTrainerList");
       }
     }
   }
+
   private static TrainerDtoForTrainee getTrainerResponse(Training training) {
     return new TrainerDtoForTrainee(
         training.getTrainer().getUsername(),
