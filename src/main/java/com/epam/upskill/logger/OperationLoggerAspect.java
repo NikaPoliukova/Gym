@@ -1,11 +1,10 @@
 package com.epam.upskill.logger;
 
-import com.epam.upskill.exception.OperationFailedException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -33,7 +32,7 @@ public class OperationLoggerAspect {
       myResult = aspect.proceed();
       return myResult;
     } finally {
-      logger.info("Transaction ID: " + transactionId + " | Operation completed with result = " + myResult);
+      logger.info(String.format("Transaction ID: %s | Operation completed with result = %s", transactionId, myResult));
       transactionIdThreadLocal.remove();
     }
   }

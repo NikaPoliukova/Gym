@@ -28,7 +28,7 @@ public class UserController {
                           @RequestParam("newPassword") @NotBlank @Size(min = 10, max = 10, message = "New password must" +
                               " be 10 characters") String newPassword) {
     if (oldPassword.equals(newPassword)) {
-      throw new OperationFailedException(username+ ": password cannot be the same as the old password",
+      throw new OperationFailedException(username + ": password cannot be the same as the old password",
           "change password");
     }
     userService.updatePassword(new UserUpdatePass(username, oldPassword, newPassword));

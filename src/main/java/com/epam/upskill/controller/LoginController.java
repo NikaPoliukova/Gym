@@ -24,11 +24,11 @@ public class LoginController {
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Authenticate a user")
-  public void login(@RequestParam("username") @NotBlank  @Size(min = 2, max = 60) String username,
-                    @RequestParam("password") @NotBlank @Size(min = 10, max = 10)String password) {
+  public void login(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username,
+                    @RequestParam("password") @NotBlank @Size(min = 10, max = 10) String password) {
     var user = userService.findByUsername(username);
     if (!user.getPassword().equals(password)) {
-      throw new AuthenticationException(", reason: wrong password" );
+      throw new AuthenticationException(", reason: wrong password");
     }
   }
 }

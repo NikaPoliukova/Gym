@@ -37,7 +37,7 @@ public class TrainingController {
                            @RequestParam("trainingName") @NotBlank @Size(min = 2, max = 60) String trainingName,
                            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
                            @RequestParam("trainingType") @NotBlank String type,
-                           @RequestParam("trainingDuration")@NotNull int duration) {
+                           @RequestParam("trainingDuration") @NotNull int duration) {
     TrainingRequest trainingRequest = new TrainingRequest(traineeUsername, trainerUsername, trainingName,
         date, type, duration);
     trainingService.saveTraining(trainingRequest);

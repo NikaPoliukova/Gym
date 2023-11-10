@@ -4,7 +4,6 @@ import com.epam.upskill.dao.TrainerRepository;
 import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.entity.Trainer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -72,8 +71,7 @@ public class TrainerRepositoryImpl implements TrainerRepository {
               Trainer.class)
           .setParameter(USERNAME, username)
           .getSingleResult());
-    }
-    catch (NoResultException ex){
+    } catch (NoResultException ex) {
       log.debug("trainer was not found");
       return Optional.empty();
     }
