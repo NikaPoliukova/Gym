@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
@@ -36,7 +37,7 @@ public class TrainingController {
                            @RequestParam("trainingName") @NotBlank @Size(min = 2, max = 60) String trainingName,
                            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
                            @RequestParam("trainingType") @NotBlank String type,
-                           @RequestParam("trainingDuration") @NotBlank @Size(min = 15, max = 60) int duration) {
+                           @RequestParam("trainingDuration")@NotNull int duration) {
     TrainingRequest trainingRequest = new TrainingRequest(traineeUsername, trainerUsername, trainingName,
         date, type, duration);
     trainingService.saveTraining(trainingRequest);

@@ -8,10 +8,14 @@ import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.Training;
 import com.epam.upskill.entity.TrainingType;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.stereotype.Repository;
 import org.springframework.validation.annotation.Validated;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -118,13 +122,14 @@ public class TrainingRepositoryImpl implements TrainingRepository {
 
   @Override
   public TrainingType findTrainingTypeByName(String name) {
-    TypedQuery<TrainingType> query = entityManager.createQuery(
-        "SELECT tt FROM TrainingType tt WHERE tt.trainingTypeName = :name", TrainingType.class);
-    query.setParameter("name", TrainingTypeEnum.valueOf(name));
     try {
+      var trainingType = TrainingTypeEnum.valueOf(name);
+      TypedQuery<TrainingType> query = entityManager.createQuery(
+          "SELECT tt FROM TrainingType tt WHERE tt.trainingTypeName = :name", TrainingType.class);
+      query.setParameter("name", trainingType);
       return query.getSingleResult();
-    } catch (NoResultException e) {
-      throw new EntityNotFoundException("TrainingType not found with name: " + name);
+    } catch (InvalidDataAccessApiUsageException e) {
+      throw new InvalidDataAccessApiUsageException(name);
     }
   }
 

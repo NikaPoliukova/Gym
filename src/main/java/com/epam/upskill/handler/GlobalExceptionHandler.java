@@ -4,13 +4,16 @@ import com.epam.upskill.exception.AuthenticationException;
 import com.epam.upskill.exception.OperationFailedException;
 import com.epam.upskill.exception.RegistrationException;
 import com.epam.upskill.exception.UserNotFoundException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.ValidationException;
 import java.time.format.DateTimeParseException;
 
@@ -36,7 +39,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
   public String handleOperationFailedException(OperationFailedException ex) {
-    return  ex.getMessage();
+    return ex.getMessage();
   }
 
   @ExceptionHandler(DateTimeParseException.class)
@@ -46,11 +49,25 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     return "Invalid date, enter in the format \"yyyy-mm-dd\"";
   }
 
+  @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ResponseBody
+  public String handleDateTimeParseException(MethodArgumentTypeMismatchException ex) {
+    return "Invalid date, enter in the format \"yyyy-mm-dd\"";
+  }
+
+  @ExceptionHandler(EntityNotFoundException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  @ResponseBody
+  public String handleEntityNotFoundException(EntityNotFoundException ex) {
+    return " This trainingType was not found" + ex.getMessage();
+  }
+
   @ExceptionHandler(IndexOutOfBoundsException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
   public String handleIndexOutOfBoundsException(IndexOutOfBoundsException ex) {
-    return "List can't be empty ";
+    return "List can't be empty" + ex.getMessage();
   }
 
   @ExceptionHandler(RegistrationException.class)
@@ -66,6 +83,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   public ErrorResponse handleException(ValidationException ex) {
     return new ErrorResponse("Invalid data", ex.getMessage());
   }
+
+  @ExceptionHandler(InvalidDataAccessApiUsageException.class)
+  @ResponseBody
+  public String handleInvalidDataAccessApiUsageException(InvalidDataAccessApiUsageException ex) {
+    return "training type was not found";
+  }
+
 
   @ExceptionHandler(Exception.class)
   @ResponseBody
