@@ -109,7 +109,7 @@ public class TrainingServiceImpl implements TrainingService {
 
   @Override
   @Transactional
-  public void delete(@NotNull Training training) {
+  public void delete(Training training) {
     trainingRepository.delete(training);
   }
 

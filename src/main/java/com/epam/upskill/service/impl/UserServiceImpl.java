@@ -19,7 +19,6 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-
 public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
 
