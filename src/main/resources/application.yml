@@ -2,6 +2,9 @@ server:
   port: 8091
 
 spring:
+  config:
+    activate:
+      on-profile: default
   datasource:
     url: jdbc:postgresql://localhost:5432/gym_bd
     username: postgres
@@ -22,3 +25,12 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     com.epam.upskill.logger: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      endpoint:
+        health:
+          show-details: ALWAYS

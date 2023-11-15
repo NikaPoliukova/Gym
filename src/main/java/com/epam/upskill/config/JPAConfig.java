@@ -1,9 +1,12 @@
 package com.epam.upskill.config;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -14,6 +17,8 @@ import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.util.Properties;
 
+@Slf4j
+@Profile("default")
 @Configuration
 public class JPAConfig {
 
@@ -45,16 +50,19 @@ public class JPAConfig {
     return entityManagerFactory;
   }
 
+  @Profile("default")
   private Properties hibernateProperties() {
     var properties = new Properties();
     properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
     properties.setProperty("hibernate.hbm2ddl.auto", hbm2ddlAuto);
     properties.setProperty("hibernate.format_sql", hibernateDialect);
     properties.setProperty("hibernate.default_schema", "gym_schema");
+    log.info("Используются hibernatePropertiesH2: {}",properties);
     return properties;
   }
 
   @Bean
+  @Profile("default")
   public DataSource dataSource() {
     var dataSource = new DriverManagerDataSource();
     dataSource.setDriverClassName(driverClassName);

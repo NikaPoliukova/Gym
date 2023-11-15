@@ -64,6 +64,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
   }
 
+  @Override
   public void toggleProfileActivation(User user) {
     entityManager.merge(user);
   }

@@ -10,7 +10,6 @@ import com.epam.upskill.entity.TrainingType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.stereotype.Repository;
-import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -28,7 +27,6 @@ import static com.epam.upskill.util.UserUtils.getLocalDate;
 
 @Slf4j
 @Repository
-@Validated
 public class TrainingRepositoryImpl implements TrainingRepository {
   public static final String USERNAME = "username";
   public static final String TRAINEE = "trainee";
@@ -56,7 +54,7 @@ public class TrainingRepositoryImpl implements TrainingRepository {
   @Override
   public List<Training> findAll() {
     log.debug("Fetching all Trainings");
-    return entityManager.createQuery("SELECT e FROM training e", Training.class).getResultList();
+    return entityManager.createQuery("SELECT e FROM Training e", Training.class).getResultList();
   }
 
 
@@ -71,6 +69,7 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     return typedQuery.getResultList();
   }
 
+  @Override
   public List<Training> findTraineeTrainingsList(String username, LocalDate periodFrom, LocalDate periodTo,
                                                  String trainerName) {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -80,19 +79,6 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     query.select(trainingRoot).where(predicates.toArray(new Predicate[0]));
     TypedQuery<Training> typedQuery = entityManager.createQuery(query);
     return typedQuery.getResultList();
-  }
-
-  private List<Predicate> getPredicates(String username, LocalDate periodFrom, LocalDate periodTo,
-                                        String trainerName, CriteriaBuilder cb, Root<Training> trainingRoot) {
-    List<Predicate> predicates = new ArrayList<>();
-    predicates.add(cb.equal(trainingRoot.get(TRAINEE).get(USERNAME), username));
-    if (periodFrom != null && periodTo != null) {
-      predicates.add(cb.between(trainingRoot.get(TRAINING_DATE), periodFrom, periodTo));
-    }
-    if (trainerName != null && !trainerName.isEmpty()) {
-      predicates.add(cb.equal(trainingRoot.get(TRAINER).get(USERNAME), trainerName));
-    }
-    return predicates;
   }
 
   @Override
@@ -171,6 +157,19 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     predicates.add(cb.equal(trainingRoot.get(TRAINEE).get(ID), traineeId));
     predicates.add(cb.equal(trainingRoot.get(TRAINING_DATE), date));
     predicates.add(cb.equal(trainingRoot.get("trainingName"), trainingName));
+    return predicates;
+  }
+
+  private List<Predicate> getPredicates(String username, LocalDate periodFrom, LocalDate periodTo,
+                                        String trainerName, CriteriaBuilder cb, Root<Training> trainingRoot) {
+    List<Predicate> predicates = new ArrayList<>();
+    predicates.add(cb.equal(trainingRoot.get(TRAINEE).get(USERNAME), username));
+    if (periodFrom != null && periodTo != null) {
+      predicates.add(cb.between(trainingRoot.get(TRAINING_DATE), periodFrom, periodTo));
+    }
+    if (trainerName != null && !trainerName.isEmpty()) {
+      predicates.add(cb.equal(trainingRoot.get(TRAINER).get(USERNAME), trainerName));
+    }
     return predicates;
   }
 

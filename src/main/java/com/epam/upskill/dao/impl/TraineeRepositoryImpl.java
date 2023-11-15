@@ -85,7 +85,5 @@ public class TraineeRepositoryImpl implements TraineeRepository {
     query.setParameter("traineeId", traineeId);
     return query.getResultList();
   }
-
-
 }
 
