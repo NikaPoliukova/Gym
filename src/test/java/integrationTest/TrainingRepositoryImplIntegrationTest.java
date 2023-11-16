@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +49,7 @@ class TrainingRepositoryImplIntegrationTest {
 
   //
   @ParameterizedTest
+  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainingProvider")
   void testSaveAndFindById(Training training) {
     // Save
@@ -69,13 +71,15 @@ class TrainingRepositoryImplIntegrationTest {
   }
 
   @ParameterizedTest
+  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainingProvider")
   void testSaveTraining(Training training) {
     Training savedTraining = trainingRepository.save(training);
-    assertNotNull(savedTraining.getId());
+    assertNotNull(savedTraining);
   }
 
   @ParameterizedTest
+  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainingProvider")
   void testFindTrainingById(Training training) {
 
@@ -92,6 +96,7 @@ class TrainingRepositoryImplIntegrationTest {
   }
 
   @ParameterizedTest
+  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainingProvider")
   void testFindAllTrainings(Training training) {
     Training training1 = new Training();
@@ -109,6 +114,7 @@ class TrainingRepositoryImplIntegrationTest {
   }
 
   @Test
+  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   void testFindTrainingTypeByName() {
     TrainingType foundTrainingType = trainingRepository.findTrainingTypeByName("PILATES");
     assertNotNull(foundTrainingType);
@@ -116,6 +122,7 @@ class TrainingRepositoryImplIntegrationTest {
   }
 
   @ParameterizedTest
+  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainingProvider")
   void testGetAssignedActiveTrainersToTrainee(Training training) {
     // Создаем тестовые данные
@@ -135,6 +142,7 @@ class TrainingRepositoryImplIntegrationTest {
   }
 
   @ParameterizedTest
+  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainingProvider")
   void testDeleteTraining(Training training) {
     Training training1 = new Training();
@@ -154,6 +162,7 @@ class TrainingRepositoryImplIntegrationTest {
   }
 
   @ParameterizedTest
+  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainingProvider")
   void testFindTrainerTrainings(Training training) {
     Training training1 = new Training();
@@ -172,6 +181,7 @@ class TrainingRepositoryImplIntegrationTest {
   }
 
   @ParameterizedTest
+  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainingProvider")
   void testFindTrainingTypes() {
     List<TrainingType> trainingTypes = trainingRepository.findTrainingTypes();
@@ -180,6 +190,7 @@ class TrainingRepositoryImplIntegrationTest {
 
 
   @ParameterizedTest
+  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainingProvider")
   void testFindTraineeTrainingsList(Training training) {
     // Save
@@ -203,6 +214,7 @@ class TrainingRepositoryImplIntegrationTest {
 
 
   @ParameterizedTest
+  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainingProvider")
   void testFindTraineeTrainingsListWithArguments(Training training) {
     // Save

@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +44,7 @@ class TrainerRepositoryImplIntegrationTest {
   TrainingRepository trainingRepository;
 
   @ParameterizedTest
+  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainerProvider")
   @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   void testSaveAndFindById(Trainer trainer) {
@@ -58,6 +60,7 @@ class TrainerRepositoryImplIntegrationTest {
   }
 
   @ParameterizedTest
+  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainerProvider")
   @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   void testFindByIsActive_WhenTrainersExist(Trainer trainer) {
@@ -73,6 +76,7 @@ class TrainerRepositoryImplIntegrationTest {
   }
 
   @ParameterizedTest
+  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainerProvider")
   @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   void testFindTraineesForTrainer_WhenTraineesExist(Trainer trainer) {
@@ -104,6 +108,7 @@ class TrainerRepositoryImplIntegrationTest {
   }
 
   @ParameterizedTest
+  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainerProvider")
   @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   void testFindAll_WhenTrainersExist(Trainer trainer1) {
@@ -121,6 +126,7 @@ class TrainerRepositoryImplIntegrationTest {
   }
 
   @ParameterizedTest
+  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainerProvider")
   @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   void testToggleProfileActivation_WhenTrainerFound(Trainer trainer) {
@@ -135,6 +141,7 @@ class TrainerRepositoryImplIntegrationTest {
   }
 
   @ParameterizedTest
+  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainerProvider")
   @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   void testFindByUsername_WhenTrainerFound(Trainer trainer) {
@@ -153,6 +160,7 @@ class TrainerRepositoryImplIntegrationTest {
   }
 
   @ParameterizedTest
+  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainerProvider")
   @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   void testFindByUsernameAndPassword_WhenTrainerFound(Trainer trainer) {
@@ -172,6 +180,7 @@ class TrainerRepositoryImplIntegrationTest {
   }
 
   @ParameterizedTest
+  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainerProvider")
   @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   void testUpdate_WhenTrainerFound(Trainer trainer) {
