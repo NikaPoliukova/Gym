@@ -13,6 +13,7 @@ spring:
     schema: gym_schema
 
   jpa:
+    show-sql: true
     generate-ddl: true
     hibernate:
       ddl-auto: create-drop

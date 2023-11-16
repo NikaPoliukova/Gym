@@ -8,8 +8,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jdbc.datasource.init.DataSourceInitializer;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -78,6 +81,17 @@ public class H2Config {
     dataSource.setUsername(h2Username);
     dataSource.setPassword(h2Password);
     return dataSource;
+  }
+  @Bean
+  public DataSourceInitializer dataSourceInitializer(DataSource dataSource) {
+    ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
+    resourceDatabasePopulator.addScript(new ClassPathResource("schema.sql"));
+
+    DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
+    dataSourceInitializer.setDataSource(dataSource);
+    dataSourceInitializer.setDatabasePopulator(resourceDatabasePopulator);
+
+    return dataSourceInitializer;
   }
 
 }

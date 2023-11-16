@@ -14,9 +14,12 @@ spring:
     url: jdbc:h2:mem:testdb
     username: sa
     password:
+    initialization-mode: always
+    data: classpath:schema.sql
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
+      show-sql: true
     show-sql: true
     properties:
       hibernate:
@@ -26,5 +29,5 @@ logging:
   level:
     org:
       hibernate:
-        sql: info
+        sql: DEBUG
 
