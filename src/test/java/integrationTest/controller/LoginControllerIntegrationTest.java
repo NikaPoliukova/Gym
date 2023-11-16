@@ -11,6 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
@@ -28,7 +29,7 @@ class LoginControllerIntegrationTest {
 
   @Test
   void login_WithCorrectParams_ThanReturnStatusOk_Test() throws Exception {
-    mockMvc.perform(MockMvcRequestBuilders.get(URL_TEMPLATE)
+    mockMvc.perform(get(URL_TEMPLATE)
             .param(USERNAME, "Ola.Trainee")
             .param(PASSWORD, "mM7cahNaEX"))
         .andExpect(status().isOk());
@@ -36,7 +37,7 @@ class LoginControllerIntegrationTest {
 
   @Test
   void login_WithWrongPassword_ThenReturnStatusNotFound_Test() throws Exception {
-    mockMvc.perform(MockMvcRequestBuilders.get(URL_TEMPLATE)
+    mockMvc.perform(get(URL_TEMPLATE)
             .param(USERNAME, "Ola.Trainee")
             .param(PASSWORD, "1234567891"))
         .andExpect(status().isUnauthorized());
@@ -44,7 +45,7 @@ class LoginControllerIntegrationTest {
 
   @Test
   void login_NonExistingUser_ThenReturnStatusNotFound_Test() throws Exception {
-    mockMvc.perform(MockMvcRequestBuilders.get(URL_TEMPLATE)
+    mockMvc.perform(get(URL_TEMPLATE)
             .param(USERNAME, "nonExistingUser")
             .param(PASSWORD, "1234567891"))
         .andExpect(status().isNotFound());
@@ -52,7 +53,7 @@ class LoginControllerIntegrationTest {
 
   @Test
   void login_MissingParameters_ThenReturnStatusBadRequest_Test() throws Exception {
-    mockMvc.perform(MockMvcRequestBuilders.get(URL_TEMPLATE))
+    mockMvc.perform(get(URL_TEMPLATE))
         .andExpect(status().isBadRequest());
   }
 
