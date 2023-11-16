@@ -32,4 +32,6 @@ public class Trainee extends User {
     return "Trainee(dateOfBirth=" + this.getDateOfBirth() + ", address=" + this.getAddress()
         + ", trainings=" + this.getTrainings() + ")";
   }
+
+
 }

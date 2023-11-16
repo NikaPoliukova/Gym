@@ -1,4 +1,4 @@
-package integrationTest;
+package integrationTest.repository;
 
 import com.epam.upskill.GymApplication;
 import com.epam.upskill.dao.TraineeRepository;
@@ -25,8 +25,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static integrationTest.TrainerRepositoryImplIntegrationTest.createAndSetTrainer;
-import static integrationTest.TrainerRepositoryImplIntegrationTest.createTrainingType;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = GymApplication.class)
@@ -147,11 +145,11 @@ class TraineeRepositoryImplIntegrationTest {
   void testFindTrainersForTrainee_WhenTrainersExist(Trainee trainee) {
     Trainee newTrainee = traineeRepository.save(trainee);
     //  List<Trainee> list = traineeRepository.findAll();
-    TrainingType specialization = createTrainingType("PILATES");
+    TrainingType specialization = TrainerRepositoryImplIntegrationTest.createTrainingType("PILATES");
     specialization.setId(4);
-    Trainer trainer1 = trainerRepository.save(createAndSetTrainer("John", "Doe", "john.doe",
+    Trainer trainer1 = trainerRepository.save(TrainerRepositoryImplIntegrationTest.createAndSetTrainer("John", "Doe", "john.doe",
         specialization, true));
-    Trainer trainer2 = trainerRepository.save(createAndSetTrainer("Trainer", "Oppov", "john.doe",
+    Trainer trainer2 = trainerRepository.save(TrainerRepositoryImplIntegrationTest.createAndSetTrainer("Trainer", "Oppov", "john.doe",
         specialization, true));
     Training training1 = new Training();
     training1.setTrainee(newTrainee);

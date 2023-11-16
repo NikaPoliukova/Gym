@@ -1,4 +1,4 @@
-package integrationTest;
+package integrationTest.repository;
 
 import com.epam.upskill.GymApplication;
 import com.epam.upskill.dao.TraineeRepository;
@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static integrationTest.TrainerRepositoryImplIntegrationTest.createTrainingType;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = GymApplication.class)
@@ -242,7 +241,7 @@ class TrainingRepositoryImplIntegrationTest {
     return Stream.of(
         createAndSetTraining("Training1", LocalDate.now(), 60,
             createTrainee("trainee.vika"), createTrainer("ola.popova"),
-            createTrainingType("PILATES"))
+            TrainerRepositoryImplIntegrationTest.createTrainingType("PILATES"))
     );
   }
 

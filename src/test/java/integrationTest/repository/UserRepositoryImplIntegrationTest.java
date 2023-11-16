@@ -1,4 +1,4 @@
-package integrationTest;
+package integrationTest.repository;
 
 import com.epam.upskill.GymApplication;
 import com.epam.upskill.dao.UserRepository;

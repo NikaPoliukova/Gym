@@ -33,4 +33,4 @@ import javax.persistence.*;
     @Column(name = "is_active")
     private boolean isActive;
 
-  }
+}

@@ -1,4 +1,4 @@
-package integrationTest;
+package integrationTest.repository;
 
 import com.epam.upskill.GymApplication;
 import com.epam.upskill.dao.TraineeRepository;
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static integrationTest.TraineeRepositoryImplIntegrationTest.createAndSetTrainee;
+import static integrationTest.repository.TraineeRepositoryImplIntegrationTest.createAndSetTrainee;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = GymApplication.class)
