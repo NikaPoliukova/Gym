@@ -1,5 +1,6 @@
 package integrationTest.repository;
 
+
 import com.epam.upskill.GymApplication;
 import com.epam.upskill.dao.UserRepository;
 import com.epam.upskill.entity.User;
@@ -9,10 +10,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +35,6 @@ class UserRepositoryIntegrationTest {
 
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("userProvider")
   void testSaveAndFindById(User user) {
     userRepository.save(user);
@@ -50,9 +48,7 @@ class UserRepositoryIntegrationTest {
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("userProvider")
-  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   void testFindAll(User user1) {
     List<User> beforeListUsers = userRepository.findAll();
     userRepository.save(user1);
@@ -64,9 +60,7 @@ class UserRepositoryIntegrationTest {
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("userProvider")
-  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   void testUpdate(User user) {
     userRepository.save(user);
 
@@ -76,88 +70,70 @@ class UserRepositoryIntegrationTest {
     updatedUser.setUsername("updatedUsername");
     System.out.println("new USER = " + updatedUser);
     userRepository.update(updatedUser);
-
     Optional<User> foundUser = userRepository.findByUsername(updatedUser.getUsername());
-    assertTrue(foundUser.isPresent());
-    assertEquals("UpdatedFirstName", foundUser.get().getFirstName());
-    assertEquals("UpdatedLastName", foundUser.get().getLastName());
-    assertEquals("updatedUsername", foundUser.get().getUsername());
+    assertAll(
+        () -> assertTrue(foundUser.isPresent()),
+        () -> assertEquals("UpdatedFirstName", foundUser.get().getFirstName()),
+        () -> assertEquals("UpdatedLastName", foundUser.get().getLastName()),
+        () -> assertEquals("updatedUsername", foundUser.get().getUsername()));
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   @MethodSource("userProvider")
   void testDelete(User user) {
     User newUser = userRepository.save(user);
     userRepository.delete(newUser.getId());
-
     Optional<User> deletedUser = userRepository.findById(newUser.getId());
     assertFalse(deletedUser.isPresent());
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   @MethodSource("userProvider")
   void testFindByUsername(User user) {
     userRepository.save(user);
     Optional<User> foundUser = userRepository.findByUsername(user.getUsername());
-
-    assertTrue(foundUser.isPresent());
-    assertEquals(user.getId(), foundUser.get().getId());
+    assertAll(
+        () -> assertTrue(foundUser.isPresent()),
+        () -> assertEquals(user.getId(), foundUser.get().getId()));
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   @MethodSource("userProvider")
   void testFindByUsernameAndPassword(User user) {
     user.setPassword("1234567890");
     userRepository.save(user);
     Optional<User> foundUser = userRepository.findByUsernameAndPassword(user.getUsername(), user.getPassword());
-
-    assertTrue(foundUser.isPresent());
-    assertEquals(user.getPassword(), foundUser.get().getPassword());
+    assertAll(
+        () -> assertTrue(foundUser.isPresent()),
+        () -> assertEquals(user.getPassword(), foundUser.get().getPassword()));
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   @MethodSource("userProvider")
   void testToggleProfileActivation(User user) {
     user.setActive(true);
     userRepository.save(user);
-
     user.setActive(false);
     userRepository.toggleProfileActivation(user);
-
     Optional<User> toggledUser = userRepository.findById(user.getId());
-    assertTrue(toggledUser.isPresent());
-    assertFalse(toggledUser.get().isActive());
+    assertAll(
+        () -> assertTrue(toggledUser.isPresent()),
+        () -> assertFalse(toggledUser.get().isActive()));
   }
 
   @Test
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   void testFindByUsername_WhenUserNotFound() {
-    // Arrange
     String nonExistingUsername = "nonexistent";
-    // Act & Assert
     assertThrows(UserNotFoundException.class, () -> userRepository.findByUsername(nonExistingUsername));
   }
 
   @Test
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   void testDelete_WhenUserNotFound() {
     long nonExistingUserId = 555L;
-    // Act & Assert
     assertThrows(NoSuchElementException.class, () -> userRepository.delete(nonExistingUserId));
   }
 
   private static Stream<User> userProvider() {
-    // ¬озвращаем поток тестовых данных User с разными комбинаци€ми заполненных полей
     return Stream.of(
         createAndSetUser("John", "Doe", "john.doe"),
         createAndSetUser("Jane", "Doe", "jane.doe"),

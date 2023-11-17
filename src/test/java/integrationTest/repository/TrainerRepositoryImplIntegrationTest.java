@@ -14,10 +14,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,41 +42,33 @@ class TrainerRepositoryImplIntegrationTest {
   TrainingRepository trainingRepository;
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainerProvider")
-  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   void testSaveAndFindById(Trainer trainer) {
     // Act
     Trainer savedTrainer = trainerRepository.save(trainer);
     Optional<Trainer> foundTrainer = trainerRepository.findById(savedTrainer.getId());
-
-    // Assert
-    assertTrue(foundTrainer.isPresent());
-    assertEquals(trainer.getFirstName(), foundTrainer.get().getFirstName());
-    assertEquals(trainer.getLastName(), foundTrainer.get().getLastName());
-    assertEquals(trainer.getUsername(), foundTrainer.get().getUsername());
+    assertAll(
+        () -> assertTrue(foundTrainer.isPresent()),
+        () -> assertEquals(trainer.getFirstName(), foundTrainer.get().getFirstName()),
+        () -> assertEquals(trainer.getLastName(), foundTrainer.get().getLastName()),
+        () -> assertEquals(trainer.getUsername(), foundTrainer.get().getUsername()));
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainerProvider")
-  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   void testFindByIsActive_WhenTrainersExist(Trainer trainer) {
     // Act
     List<Trainer> oldList = trainerRepository.findByIsActive();
     trainingTypeRepository.save(trainer.getSpecialization());
     trainerRepository.save(trainer);
     List<Trainer> activeTrainers = trainerRepository.findByIsActive();
-    // Assert
-    assertEquals(oldList.size() + 1, activeTrainers.size());
-    assertTrue(activeTrainers.contains(trainer));
-
+    assertAll(
+        () -> assertEquals(oldList.size() + 1, activeTrainers.size()),
+        () -> assertTrue(activeTrainers.contains(trainer)));
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainerProvider")
-  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   void testFindTraineesForTrainer_WhenTraineesExist(Trainer trainer) {
     // Arrange
     TrainingType type = new TrainingType();
@@ -100,17 +90,14 @@ class TrainerRepositoryImplIntegrationTest {
     trainingRepository.save(training2);
     // Act
     List<Trainee> trainees = trainerRepository.findTraineesForTrainer(savedTrainer.getId());
-
-    // Assert
-    assertEquals(2, trainees.size());
-    assertTrue(trainees.contains(trainee));
-    assertTrue(trainees.contains(trainee2));
+    assertAll(
+        () -> assertEquals(2, trainees.size()),
+        () -> assertTrue(trainees.contains(trainee)),
+        () -> assertTrue(trainees.contains(trainee2)));
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainerProvider")
-  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   void testFindAll_WhenTrainersExist(Trainer trainer1) {
     TrainingType type = new TrainingType();
     type.setId(9);
@@ -120,49 +107,42 @@ class TrainerRepositoryImplIntegrationTest {
     Trainer savedTrainer = trainerRepository.save(trainer1);
     // Act
     List<Trainer> allTrainers = trainerRepository.findAll();
-    // Assert
-    assertEquals(oldList.size() + 1, allTrainers.size());
-    assertTrue(allTrainers.contains(savedTrainer));
+    assertAll(
+        () -> assertEquals(oldList.size() + 1, allTrainers.size()),
+        () -> assertTrue(allTrainers.contains(savedTrainer)));
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainerProvider")
-  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   void testToggleProfileActivation_WhenTrainerFound(Trainer trainer) {
     trainer.setActive(false);
     Trainer savedTrainer = trainerRepository.save(trainer);
-    // Act
+
     trainerRepository.toggleProfileActivation(trainer);
-    // Assert
+
     Optional<Trainer> toggledTrainer = trainerRepository.findById(savedTrainer.getId());
-    assertTrue(toggledTrainer.isPresent());
-    assertFalse(toggledTrainer.get().isActive());
+    assertAll(
+        () -> assertTrue(toggledTrainer.isPresent()),
+        () -> assertFalse(toggledTrainer.get().isActive()));
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainerProvider")
-  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   void testFindByUsername_WhenTrainerFound(Trainer trainer) {
     TrainingType type = new TrainingType();
     type.setId(9);
     type.setTrainingTypeName((TrainingTypeEnum.valueOf("YOGA")));
     trainingTypeRepository.save(trainer.getSpecialization());
     trainerRepository.save(trainer);
-    // Act
     Optional<Trainer> foundTrainer = trainerRepository.findByUsername(trainer.getUsername());
-
-    // Assert
-    assertTrue(foundTrainer.isPresent());
-    assertEquals(trainer.getFirstName(), foundTrainer.get().getFirstName());
-    assertEquals(trainer.getLastName(), foundTrainer.get().getLastName());
+    assertAll(
+        () -> assertTrue(foundTrainer.isPresent()),
+        () -> assertEquals(trainer.getFirstName(), foundTrainer.get().getFirstName()),
+        () -> assertEquals(trainer.getLastName(), foundTrainer.get().getLastName()));
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainerProvider")
-  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   void testFindByUsernameAndPassword_WhenTrainerFound(Trainer trainer) {
     TrainingType type = new TrainingType();
     type.setId(9);
@@ -173,16 +153,14 @@ class TrainerRepositoryImplIntegrationTest {
     // Act
     Optional<Trainer> foundTrainer = trainerRepository.findByUsernameAndPassword(trainer.getUsername(),
         trainer.getPassword());
-    // Assert
-    assertTrue(foundTrainer.isPresent());
-    assertEquals(trainer.getFirstName(), foundTrainer.get().getFirstName());
-    assertEquals(trainer.getLastName(), foundTrainer.get().getLastName());
+    assertAll(
+        () -> assertTrue(foundTrainer.isPresent()),
+        () -> assertEquals(trainer.getFirstName(), foundTrainer.get().getFirstName()),
+        () -> assertEquals(trainer.getLastName(), foundTrainer.get().getLastName()));
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainerProvider")
-  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   void testUpdate_WhenTrainerFound(Trainer trainer) {
     // Arrange
     trainerRepository.save(trainer);
@@ -191,13 +169,13 @@ class TrainerRepositoryImplIntegrationTest {
     trainer.setLastName("UpdatedLastName");
     trainer.setUsername("updatedUsername");
     trainerRepository.update(trainer);
-
     // Assert
     Optional<Trainer> foundTrainer = trainerRepository.findById(trainer.getId());
-    assertTrue(foundTrainer.isPresent());
-    assertEquals("UpdatedFirstName", foundTrainer.get().getFirstName());
-    assertEquals("UpdatedLastName", foundTrainer.get().getLastName());
-    assertEquals("updatedUsername", foundTrainer.get().getUsername());
+    assertAll(
+        () -> assertTrue(foundTrainer.isPresent()),
+        () -> assertEquals("UpdatedFirstName", foundTrainer.get().getFirstName()),
+        () -> assertEquals("UpdatedLastName", foundTrainer.get().getLastName()),
+        () -> assertEquals("updatedUsername", foundTrainer.get().getUsername()));
   }
 
   private static Stream<Trainer> trainerProvider() {
@@ -207,8 +185,8 @@ class TrainerRepositoryImplIntegrationTest {
     );
   }
 
-   static Trainer createAndSetTrainer(String firstName, String lastName, String username,
-                                             TrainingType specialization, boolean isActive) {
+  static Trainer createAndSetTrainer(String firstName, String lastName, String username,
+                                     TrainingType specialization, boolean isActive) {
     Trainer trainer = new Trainer();
     trainer.setFirstName(firstName);
     trainer.setLastName(lastName);

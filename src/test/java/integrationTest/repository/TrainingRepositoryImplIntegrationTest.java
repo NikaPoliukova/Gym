@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,31 +45,24 @@ class TrainingRepositoryImplIntegrationTest {
   @Autowired
   private TraineeRepository traineeRepository;
 
-  //
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainingProvider")
   void testSaveAndFindById(Training training) {
-    // Save
+
     Training training1 = new Training();
     Trainee trainee = traineeRepository.save(training.getTrainee());
     Trainer trainer = trainerRepository.save(training.getTrainer());
-
     training1.setTrainer(trainer);
     training1.setTrainee(trainee);
     training1.setTrainingName("Training the best");
     Training saverdTraining = trainingRepository.save(training1);
-
-    // Find by ID
     Optional<Training> foundTraining = trainingRepository.findById(saverdTraining.getId());
-
-    // Assert
-    assertTrue(foundTraining.isPresent());
-    assertEquals(training1.getTrainingName(), foundTraining.get().getTrainingName());
+    assertAll(
+        () -> assertTrue(foundTraining.isPresent()),
+        () -> assertEquals(training1.getTrainingName(), foundTraining.get().getTrainingName()));
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainingProvider")
   void testSaveTraining(Training training) {
     Training savedTraining = trainingRepository.save(training);
@@ -78,7 +70,6 @@ class TrainingRepositoryImplIntegrationTest {
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainingProvider")
   void testFindTrainingById(Training training) {
 
@@ -89,13 +80,12 @@ class TrainingRepositoryImplIntegrationTest {
     training.setTrainingName("Training the best");
     Training training1 = trainingRepository.save(training);
     Optional<Training> foundTraining = trainingRepository.findById(training1.getId());
-
-    assertTrue(foundTraining.isPresent());
-    assertEquals(training.getId(), foundTraining.get().getId());
+    assertAll(
+        () -> assertTrue(foundTraining.isPresent()),
+        () -> assertEquals(training.getId(), foundTraining.get().getId()));
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainingProvider")
   void testFindAllTrainings(Training training) {
     Training training1 = new Training();
@@ -107,21 +97,21 @@ class TrainingRepositoryImplIntegrationTest {
     training1.setTrainingName("Training the best");
     Training savedTraining = trainingRepository.save(training1);
     List<Training> newList = trainingRepository.findAll();
-    assertNotNull(newList);
-    assertTrue(newList.contains(savedTraining));
-    assertEquals(oldList.size() + 1, newList.size());
+    assertAll(
+        () -> assertNotNull(newList),
+        () -> assertTrue(newList.contains(savedTraining)),
+        () -> assertEquals(oldList.size() + 1, newList.size()));
   }
 
   @Test
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   void testFindTrainingTypeByName() {
     TrainingType foundTrainingType = trainingRepository.findTrainingTypeByName("PILATES");
-    assertNotNull(foundTrainingType);
-    assertEquals("PILATES", foundTrainingType.getTrainingTypeName().toString());
+    assertAll(
+        () -> assertNotNull(foundTrainingType),
+        () -> assertEquals("PILATES", foundTrainingType.getTrainingTypeName().toString()));
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainingProvider")
   void testGetAssignedActiveTrainersToTrainee(Training training) {
     // Создаем тестовые данные
@@ -129,46 +119,37 @@ class TrainingRepositoryImplIntegrationTest {
     Trainee trainee = traineeRepository.save(training.getTrainee());
     Trainer trainer = trainerRepository.save(training.getTrainer());
     trainer.setActive(true);
-
     training1.setTrainer(trainer);
     training1.setTrainee(trainee);
     training1.setTrainingName("Training the best");
     Training saverdTraining = trainingRepository.save(training1);
-
     List<Trainer> assignedTrainers = trainingRepository.getAssignedActiveTrainersToTrainee(saverdTraining.getId());
-
     assertNotNull(assignedTrainers);
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainingProvider")
   void testDeleteTraining(Training training) {
     Training training1 = new Training();
     Trainee trainee = traineeRepository.save(training.getTrainee());
     Trainer trainer = trainerRepository.save(training.getTrainer());
     trainer.setActive(true);
-
     training1.setTrainer(trainer);
     training1.setTrainee(trainee);
     training1.setTrainingName("Training the best");
     Training saverdTraining = trainingRepository.save(training1);
-
     trainingRepository.delete(saverdTraining);
-
     Optional<Training> deletedTraining = trainingRepository.findById(saverdTraining.getId());
     assertFalse(deletedTraining.isPresent());
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainingProvider")
   void testFindTrainerTrainings(Training training) {
     Training training1 = new Training();
     Trainee trainee = traineeRepository.save(training.getTrainee());
     Trainer trainer = trainerRepository.save(training.getTrainer());
     trainee.setUsername("trainee.trainee");
-
     training1.setTrainer(trainer);
     training1.setTrainee(trainee);
     training1.setTrainingName("Training the best");
@@ -180,7 +161,6 @@ class TrainingRepositoryImplIntegrationTest {
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainingProvider")
   void testFindTrainingTypes() {
     List<TrainingType> trainingTypes = trainingRepository.findTrainingTypes();
@@ -189,7 +169,6 @@ class TrainingRepositoryImplIntegrationTest {
 
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainingProvider")
   void testFindTraineeTrainingsList(Training training) {
     // Save
@@ -197,23 +176,19 @@ class TrainingRepositoryImplIntegrationTest {
     Trainee trainee = traineeRepository.save(training.getTrainee());
     Trainer trainer = trainerRepository.save(training.getTrainer());
     trainee.setUsername("trainee.trainee");
-
     training1.setTrainer(trainer);
     training1.setTrainee(trainee);
     training1.setTrainingName("Training the best");
     trainingRepository.save(training1);
-
     List<Training> trainings = trainingRepository.findTraineeTrainingsList(createTrainingDtoRequest(training1.getTrainee().getUsername(),
         training.getTrainingDate().minusMonths(1), training.getTrainingDate().plusMonths(1),
         training1.getTrainer().getUsername(), training.getTrainingType().getTrainingTypeName()));
-
     // Assert
     assertNotNull(trainings);
   }
 
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("trainingProvider")
   void testFindTraineeTrainingsListWithArguments(Training training) {
     // Save
@@ -221,7 +196,6 @@ class TrainingRepositoryImplIntegrationTest {
     Trainee trainee = traineeRepository.save(training.getTrainee());
     Trainer trainer = trainerRepository.save(training.getTrainer());
     trainee.setUsername("trainee.trainee");
-
     training1.setTrainer(trainer);
     training1.setTrainee(trainee);
     training1.setTrainingName("Training the best");
@@ -230,10 +204,9 @@ class TrainingRepositoryImplIntegrationTest {
 
     List<Training> trainings = trainingRepository.findTraineeTrainingsList(training1.getTrainee().getId(),
         training.getTrainingDate().toString(), training1.getTrainingName());
-
-    // Assert
-    assertEquals(1, trainings.size());
-    assertEquals("Training the best",training1.getTrainingName());
+    assertAll(
+        () -> assertEquals(1, trainings.size()),
+        () -> assertEquals("Training the best", training1.getTrainingName()));
   }
 
 
