@@ -117,7 +117,7 @@ public class TrainingServiceImpl implements TrainingService {
   @Transactional
   public List<TrainerDtoForTrainee> updateTraineeTrainerList(UpdateTraineeTrainerDto dto) {
     Trainee trainee = traineeService.findByUsername(dto.username());
-    checkForNewTrainerFor(dto);
+    checkForNewTrainerFor(dto.list());
     List<Training> trainings = findTrainingsByUsernameAndCriteria(trainee.getId(), dto.trainingDate(), dto.trainingName());
     Training patternTraining = trainings.get(0);
     trainings.forEach(trainingRepository::delete);
@@ -131,9 +131,8 @@ public class TrainingServiceImpl implements TrainingService {
         .toList();
   }
 
-  private void checkForNewTrainerFor(UpdateTraineeTrainerDto dto) {
-    List<TrainersDtoList> dtoList = dto.list();
-    for (TrainersDtoList tdl : dtoList) {
+  private void checkForNewTrainerFor(List<TrainersDtoList> list) {
+       for (TrainersDtoList tdl : list) {
       try {
         trainerService.findByUsername(tdl.username());
       } catch (UserNotFoundException ex) {

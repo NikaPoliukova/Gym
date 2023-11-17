@@ -2,24 +2,31 @@ package com.epam.upskill.config;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.util.Properties;
 
 @Slf4j
-@Profile("default")
 @Configuration
-public class JPAConfig {
+@Profile("test")
+@EnableTransactionManagement
+@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+@PropertySource("classpath:application-test.yml")
+public class TestConfig {
 
   @Value("${spring.datasource.url}")
   private String url;
@@ -39,7 +46,7 @@ public class JPAConfig {
   private String hbm2ddlAuto;
 
   @Bean
-  public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
+  public LocalContainerEntityManagerFactoryBean entityManagerFactoryTest(DataSource dataSource) {
     LocalContainerEntityManagerFactoryBean entityManagerFactory = new LocalContainerEntityManagerFactoryBean();
     entityManagerFactory.setDataSource(dataSource);
     entityManagerFactory.setPackagesToScan("com.epam.upskill.entity");
@@ -54,13 +61,13 @@ public class JPAConfig {
     properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
     properties.setProperty("hibernate.hbm2ddl.auto", hbm2ddlAuto);
     properties.setProperty("hibernate.format_sql", hibernateDialect);
-    properties.setProperty("hibernate.default_schema", "gym_schema");
-    log.info("–ò—Å–ø–æ–ª—å–∑—É—é—Ç—Å—è hibernatePropertiesH2: {}",properties);
+    properties.setProperty("hibernate.default_schema", "test_gym_schema");
+    log.info("»ÒÔÓÎ¸ÁÛ˛ÚÒˇ hibernatePropertiesH2: {}", properties);
     return properties;
   }
 
   @Bean
-  public DataSource dataSource() {
+  public DataSource dataSourceTest() {
     var dataSource = new DriverManagerDataSource();
     dataSource.setDriverClassName(driverClassName);
     dataSource.setUrl(url);
@@ -70,14 +77,9 @@ public class JPAConfig {
   }
 
   @Bean
-  public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
+  public PlatformTransactionManager transactionManagerTest(EntityManagerFactory entityManagerFactory) {
     JpaTransactionManager transactionManager = new JpaTransactionManager();
     transactionManager.setEntityManagerFactory(entityManagerFactory);
     return transactionManager;
   }
 }
-
-
-
-
-

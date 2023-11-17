@@ -92,6 +92,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 
   @ExceptionHandler(Exception.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   @ResponseBody
   public ErrorResponse handleException(Exception ex) {
     return new ErrorResponse("Internal Server Error", ex.getMessage());

@@ -7,9 +7,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -17,11 +19,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = GymApplication.class)
 @AutoConfigureMockMvc
+@TestPropertySource(properties = "spring.config.activate.on-profile=test")
+@EnableTransactionManagement
+@ActiveProfiles("test")
 class LoginControllerIntegrationTest {
 
-  public static final String USERNAME = "username";
-  public static final String PASSWORD = "password";
-  public static final String URL_TEMPLATE = "/api/v1/login";
+  private static final String USERNAME = "username";
+  private static final String PASSWORD = "password";
+  private static final String URL_TEMPLATE = "/api/v1/login";
   @Autowired
   private MockMvc mockMvc;
   @Autowired
@@ -29,16 +34,18 @@ class LoginControllerIntegrationTest {
 
   @Test
   void login_WithCorrectParams_ThanReturnStatusOk_Test() throws Exception {
-    mockMvc.perform(get(URL_TEMPLATE)
-            .param(USERNAME, "Ola.Trainee")
-            .param(PASSWORD, "mM7cahNaEX"))
+    mockMvc.perform(
+            get(URL_TEMPLATE)
+                .param(USERNAME, "Trainee.Trainee")
+                .param(PASSWORD, "VrGvccsnZW")
+        )
         .andExpect(status().isOk());
   }
 
   @Test
   void login_WithWrongPassword_ThenReturnStatusNotFound_Test() throws Exception {
     mockMvc.perform(get(URL_TEMPLATE)
-            .param(USERNAME, "Ola.Trainee")
+            .param(USERNAME, "Trainee.Trainee")
             .param(PASSWORD, "1234567891"))
         .andExpect(status().isUnauthorized());
   }
@@ -49,6 +56,14 @@ class LoginControllerIntegrationTest {
             .param(USERNAME, "nonExistingUser")
             .param(PASSWORD, "1234567891"))
         .andExpect(status().isNotFound());
+  }
+
+  @Test
+  void login_WithWrongUsername_ThenReturnStatusUnauthorized_Test() throws Exception {
+    mockMvc.perform(get("/api/v1/login")
+            .param(USERNAME, "NonExistingUser")
+            .param(PASSWORD, "validPassword"))
+        .andExpect(status().isBadRequest());
   }
 
   @Test

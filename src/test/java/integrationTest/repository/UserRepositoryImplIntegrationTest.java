@@ -36,7 +36,7 @@ class UserRepositoryIntegrationTest {
 
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("userProvider")
   void testSaveAndFindById(User user) {
     userRepository.save(user);
@@ -50,7 +50,7 @@ class UserRepositoryIntegrationTest {
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("userProvider")
   @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   void testFindAll(User user1) {
@@ -64,7 +64,7 @@ class UserRepositoryIntegrationTest {
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @MethodSource("userProvider")
   @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   void testUpdate(User user) {
@@ -85,7 +85,7 @@ class UserRepositoryIntegrationTest {
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   @MethodSource("userProvider")
   void testDelete(User user) {
@@ -97,7 +97,7 @@ class UserRepositoryIntegrationTest {
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   @MethodSource("userProvider")
   void testFindByUsername(User user) {
@@ -109,7 +109,7 @@ class UserRepositoryIntegrationTest {
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   @MethodSource("userProvider")
   void testFindByUsernameAndPassword(User user) {
@@ -122,7 +122,7 @@ class UserRepositoryIntegrationTest {
   }
 
   @ParameterizedTest
-  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   @MethodSource("userProvider")
   void testToggleProfileActivation(User user) {
@@ -138,7 +138,7 @@ class UserRepositoryIntegrationTest {
   }
 
   @Test
-  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   void testFindByUsername_WhenUserNotFound() {
     // Arrange
@@ -148,7 +148,7 @@ class UserRepositoryIntegrationTest {
   }
 
   @Test
-  @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+  @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
   @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   void testDelete_WhenUserNotFound() {
     long nonExistingUserId = 555L;
