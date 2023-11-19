@@ -69,7 +69,8 @@ class TraineeControllerTest {
   void testGetTrainee() {
     Trainee trainee = new Trainee();
     when(traineeService.findByUsername(USERNAME)).thenReturn(trainee);
-    TraineeResponse expectedResponse = Mockito.mock(TraineeResponse.class);
+    TraineeResponse expectedResponse = new TraineeResponse(FIRST_NAME,LAST_NAME,
+        LocalDate.now().minusYears(15),ADDRESS,true,new ArrayList<>());
     when(traineeConverter.toTraineeResponse(trainee, traineeService)).thenReturn(expectedResponse);
     TraineeResponse result = traineeController.getTrainee(USERNAME);
     assertEquals(expectedResponse, result);
@@ -87,8 +88,10 @@ class TraineeControllerTest {
   void testUpdateTrainee() {
     TraineeUpdateRequest updateRequest = new TraineeUpdateRequest(USERNAME, FIRST_NAME, LAST_NAME, LocalDate.now(), "Address", true);
     Trainee trainee = new Trainee();
+
     when(traineeService.updateTrainee(updateRequest)).thenReturn(trainee);
-    TraineeUpdateResponse expectedResponse = Mockito.mock(TraineeUpdateResponse.class);
+    TraineeUpdateResponse expectedResponse = new TraineeUpdateResponse(USERNAME, FIRST_NAME, LAST_NAME,
+        "2000-04-05", ADDRESS, true, new ArrayList<>());
     when(traineeConverter.toTraineeUpdateResponse(trainee, traineeService)).thenReturn(expectedResponse);
     TraineeUpdateResponse result = traineeController.updateTrainee(USERNAME, FIRST_NAME, LAST_NAME,
         LocalDate.now(), ADDRESS, true);

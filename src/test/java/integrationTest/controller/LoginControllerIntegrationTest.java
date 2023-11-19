@@ -71,6 +71,5 @@ class LoginControllerIntegrationTest {
     mockMvc.perform(get(URL_TEMPLATE))
         .andExpect(status().isBadRequest());
   }
-
 }
 

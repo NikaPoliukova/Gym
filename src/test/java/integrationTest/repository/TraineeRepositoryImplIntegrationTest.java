@@ -42,47 +42,56 @@ class TraineeRepositoryImplIntegrationTest {
   @ParameterizedTest
   @MethodSource("traineeProvider")
   void testSaveAndFindById(Trainee trainee) {
+    // Arrange
     traineeRepository.save(trainee);
     // Act
     Optional<Trainee> foundTrainee = traineeRepository.findById(trainee.getId());
+
+    // Assert
     assertAll(
         () -> assertTrue(foundTrainee.isPresent()),
         () -> assertEquals(trainee.getFirstName(), foundTrainee.get().getFirstName()),
         () -> assertEquals(trainee.getLastName(), foundTrainee.get().getLastName()),
-        () -> assertEquals(trainee.getUsername(), foundTrainee.get().getUsername()));
+        () -> assertEquals(trainee.getUsername(), foundTrainee.get().getUsername())
+    );
   }
 
   @ParameterizedTest
   @MethodSource("traineeProvider")
   void testFindByUsername_WhenUserFound(Trainee trainee) {
+    // Arrange
     traineeRepository.save(trainee);
     // Act
     Optional<Trainee> foundTrainee = traineeRepository.findByUsername(trainee.getUsername());
+    // Assert
     assertAll(
         () -> assertTrue(foundTrainee.isPresent()),
         () -> assertEquals(trainee.getFirstName(), foundTrainee.get().getFirstName()),
-        () -> assertEquals(trainee.getLastName(), foundTrainee.get().getLastName()));
+        () -> assertEquals(trainee.getLastName(), foundTrainee.get().getLastName())
+    );
   }
 
   @ParameterizedTest
   @MethodSource("traineeProvider")
   void testFindByUsernameAndPassword_WhenUserFound(Trainee trainee) {
+    // Arrange
     trainee.setPassword("password");
     traineeRepository.save(trainee);
     // Act
-    Optional<Trainee> foundTrainee = traineeRepository.findByUsernameAndPassword(trainee.getUsername(),
-        trainee.getPassword());
+    Optional<Trainee> foundTrainee = traineeRepository.findByUsernameAndPassword(trainee.getUsername(), trainee.getPassword());
+    // Assert
     assertAll(
         () -> assertTrue(foundTrainee.isPresent()),
         () -> assertEquals(trainee.getFirstName(), foundTrainee.get().getFirstName()),
         () -> assertEquals(trainee.getLastName(), foundTrainee.get().getLastName()),
-        () -> assertEquals(trainee.getUsername(), foundTrainee.get().getUsername()));
+        () -> assertEquals(trainee.getUsername(), foundTrainee.get().getUsername())
+    );
   }
 
   @ParameterizedTest
   @MethodSource("traineeProvider")
   void testUpdate_WhenUserFound(Trainee trainee) {
-    traineeRepository.findAll();
+    // Arrange
     Trainee savedTrainee = traineeRepository.save(trainee);
     // Act
     trainee.setFirstName("UpdatedFirstName");
@@ -102,15 +111,19 @@ class TraineeRepositoryImplIntegrationTest {
   @ParameterizedTest
   @MethodSource("traineeProvider")
   void testFindAll_WhenUsersExist(Trainee trainee1) {
+    // Arrange
     Trainee traineeNew = traineeRepository.save(trainee1);
+    // Act
     List<Trainee> list = traineeRepository.findAll();
-    assertTrue(list.contains(traineeNew));
 
+    // Assert
+    assertTrue(list.contains(traineeNew));
   }
 
   @ParameterizedTest
   @MethodSource("traineeProvider")
   void testToggleProfileActivation_WhenUserFound(Trainee trainee) {
+    // Arrange
     trainee.setActive(true);
     Trainee newTrainee = traineeRepository.save(trainee);
     // Act
@@ -120,12 +133,14 @@ class TraineeRepositoryImplIntegrationTest {
     Optional<Trainee> toggledTrainee = traineeRepository.findById(newTrainee.getId());
     assertAll(
         () -> assertTrue(toggledTrainee.isPresent()),
-        () -> assertFalse(toggledTrainee.get().isActive()));
+        () -> assertFalse(toggledTrainee.get().isActive())
+    );
   }
 
   @ParameterizedTest
   @MethodSource("traineeProvider")
   void testFindTrainersForTrainee_WhenTrainersExist(Trainee trainee) {
+    // Arrange
     Trainee newTrainee = traineeRepository.save(trainee);
     TrainingType specialization = TrainerRepositoryImplIntegrationTest.createTrainingType("PILATES");
     specialization.setId(4);
@@ -145,23 +160,27 @@ class TraineeRepositoryImplIntegrationTest {
     trainingRepository.save(training2);
     // Act
     List<Trainer> trainers = traineeRepository.findTrainersForTrainee(newTrainee.getId());
+    // Assert
     assertAll(
         () -> assertEquals(2, trainers.size()),
         () -> assertTrue(trainers.contains(trainer1)),
-        () -> assertTrue(trainers.contains(trainer2)));
+        () -> assertTrue(trainers.contains(trainer2))
+    );
   }
-
 
   @Test
   void testFindByUsername_WhenUserNotFound() {
+    // Act
     Optional<Trainee> foundTrainee = traineeRepository.findByUsername("nonexistent");
+    // Assert
     assertFalse(foundTrainee.isPresent());
   }
 
   @Test
   void testFindByUsernameAndPassword_WhenUserNotFound() {
-    assertThrows(EmptyResultDataAccessException.class, ()
-        -> traineeRepository.findByUsernameAndPassword("nonexistent", "password"));
+    // Act & Assert
+    assertThrows(EmptyResultDataAccessException.class,
+        () -> traineeRepository.findByUsernameAndPassword("nonexistent", "password"));
   }
 
   @Test

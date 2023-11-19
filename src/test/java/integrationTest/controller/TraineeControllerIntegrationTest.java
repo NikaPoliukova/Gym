@@ -46,7 +46,6 @@ class TraineeControllerIntegrationTest {
         .andExpect(jsonPath("$.address").value("123 Main St"))
         .andExpect(jsonPath("$.isActive").value(true))
         .andExpect(jsonPath("$.trainersList").isArray());
-
   }
 
   @Test
@@ -79,8 +78,10 @@ class TraineeControllerIntegrationTest {
 
   @Test
   void findNotActiveTrainers_WithValidUsername_ThenReturnStatusOk_Test() throws Exception {
-    mockMvc.perform(get("/api/v1/trainees/not-active-trainers")
-            .param(USERNAME, "Trainee.Trainee"))
+    mockMvc.perform(
+            get("/api/v1/trainees/not-active-trainers")
+                .param(USERNAME, "Trainee.Trainee")
+        )
         .andExpect(status().isOk());
   }
 
@@ -104,22 +105,23 @@ class TraineeControllerIntegrationTest {
   @Test
   void findTrainingsList_WithInvalidParams_Test() throws Exception {
     mockMvc.perform(
-        put("/api/v1/trainees/setting/trainers")
-            .param(USERNAME, "Incorrect")
-            .param("trainingDate", "2023-11-17")
-            .param("trainingName", "Training1")
-            .content("[{\"username\": \"Trainer.Super\"}]")
-            .contentType(MediaType.APPLICATION_JSON)
-    )
+            put("/api/v1/trainees/setting/trainers")
+                .param(USERNAME, "Incorrect")
+                .param("trainingDate", "2023-11-17")
+                .param("trainingName", "Training1")
+                .content("[{\"username\": \"Trainer.Super\"}]")
+                .contentType(MediaType.APPLICATION_JSON)
+        )
         .andExpect(status().isNotFound());
   }
 
   @Test
   void toggleActivation_WithValidParams_ThenReturnStatusOk_Test() throws Exception {
-    mockMvc.perform(patch("/api/v1/trainees/toggle-activation")
-            .param(USERNAME, "Trainee.Trainee")
-            .param("active", "false"))
+    mockMvc.perform(
+            patch("/api/v1/trainees/toggle-activation")
+                .param(USERNAME, "Trainee.Trainee")
+                .param("active", "false")
+        )
         .andExpect(status().isOk());
   }
-
 }

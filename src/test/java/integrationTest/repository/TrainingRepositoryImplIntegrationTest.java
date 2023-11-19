@@ -48,138 +48,163 @@ class TrainingRepositoryImplIntegrationTest {
   @ParameterizedTest
   @MethodSource("trainingProvider")
   void testSaveAndFindById(Training training) {
-
-    Training training1 = new Training();
+    // Arrange
     Trainee trainee = traineeRepository.save(training.getTrainee());
     Trainer trainer = trainerRepository.save(training.getTrainer());
+    Training training1 = new Training();
     training1.setTrainer(trainer);
     training1.setTrainee(trainee);
     training1.setTrainingName("Training the best");
-    Training saverdTraining = trainingRepository.save(training1);
-    Optional<Training> foundTraining = trainingRepository.findById(saverdTraining.getId());
+    // Act
+    Training savedTraining = trainingRepository.save(training1);
+    Optional<Training> foundTraining = trainingRepository.findById(savedTraining.getId());
+    // Assert
     assertAll(
         () -> assertTrue(foundTraining.isPresent()),
-        () -> assertEquals(training1.getTrainingName(), foundTraining.get().getTrainingName()));
+        () -> assertEquals(training1.getTrainingName(), foundTraining.get().getTrainingName())
+    );
   }
 
   @ParameterizedTest
   @MethodSource("trainingProvider")
   void testSaveTraining(Training training) {
+    // Act
     Training savedTraining = trainingRepository.save(training);
+    // Assert
     assertNotNull(savedTraining);
   }
 
   @ParameterizedTest
   @MethodSource("trainingProvider")
   void testFindTrainingById(Training training) {
-
+    // Arrange
     Trainee trainee = traineeRepository.save(training.getTrainee());
     Trainer trainer = trainerRepository.save(training.getTrainer());
     training.setTrainer(trainer);
     training.setTrainee(trainee);
     training.setTrainingName("Training the best");
     Training training1 = trainingRepository.save(training);
+    // Act
     Optional<Training> foundTraining = trainingRepository.findById(training1.getId());
+    // Assert
     assertAll(
         () -> assertTrue(foundTraining.isPresent()),
-        () -> assertEquals(training.getId(), foundTraining.get().getId()));
+        () -> assertEquals(training.getId(), foundTraining.get().getId())
+    );
   }
 
   @ParameterizedTest
   @MethodSource("trainingProvider")
   void testFindAllTrainings(Training training) {
-    Training training1 = new Training();
+    // Arrange
     Trainee trainee = traineeRepository.save(training.getTrainee());
     Trainer trainer = trainerRepository.save(training.getTrainer());
-    List<Training> oldList = trainingRepository.findAll();
+    Training training1 = new Training();
     training1.setTrainer(trainer);
     training1.setTrainee(trainee);
     training1.setTrainingName("Training the best");
+    // Act
+    List<Training> oldList = trainingRepository.findAll();
     Training savedTraining = trainingRepository.save(training1);
     List<Training> newList = trainingRepository.findAll();
+    // Assert
     assertAll(
         () -> assertNotNull(newList),
         () -> assertTrue(newList.contains(savedTraining)),
-        () -> assertEquals(oldList.size() + 1, newList.size()));
+        () -> assertEquals(oldList.size() + 1, newList.size())
+    );
   }
 
   @Test
   void testFindTrainingTypeByName() {
+    // Act
     TrainingType foundTrainingType = trainingRepository.findTrainingTypeByName("PILATES");
+    // Assert
     assertAll(
         () -> assertNotNull(foundTrainingType),
-        () -> assertEquals("PILATES", foundTrainingType.getTrainingTypeName().toString()));
+        () -> assertEquals("PILATES", foundTrainingType.getTrainingTypeName().toString())
+    );
   }
 
   @ParameterizedTest
   @MethodSource("trainingProvider")
   void testGetAssignedActiveTrainersToTrainee(Training training) {
-    // Создаем тестовые данные
-    Training training1 = new Training();
+    // Arrange
     Trainee trainee = traineeRepository.save(training.getTrainee());
     Trainer trainer = trainerRepository.save(training.getTrainer());
     trainer.setActive(true);
+    Training training1 = new Training();
     training1.setTrainer(trainer);
     training1.setTrainee(trainee);
     training1.setTrainingName("Training the best");
-    Training saverdTraining = trainingRepository.save(training1);
-    List<Trainer> assignedTrainers = trainingRepository.getAssignedActiveTrainersToTrainee(saverdTraining.getId());
+    Training savedTraining = trainingRepository.save(training1);
+    // Act
+    List<Trainer> assignedTrainers = trainingRepository.getAssignedActiveTrainersToTrainee(savedTraining.getId());
+    // Assert
     assertNotNull(assignedTrainers);
   }
 
   @ParameterizedTest
   @MethodSource("trainingProvider")
   void testDeleteTraining(Training training) {
-    Training training1 = new Training();
+    // Arrange
     Trainee trainee = traineeRepository.save(training.getTrainee());
     Trainer trainer = trainerRepository.save(training.getTrainer());
     trainer.setActive(true);
+    Training training1 = new Training();
     training1.setTrainer(trainer);
     training1.setTrainee(trainee);
     training1.setTrainingName("Training the best");
-    Training saverdTraining = trainingRepository.save(training1);
-    trainingRepository.delete(saverdTraining);
-    Optional<Training> deletedTraining = trainingRepository.findById(saverdTraining.getId());
+    Training savedTraining = trainingRepository.save(training1);
+    // Act
+    trainingRepository.delete(savedTraining);
+    Optional<Training> deletedTraining = trainingRepository.findById(savedTraining.getId());
+    // Assert
     assertFalse(deletedTraining.isPresent());
   }
 
   @ParameterizedTest
   @MethodSource("trainingProvider")
   void testFindTrainerTrainings(Training training) {
-    Training training1 = new Training();
+    // Arrange
     Trainee trainee = traineeRepository.save(training.getTrainee());
     Trainer trainer = trainerRepository.save(training.getTrainer());
     trainee.setUsername("trainee.trainee");
+    Training training1 = new Training();
     training1.setTrainer(trainer);
     training1.setTrainee(trainee);
     training1.setTrainingName("Training the best");
     trainingRepository.save(training1);
+    // Act
     List<Training> trainerTrainings = trainingRepository.findTrainerTrainings(
         new TrainingTrainerDto(trainer.getId(), LocalDate.now().minusMonths(1), LocalDate.now(),
             trainee.getUsername()));
+    // Assert
     assertNotNull(trainerTrainings);
   }
 
   @ParameterizedTest
   @MethodSource("trainingProvider")
   void testFindTrainingTypes() {
+    // Act
     List<TrainingType> trainingTypes = trainingRepository.findTrainingTypes();
+    // Assert
     assertNotNull(trainingTypes);
   }
-
 
   @ParameterizedTest
   @MethodSource("trainingProvider")
   void testFindTraineeTrainingsList(Training training) {
-    // Save
-    Training training1 = new Training();
+    // Arrange
     Trainee trainee = traineeRepository.save(training.getTrainee());
     Trainer trainer = trainerRepository.save(training.getTrainer());
     trainee.setUsername("trainee.trainee");
+    Training training1 = new Training();
     training1.setTrainer(trainer);
     training1.setTrainee(trainee);
     training1.setTrainingName("Training the best");
     trainingRepository.save(training1);
+    // Act
     List<Training> trainings = trainingRepository.findTraineeTrainingsList(createTrainingDtoRequest(training1.getTrainee().getUsername(),
         training.getTrainingDate().minusMonths(1), training.getTrainingDate().plusMonths(1),
         training1.getTrainer().getUsername(), training.getTrainingType().getTrainingTypeName()));
@@ -187,26 +212,27 @@ class TrainingRepositoryImplIntegrationTest {
     assertNotNull(trainings);
   }
 
-
   @ParameterizedTest
   @MethodSource("trainingProvider")
   void testFindTraineeTrainingsListWithArguments(Training training) {
-    // Save
-    Training training1 = new Training();
+    // Arrange
     Trainee trainee = traineeRepository.save(training.getTrainee());
     Trainer trainer = trainerRepository.save(training.getTrainer());
     trainee.setUsername("trainee.trainee");
+    Training training1 = new Training();
     training1.setTrainer(trainer);
     training1.setTrainee(trainee);
     training1.setTrainingName("Training the best");
     training1.setTrainingDate(training.getTrainingDate());
     trainingRepository.save(training1);
-
+    // Act
     List<Training> trainings = trainingRepository.findTraineeTrainingsList(training1.getTrainee().getId(),
         training.getTrainingDate().toString(), training1.getTrainingName());
+    // Assert
     assertAll(
         () -> assertEquals(1, trainings.size()),
-        () -> assertEquals("Training the best", training1.getTrainingName()));
+        () -> assertEquals("Training the best", training1.getTrainingName())
+    );
   }
 
 

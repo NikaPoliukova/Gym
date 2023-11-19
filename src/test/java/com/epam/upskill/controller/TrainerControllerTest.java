@@ -59,20 +59,26 @@ class TrainerControllerTest {
     trainer.setActive(true);
     trainer.setUsername(USERNAME);
     when(trainerService.findByUsername(USERNAME)).thenReturn(trainer);
-    when(trainerConverter.toTrainerResponse(trainer, trainerService)).thenReturn(mock(TrainerResponse.class));
+    TrainerResponse trainerResponse = new TrainerResponse("Jon", "Doe",
+        "YOGA", true, new ArrayList<>());
+    when(trainerConverter.toTrainerResponse(trainer, trainerService)).thenReturn(trainerResponse);
     TrainerResponse result = trainerController.getTrainer(USERNAME);
     assertNotNull(result);
+
   }
 
+
   @Test
-   void testUpdateTrainer() {
+  void testUpdateTrainer() {
     TrainerUpdateRequest updateRequest =
         new TrainerUpdateRequest(USERNAME, FIRST_NAME, LAST_NAME, SPECIALIZATION, true);
     Trainer trainer = new Trainer();
     trainer.setActive(true);
+    TrainerUpdateResponse expectedResponse  = new TrainerUpdateResponse(USERNAME, FIRST_NAME, LAST_NAME,
+        "YOGA", true, new ArrayList<>());
     trainer.setUsername(USERNAME);
     when(trainerService.update(updateRequest)).thenReturn(trainer);
-    when(trainerConverter.toTrainerUpdateResponse(trainer, trainerService)).thenReturn(mock(TrainerUpdateResponse.class));
+    when(trainerConverter.toTrainerUpdateResponse(trainer, trainerService)).thenReturn(expectedResponse );
     TrainerUpdateResponse result =
         trainerController.updateTrainer(USERNAME, FIRST_NAME, LAST_NAME, SPECIALIZATION, true);
     assertNotNull(result);
@@ -80,7 +86,7 @@ class TrainerControllerTest {
 
 
   @Test
-   void testUpdateTrainerOperationFailedException() {
+  void testUpdateTrainerOperationFailedException() {
     when(trainerService.update(any(TrainerUpdateRequest.class)))
         .thenThrow(new OperationFailedException(USERNAME, "update Trainer's profile"));
     assertThrows(OperationFailedException.class, () -> {
@@ -97,17 +103,17 @@ class TrainerControllerTest {
   }
 
   @Test
-   void testFindTrainerTrainingsList() {
+  void testFindTrainerTrainingsList() {
     List<Training> trainingsList = new ArrayList<>();
     when(trainingService.findTrainerTrainings(any(TrainingTrainerRequest.class))).thenReturn(trainingsList);
     when(trainingConverter.toTrainerTrainingResponse(trainingsList)).thenReturn(new ArrayList<>());
-    List<TrainingTrainerResponse> result = trainerController.findTrainerTrainingsList(USERNAME,PERIOD_FROM ,
-        PERIOD_TO,"Training");
+    List<TrainingTrainerResponse> result = trainerController.findTrainerTrainingsList(USERNAME, PERIOD_FROM,
+        PERIOD_TO, "Training");
     assertNotNull(result);
   }
 
   @Test
-   void testToggleActivation() {
+  void testToggleActivation() {
     Trainer trainer = new Trainer();
     trainer.setActive(true);
     trainer.setUsername(USERNAME);

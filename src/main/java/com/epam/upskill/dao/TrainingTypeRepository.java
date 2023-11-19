@@ -4,5 +4,5 @@ import com.epam.upskill.entity.TrainingType;
 
 public interface TrainingTypeRepository {
 
-   TrainingType save(TrainingType trainingType);
+  TrainingType save(TrainingType trainingType);
 }

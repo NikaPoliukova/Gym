@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
 
@@ -132,7 +131,7 @@ public class TrainingServiceImpl implements TrainingService {
   }
 
   private void checkForNewTrainerFor(List<TrainersDtoList> list) {
-       for (TrainersDtoList tdl : list) {
+    for (TrainersDtoList tdl : list) {
       try {
         trainerService.findByUsername(tdl.username());
       } catch (UserNotFoundException ex) {

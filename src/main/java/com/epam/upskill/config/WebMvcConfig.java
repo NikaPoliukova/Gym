@@ -19,5 +19,15 @@
 //        .excludePathPatterns("/createTrainee", "/createTrainer", "/swagger-ui.html",
 //            "/v2/api-docs", "/swagger-resources", "/swagger-resources/**", "/webjars/**", "/swagger-ui/index.html#/");
 //  }
+
+//@Override
+//public void addCorsMappings(CorsRegistry registry) {
+//    registry.addMapping("/**")
+//    .allowedOrigins("http://localhost:3000") // Разрешенные источники (замените на ваши)
+//    .allowedMethods("GET", "POST", "PUT", "DELETE")
+//    .allowedHeaders("*")
+//    .allowCredentials(true)
+//    .maxAge(3600);
+//    }
 //}
 //

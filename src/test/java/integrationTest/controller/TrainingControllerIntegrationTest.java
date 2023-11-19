@@ -29,13 +29,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 class TrainingControllerIntegrationTest {
 
-  private static final String USERNAME = "username";
-  public static final String TRAINING_NAME = "trainingName";
-  public static final String TRAINING_DURATION = "trainingDuration";
-  public static final String TRAINING_TYPE = "trainingType";
-  public static final String DATE = "date";
-  public static final String TRAINEE_USERNAME = "traineeUsername";
-  public static final String TRAINER_USERNAME = "trainerUsername";
+  private static final String TRAINING_NAME = "trainingName";
+  private static final String TRAINING_DURATION = "trainingDuration";
+  private static final String TRAINING_TYPE = "trainingType";
+  private static final String DATE = "date";
+  private static final String TRAINEE_USERNAME = "traineeUsername";
+  private static final String TRAINER_USERNAME = "trainerUsername";
 
   @Autowired
   private MockMvc mockMvc;
@@ -70,10 +69,11 @@ class TrainingControllerIntegrationTest {
 
   @Test
   void getTrainingTypes_ReturnsListOfTrainingTypes_WhenCalled() throws Exception {
-    mockMvc.perform(get("/api/v1/trainings/training-types"))
+    mockMvc.perform(
+            get("/api/v1/trainings/training-types"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType("application/json"))
+        .andExpect(content().contentType("application/json")
+        )
         .andExpect(jsonPath("$", hasSize(5)));
   }
-
 }

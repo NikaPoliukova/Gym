@@ -37,35 +37,42 @@ class UserControllerIntegrationTest {
 
   @Test
   void changeLogin_WithValidParams_ThenReturnStatusOk_Test() throws Exception {
-    mockMvc.perform(put(USER_SETTING_LOGIN)
-            .param(USERNAME, "Trainee.Trainee")
-            .param(OLD_PASSWORD, "VrGvccsnZW")
-            .param(NEW_PASSWORD, "1234567890"))
+    mockMvc.perform(
+            put(USER_SETTING_LOGIN)
+                .param(USERNAME, "Trainee.Trainee")
+                .param(OLD_PASSWORD, "VrGvccsnZW")
+                .param(NEW_PASSWORD, "1234567890")
+        )
         .andExpect(status().isOk());
   }
 
   @Test
   void changeLogin_WithSameOldAndNewPassword_ThenReturnStatusBadRequest_Test() throws Exception {
-    mockMvc.perform(put(USER_SETTING_LOGIN)
+    mockMvc.perform(put
+            (USER_SETTING_LOGIN)
             .param(USERNAME, "Trainee.Trainee")
             .param(OLD_PASSWORD, "VrGvccsnZW")
-            .param(NEW_PASSWORD, "VrGvccsnZW"))
+            .param(NEW_PASSWORD, "VrGvccsnZW")
+        )
         .andExpect(status().isBadRequest());
   }
 
   @Test
   void changeLogin_WithIncorrectOldPassword_ThenReturnStatusBadRequest_Test() throws Exception {
-    mockMvc.perform(put(USER_SETTING_LOGIN)
+    mockMvc.perform(put
+            (USER_SETTING_LOGIN)
             .param(USERNAME, "Trainee.Trainee")
             .param(OLD_PASSWORD, "7854123658")
-            .param(NEW_PASSWORD, "1234567890"))
+            .param(NEW_PASSWORD, "1234567890")
+        )
         .andExpect(status().isNotFound());
   }
 
   @Test
   void changeLogin_WithMissingParameters_ThenReturnStatusBadRequest_Test() throws Exception {
-    mockMvc.perform(put(USER_SETTING_LOGIN))
+    mockMvc.perform(
+            put(USER_SETTING_LOGIN)
+        )
         .andExpect(status().isBadRequest());
   }
-
 }

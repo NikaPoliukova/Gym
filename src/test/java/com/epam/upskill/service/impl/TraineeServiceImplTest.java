@@ -105,9 +105,8 @@ class TraineeServiceImplTest {
 
   @Test
   void testSaveTrainee() {
-    TraineeRegistration traineeDto = Mockito.mock(TraineeRegistration.class);
-    when(traineeDto.firstName()).thenReturn("John");
-    when(traineeDto.lastName()).thenReturn("Doe");
+    TraineeRegistration traineeDto = new TraineeRegistration("John", "Doe", "address1",
+        LocalDate.now().minusYears(15));
     Trainee trainee = new Trainee();
     when(userService.findAll()).thenReturn(Collections.emptyList());
     when(traineeConverter.toTrainee(traineeDto)).thenReturn(trainee);
@@ -115,6 +114,7 @@ class TraineeServiceImplTest {
     Trainee result = traineeService.saveTrainee(traineeDto);
     assertEquals(trainee, result);
   }
+
 
 
   @Test

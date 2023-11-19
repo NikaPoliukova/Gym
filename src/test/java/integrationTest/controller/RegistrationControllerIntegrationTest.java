@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @EnableTransactionManagement
 @ActiveProfiles("test")
 @Transactional
-public class RegistrationControllerIntegrationTest {
+class RegistrationControllerIntegrationTest {
   private static final String REGISTRATION_TRAINEE_URL = "/api/v1/registration/trainee";
   private static final String REGISTRATION_TRAINER_URL = "/api/v1/registration/trainer";
   private static final String FIRST_NAME = "firstName";
@@ -55,7 +55,6 @@ public class RegistrationControllerIntegrationTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.username").value("Trainee.Trainee11"))
         .andExpect(jsonPath("$.password").exists());
-
   }
 
   @Test
@@ -82,5 +81,4 @@ public class RegistrationControllerIntegrationTest {
     mockMvc.perform(post(REGISTRATION_TRAINER_URL))
         .andExpect(status().isBadRequest());
   }
-
 }

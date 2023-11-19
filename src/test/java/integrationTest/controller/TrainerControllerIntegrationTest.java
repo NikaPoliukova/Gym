@@ -28,6 +28,8 @@ class TrainerControllerIntegrationTest {
   private static final String FIRST_NAME = "firstName";
   private static final String LAST_NAME = "lastName";
   private static final String USERNAME = "username";
+  private static final String SPECIALIZATION = "specialization";
+  private static final String ACTIVE = "isActive";
 
   @Autowired
   private MockMvc mockMvc;
@@ -51,7 +53,6 @@ class TrainerControllerIntegrationTest {
                 .param(USERNAME, "nonExistingTrainer")
         )
         .andExpect(status().isNotFound());
-
   }
 
   @Test
@@ -61,8 +62,8 @@ class TrainerControllerIntegrationTest {
                 .param(USERNAME, "Trainer.Trainer")
                 .param(FIRST_NAME, "TrainerNew")
                 .param(LAST_NAME, "Trainer")
-                .param("specialization", "CARDIO")
-                .param("isActive", "false")
+                .param(SPECIALIZATION, "CARDIO")
+                .param(ACTIVE, "false")
         )
         .andExpect(status().isOk())
         .andExpect(content().contentType("application/json"))
@@ -74,13 +75,14 @@ class TrainerControllerIntegrationTest {
 
   @Test
   void updateTrainer_ReturnsBadRequest_WhenUsernameIsInvalid() throws Exception {
-    // Выполнение запроса с некорректным именем пользователя
-    mockMvc.perform(put("/api/v1/trainers/trainer/setting/profile")
-            .param("username", "   ") // некорректное имя пользователя
-            .param("firstName", "TrainerNew")
-            .param("lastName", "Trainer")
-            .param("specialization", "CARDIO")
-            .param("isActive", "false"))
+    mockMvc.perform(
+            put("/api/v1/trainers/trainer/setting/profile")
+                .param(USERNAME, "   ")
+                .param(FIRST_NAME, "TrainerNew")
+                .param(LAST_NAME, "Trainer")
+                .param(SPECIALIZATION, "CARDIO")
+                .param(ACTIVE, "false")
+        )
         .andExpect(status().isBadRequest());
   }
 
@@ -109,10 +111,11 @@ class TrainerControllerIntegrationTest {
 
   @Test
   void toggleActivation_TogglesActivation_WhenCalled() throws Exception {
-
-    mockMvc.perform(patch("/api/v1/trainers/trainer/toggle-activation")
-            .param(USERNAME, "Trainer.Trainer")
-            .param("active", "false"))
+    mockMvc.perform(
+            patch("/api/v1/trainers/trainer/toggle-activation")
+                .param(USERNAME, "Trainer.Trainer")
+                .param("active", "false")
+        )
         .andExpect(status().isOk());
   }
 }
