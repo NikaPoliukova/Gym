@@ -80,8 +80,10 @@ class TrainerRepositoryImplIntegrationTest {
     type.setId(9);
     type.setTrainingTypeName(TrainingTypeEnum.YOGA);
     trainingTypeRepository.save(trainer.getSpecialization());
-    Trainee trainee = traineeRepository.save(createAndSetTrainee("Ola", "Doe", "ola.doe", "address1"));
-    Trainee trainee2 = traineeRepository.save(createAndSetTrainee("Oleg", "Doe", "oleg.doe", "address5"));
+    Trainee trainee = traineeRepository.save(createAndSetTrainee("Ola", "Doe", "ola.doe",
+        "address1"));
+    Trainee trainee2 = traineeRepository.save(createAndSetTrainee("Oleg", "Doe", "oleg.doe",
+        "address5"));
     Trainer savedTrainer = trainerRepository.save(trainer);
     Training training1 = new Training();
     training1.setTrainee(trainee);

@@ -9,8 +9,11 @@ import com.epam.upskill.entity.Training;
 import com.epam.upskill.service.TraineeService;
 import com.epam.upskill.service.TrainingService;
 import com.epam.upskill.service.UserService;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Timer;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -35,6 +38,12 @@ public class TraineeController {
   private final TrainerConverter trainerConverter;
   private final TrainingConverter trainingConverter;
   private final TrainingService trainingService;
+
+  @Autowired
+  private Counter customRequestsCounter;
+
+  @Autowired
+  private Timer customRequestLatencyTimer;
 
   @GetMapping("/trainee")
   @ResponseStatus(HttpStatus.OK)
@@ -103,7 +112,6 @@ public class TraineeController {
                                                          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodTo,
                                                          @RequestParam(required = false) String trainerName,
                                                          @RequestParam(required = false) String trainingType) {
-
     List<Training> trainingsList = trainingService.findTrainingsByUsernameAndCriteria(new TrainingTraineeRequest
         (username, periodFrom, periodTo, trainerName, trainingType));
     return trainingConverter.toTrainingResponse(trainingsList);
@@ -114,7 +122,11 @@ public class TraineeController {
   @ApiOperation("Activate or deactivate a Trainee's profile")
   public void toggleActivation(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username,
                                @RequestParam("active") @NotNull boolean isActive) {
+    customRequestsCounter.increment();
+    Timer.Sample sample = Timer.start();
     var trainee = traineeService.findByUsername(username);
     traineeService.toggleProfileActivation(trainee.getId(), isActive);
+    sample.stop(customRequestLatencyTimer);
+
   }
 }

@@ -10,6 +10,7 @@ import com.epam.upskill.exception.UserNotFoundException;
 import com.epam.upskill.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,11 +22,13 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
 
   @Override
   @Transactional
   public User findById(long userId) {
-    return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(" witt userId = " + userId));
+    return userRepository.findById(userId).orElseThrow(
+        () -> new UserNotFoundException(" witt userId = " + userId));
 
   }
 
@@ -40,13 +43,13 @@ public class UserServiceImpl implements UserService {
   @Transactional(readOnly = true)
   public User findByUsername(String username) {
     return userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
-
   }
 
   @Override
   @Transactional
   public void updatePassword(UserUpdatePass userUpdatePass) {
-    var user = findByUsernameAndPassword(userUpdatePass.username(), userUpdatePass.oldPassword());
+    var hashedPassword = passwordEncoder.encode(userUpdatePass.oldPassword());
+    var user = findByUsernameAndPassword(passwordEncoder.encode(userUpdatePass.username()), hashedPassword);
     user.setPassword(userUpdatePass.newPassword());
     userRepository.update(user);
   }
@@ -54,7 +57,8 @@ public class UserServiceImpl implements UserService {
   @Override
   @Transactional
   public User findByUsernameAndPassword(String username, String password) {
-    return userRepository.findByUsernameAndPassword(username, password)
+    var hashedPassword = passwordEncoder.encode(password);
+    return userRepository.findByUsernameAndPassword(username, hashedPassword)
         .orElseThrow(() -> new UserNotFoundException(username));
   }
 

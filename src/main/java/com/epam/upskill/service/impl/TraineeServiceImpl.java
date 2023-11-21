@@ -13,6 +13,7 @@ import com.epam.upskill.service.UserService;
 import com.epam.upskill.util.UserUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +25,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class TraineeServiceImpl implements TraineeService {
-
+  private final PasswordEncoder passwordEncoder;
   private final TraineeRepository traineeRepository;
   private final UserService userService;
   private final TraineeConverter traineeConverter;
@@ -48,7 +49,8 @@ public class TraineeServiceImpl implements TraineeService {
   @Override
   @Transactional
   public Trainee findByUsernameAndPassword(String username, String password) {
-    return traineeRepository.findByUsernameAndPassword(username, password).orElseThrow(()
+    var hashedPassword  =  passwordEncoder.encode(password);
+    return traineeRepository.findByUsernameAndPassword(username, hashedPassword).orElseThrow(()
         -> new UserNotFoundException(username));
   }
 
@@ -64,9 +66,10 @@ public class TraineeServiceImpl implements TraineeService {
   public Trainee saveTrainee(TraineeRegistration traineeDto) {
     var username = UserUtils.createUsername(traineeDto.firstName(), traineeDto.lastName(),
         userService.findAll());
-    var password = UserUtils.generateRandomPassword();
+    var password =UserUtils.generateRandomPassword();
+    var hashedPassword  =  passwordEncoder.encode(password);
     var trainee = traineeConverter.toTrainee(traineeDto);
-    fillInTheTrainee(traineeDto, username, password, trainee);
+    fillInTheTrainee(traineeDto, username, hashedPassword, trainee);
     return traineeRepository.save(trainee);
   }
 

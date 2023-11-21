@@ -6,9 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
-
+@SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-@SpringBootApplication(exclude = SecurityAutoConfiguration.class)
 public class GymApplication {
 
   public static void main(String[] args) {

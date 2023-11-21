@@ -17,7 +17,8 @@
 //    registry.addInterceptor(myInterceptor)
 //        .addPathPatterns("/**")
 //        .excludePathPatterns("/createTrainee", "/createTrainer", "/swagger-ui.html",
-//            "/v2/api-docs", "/swagger-resources", "/swagger-resources/**", "/webjars/**", "/swagger-ui/index.html#/");
+//            "/v2/api-docs", "/swagger-resources", "/swagger-resources/**", "/webjars/**", "/swagger-ui/index.html#/",
+//            ""/actuator/**);
 //  }
 
 //@Override
