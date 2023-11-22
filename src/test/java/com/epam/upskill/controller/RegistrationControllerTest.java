@@ -5,6 +5,7 @@ import com.epam.upskill.dto.TrainerRegistration;
 import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.exception.RegistrationException;
+import com.epam.upskill.security.Principal;
 import com.epam.upskill.service.TraineeService;
 import com.epam.upskill.service.TrainerService;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,8 +44,8 @@ class RegistrationControllerTest {
   @Test
   void testTraineeRegistrationSuccess() {
     TraineeRegistration traineeRegistration = new TraineeRegistration(FIRST_NAME, LAST_NAME, ADDRESS, DATE_OF_BIRTH);
-    Trainee trainee = new Trainee();
-    when(traineeService.saveTrainee(traineeRegistration)).thenReturn(trainee);
+    var principal = new Principal("username", "password12");
+    when(traineeService.saveTrainee(traineeRegistration)).thenReturn(principal);
     registrationController.traineeRegistration(FIRST_NAME, LAST_NAME, ADDRESS, DATE_OF_BIRTH);
 
   }
@@ -60,7 +61,7 @@ class RegistrationControllerTest {
   @Test
   void testTrainerRegistrationSuccess() {
     TrainerRegistration trainerRegistration = new TrainerRegistration(FIRST_NAME, LAST_NAME, SPECIALIZATION);
-    Trainer trainer = new Trainer();
+    var trainer = new Principal("username", "password12");
     when(trainerService.saveTrainer(trainerRegistration)).thenReturn(trainer);
     registrationController.trainerRegistration(FIRST_NAME, LAST_NAME, SPECIALIZATION);
   }

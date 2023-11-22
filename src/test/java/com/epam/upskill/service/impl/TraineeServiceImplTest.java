@@ -107,11 +107,11 @@ class TraineeServiceImplTest {
   void testSaveTrainee() {
     TraineeRegistration traineeDto = new TraineeRegistration("John", "Doe", "address1",
         LocalDate.now().minusYears(15));
-    Trainee trainee = new Trainee();
+    var trainee = new Trainee();
     when(userService.findAll()).thenReturn(Collections.emptyList());
     when(traineeConverter.toTrainee(traineeDto)).thenReturn(trainee);
     when(traineeRepository.save(trainee)).thenReturn(trainee);
-    Trainee result = traineeService.saveTrainee(traineeDto);
+    var result = traineeService.saveTrainee(traineeDto);
     assertEquals(trainee, result);
   }
 

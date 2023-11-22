@@ -4,6 +4,7 @@ import com.epam.upskill.dto.TraineeRegistration;
 import com.epam.upskill.dto.TraineeUpdateRequest;
 import com.epam.upskill.dto.TrainerDtoForTrainee;
 import com.epam.upskill.entity.Trainee;
+import com.epam.upskill.security.Principal;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public interface TraineeService {
 
   Trainee findByUsernameAndPassword(String username, String password);
 
-  Trainee saveTrainee(TraineeRegistration trainee);
+  Principal saveTrainee(TraineeRegistration trainee);
 
   List<Trainee> findAll();
 

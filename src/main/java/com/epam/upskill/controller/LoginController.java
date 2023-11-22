@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,8 @@ import javax.validation.constraints.Size;
 public class LoginController {
   @Autowired
   private Counter customRequestsCounter;
-
+  @Autowired
+  private PasswordEncoder passwordEncoder;
   @Autowired
   private Timer customRequestLatencyTimer;
 
@@ -40,7 +42,7 @@ public class LoginController {
     customRequestsCounter.increment();
     var user = userService.findByUsername(username);
     sample.stop(customRequestLatencyTimer);
-    if (!user.getPassword().equals(password)) {
+    if (!passwordEncoder.matches(password, user.getPassword())) {
       throw new AuthenticationException(", reason: wrong password");
     }
   }

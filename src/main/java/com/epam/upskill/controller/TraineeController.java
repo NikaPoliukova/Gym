@@ -95,8 +95,7 @@ public class TraineeController {
                                                       @RequestParam("trainingDate") @NotBlank String trainingDate,
                                                       @RequestParam("trainingName") @NotBlank String trainingName,
                                                       @RequestBody @NotEmpty List<TrainersDtoList> list) {
-    var dto = new UpdateTraineeTrainerDto(username, trainingDate,
-        trainingName, list);
+    var dto = new UpdateTraineeTrainerDto(username, trainingDate, trainingName, list);
     return trainingService.updateTraineeTrainerList(dto);
 
   }

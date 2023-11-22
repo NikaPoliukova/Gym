@@ -8,6 +8,7 @@ import com.epam.upskill.dto.TraineeUpdateRequest;
 import com.epam.upskill.dto.TrainerDtoForTrainee;
 import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.exception.UserNotFoundException;
+import com.epam.upskill.security.Principal;
 import com.epam.upskill.service.TraineeService;
 import com.epam.upskill.service.UserService;
 import com.epam.upskill.util.UserUtils;
@@ -63,14 +64,15 @@ public class TraineeServiceImpl implements TraineeService {
 
   @Override
   @Transactional
-  public Trainee saveTrainee(TraineeRegistration traineeDto) {
+  public Principal saveTrainee(TraineeRegistration traineeDto) {
     var username = UserUtils.createUsername(traineeDto.firstName(), traineeDto.lastName(),
         userService.findAll());
     var password =UserUtils.generateRandomPassword();
     var hashedPassword  =  passwordEncoder.encode(password);
     var trainee = traineeConverter.toTrainee(traineeDto);
     fillInTheTrainee(traineeDto, username, hashedPassword, trainee);
-    return traineeRepository.save(trainee);
+    var savedTrainee = traineeRepository.save(trainee);
+    return new Principal(savedTrainee.getUsername(),password);
   }
 
   @Override

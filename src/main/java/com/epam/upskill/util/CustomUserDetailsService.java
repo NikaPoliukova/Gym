@@ -24,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
     return User.withUsername(user.get().getUsername())
         .password(user.get().getPassword())
-        .authorities(Collections.emptyList()) // Пустая коллекция ролей
+        .authorities(Collections.emptyList())
         .build();
   }
 }

@@ -4,6 +4,7 @@ import com.epam.upskill.dto.TraineeDtoForTrainer;
 import com.epam.upskill.dto.TrainerRegistration;
 import com.epam.upskill.dto.TrainerUpdateRequest;
 import com.epam.upskill.entity.Trainer;
+import com.epam.upskill.security.Principal;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public interface TrainerService {
 
   List<Trainer> findAll();
 
-  Trainer saveTrainer(TrainerRegistration trainerDto);
+  Principal saveTrainer(TrainerRegistration trainerDto);
 
   Trainer update(TrainerUpdateRequest request);
 

@@ -85,6 +85,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   @ExceptionHandler(InvalidDataAccessApiUsageException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
   public String handleInvalidDataAccessApiUsageException(InvalidDataAccessApiUsageException ex) {
     return "training type was not found";

@@ -8,8 +8,10 @@ import com.epam.upskill.service.TrainerService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,8 +38,7 @@ public class RegistrationController {
                                        @RequestParam(required = false)
                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateOfBirth) {
     TraineeRegistration traineeRegistration = new TraineeRegistration(firstName, lastName, address, dateOfBirth);
-    var trainee = traineeService.saveTrainee(traineeRegistration);
-    return new Principal(trainee.getUsername(), trainee.getPassword());
+    return traineeService.saveTrainee(traineeRegistration);
   }
 
   @PostMapping("/trainer")
@@ -47,7 +48,6 @@ public class RegistrationController {
                                        @RequestParam("lastName") @NotBlank @Size(min = 2, max = 30) String lastName,
                                        @RequestParam("specialization") @NotBlank String specialization) {
     TrainerRegistration trainerRegistration = new TrainerRegistration(firstName, lastName, specialization);
-    var trainer = trainerService.saveTrainer(trainerRegistration);
-    return new Principal(trainer.getUsername(), trainer.getPassword());
+    return trainerService.saveTrainer(trainerRegistration);
   }
 }

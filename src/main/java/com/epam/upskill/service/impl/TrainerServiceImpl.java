@@ -10,6 +10,7 @@ import com.epam.upskill.entity.Trainee;
 import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.TrainingType;
 import com.epam.upskill.exception.UserNotFoundException;
+import com.epam.upskill.security.Principal;
 import com.epam.upskill.service.TrainerService;
 import com.epam.upskill.service.UserService;
 import com.epam.upskill.util.UserUtils;
@@ -65,7 +66,7 @@ public class TrainerServiceImpl implements TrainerService {
 
   @Override
   @Transactional
-  public Trainer saveTrainer(TrainerRegistration trainerRegistration) {
+  public Principal saveTrainer(TrainerRegistration trainerRegistration) {
     var username = UserUtils.createUsername(trainerRegistration.firstName(), trainerRegistration.lastName(),
         userService.findAll());
     var password = UserUtils.generateRandomPassword();
@@ -73,7 +74,8 @@ public class TrainerServiceImpl implements TrainerService {
     Trainer trainer = new Trainer();
     TrainingType trainingType = trainingRepository.findTrainingTypeByName(trainerRegistration.specialization());
     fillInTheTrainer(trainerRegistration, username, hashedPassword, trainer, trainingType);
-    return trainerRepository.save(trainer);
+    var savedTrainer = trainerRepository.save(trainer);
+    return new com.epam.upskill.security.Principal(savedTrainer.getUsername(),password);
   }
 
   @Override

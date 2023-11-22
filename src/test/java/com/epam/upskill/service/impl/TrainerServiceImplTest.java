@@ -106,18 +106,11 @@ public class TrainerServiceImplTest {
     when(trainingRepository.findTrainingTypeByName(registration.specialization())).thenReturn(trainingType);
     when(userService.findAll()).thenReturn(Collections.emptyList());
     when(trainerRepository.save(any(Trainer.class))).thenReturn(new Trainer());
-    Trainer result = trainerService.saveTrainer(registration);
-    result.setSpecialization(trainingType);
-    result.setUsername(USERNAME);
-    result.setPassword(PASSWORD);
-    result.setActive(true);
+    var result = trainerService.saveTrainer(registration);
     assertNotNull(result);
     assertEquals(registration.firstName(), FIRST_NAME);
     assertEquals(registration.lastName(), LAST_NAME);
-    assertEquals(USERNAME, result.getUsername());
-    assertEquals(PASSWORD, result.getPassword());
-    assertTrue(result.isActive());
-    assertEquals(trainingType, result.getSpecialization());
+
   }
 
   @Test
