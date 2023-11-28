@@ -21,7 +21,6 @@ import java.io.IOException;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
   private final JwtUtils jwtUtils;
-  private final UserRepository userRepository;
   private static final String TOKEN_NAME = "JWT";
 
 

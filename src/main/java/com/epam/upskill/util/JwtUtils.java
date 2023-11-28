@@ -93,7 +93,7 @@ public class JwtUtils {
       Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
       return true;
     } catch (Exception ex) {
-      throw new AuthenticationCredentialsNotFoundException("JWT token is not valid " + token);
+      return false;
     }
   }
 

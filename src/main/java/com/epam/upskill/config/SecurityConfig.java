@@ -1,6 +1,7 @@
 package com.epam.upskill.config;
 
 
+import com.epam.upskill.handler.CustomAuthenticationFailureHandler;
 import com.epam.upskill.handler.SuccessAuthHandler;
 import com.epam.upskill.security.filter.JwtFilter;
 import com.epam.upskill.util.CustomUserDetailsService;
@@ -24,6 +25,7 @@ public class SecurityConfig {
   private final CustomUserDetailsService customUserDetailsService;
   private final SuccessAuthHandler successAuthHandler;
   private final JwtFilter jwtFilter;
+  private final CustomAuthenticationFailureHandler authenticationSuccessHandler;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -37,6 +39,7 @@ public class SecurityConfig {
         .formLogin()
         .permitAll()
         .successHandler(successAuthHandler)
+        .failureHandler(authenticationSuccessHandler)
         .and()
         .logout()
         .permitAll()
