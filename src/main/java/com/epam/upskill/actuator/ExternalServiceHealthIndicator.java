@@ -11,7 +11,7 @@ public class ExternalServiceHealthIndicator implements HealthIndicator {
 
   @Override
   public Health health() {
-     return Health.up().withDetail("GymApplication", "Available")
+    return Health.up().withDetail("GymApplication", "Available")
         .withDetail("URL", "http://localhost:8091").build();
   }
 }

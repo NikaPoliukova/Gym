@@ -7,10 +7,10 @@ import com.epam.upskill.dto.UserUpdatePass;
 import com.epam.upskill.entity.User;
 import com.epam.upskill.exception.OperationFailedException;
 import com.epam.upskill.exception.UserNotFoundException;
+import com.epam.upskill.service.HashPassService;
 import com.epam.upskill.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +22,7 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
-  private final PasswordEncoder passwordEncoder;
+  private final HashPassService hashPassService;
 
   @Override
   @Transactional
@@ -48,16 +48,16 @@ public class UserServiceImpl implements UserService {
   @Override
   @Transactional
   public void updatePassword(UserUpdatePass userUpdatePass) {
-    var hashedPassword = passwordEncoder.encode(userUpdatePass.oldPassword());
-    var user = findByUsernameAndPassword(passwordEncoder.encode(userUpdatePass.username()), hashedPassword);
-    user.setPassword(userUpdatePass.newPassword());
+    var hashedPassword = hashPassService.hashPass(userUpdatePass.oldPassword());
+    var user = findByUsernameAndPassword(userUpdatePass.username(), hashedPassword);
+    user.setPassword(hashPassService.hashPass(userUpdatePass.newPassword()));
     userRepository.update(user);
   }
 
   @Override
   @Transactional
   public User findByUsernameAndPassword(String username, String password) {
-    var hashedPassword = passwordEncoder.encode(password);
+    var hashedPassword = hashPassService.hashPass(password);
     return userRepository.findByUsernameAndPassword(username, hashedPassword)
         .orElseThrow(() -> new UserNotFoundException(username));
   }

@@ -67,7 +67,7 @@ public class TrainerController {
     return trainingConverter.toTrainerTrainingResponse(trainingsList);
   }
 
-  @PatchMapping("/toggle-activation")
+  @PatchMapping("/toggle-actilvation")
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Activate or deactivate Trainer's profile")
   public void toggleActivation(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username,

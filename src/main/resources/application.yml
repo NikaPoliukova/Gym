@@ -40,3 +40,8 @@ management:
       metrics:
         enabled: true
 
+security:
+  secretKey: "my_custom_secret_key_nika"
+  refresh_secret: "secretRefresh"
+
+secret: "SECRET"

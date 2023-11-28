@@ -11,7 +11,8 @@ import com.epam.upskill.service.TrainingService;
 import com.epam.upskill.service.UserService;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Timer;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -47,7 +48,8 @@ public class TraineeController {
 
   @GetMapping("/trainee")
   @ResponseStatus(HttpStatus.OK)
-  @ApiOperation("Get Trainee by username")
+  @Operation(summary = "Get Trainee", description = "Get Trainee")
+  @SecurityRequirement(name = "Bearer Authentication")
   public TraineeResponse getTrainee(@RequestParam("username") @NotBlank String username) {
     var trainee = traineeService.findByUsername(username);
     return converter.toTraineeResponse(trainee, traineeService);
@@ -55,7 +57,8 @@ public class TraineeController {
 
   @PutMapping("/trainee/setting/profile")
   @ResponseStatus(HttpStatus.OK)
-  @ApiOperation("Update Trainee profile")
+  @Operation(summary = "Update Trainee profile", description = "Update Trainee profile")
+  @SecurityRequirement(name = "Bearer Authentication")
   public TraineeUpdateResponse updateTrainee(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username,
                                              @RequestParam("firstName") @Size(min = 2, max = 30) String firstName,
                                              @RequestParam("lastName") @Size(min = 2, max = 30) String lastName,
@@ -70,9 +73,10 @@ public class TraineeController {
 
   }
 
+  @Operation(summary = "Delete user", description = "Delete Trainee by username")
+  @SecurityRequirement(name = "Bearer Authentication")
   @DeleteMapping
   @ResponseStatus(HttpStatus.OK)
-  @ApiOperation("Delete Trainee by username")
   public void deleteTrainee(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username) {
     var trainee = traineeService.findByUsername(username);
     userService.delete(trainee.getId());
@@ -80,7 +84,9 @@ public class TraineeController {
 
   @GetMapping("/not-active-trainers")
   @ResponseStatus(HttpStatus.OK)
-  @ApiOperation("Find not assigned active trainers for a Trainee")
+  @Operation(summary = "Find not assigned active trainers for a Trainee",
+      description = "Find not assigned active trainers for a Trainee")
+  @SecurityRequirement(name = "Bearer Authentication")
   public List<TrainerDtoForTrainee> findNotActiveTrainers(@RequestParam("username") @NotBlank
                                                           @Size(min = 2, max = 60) String username) {
     List<Trainer> trainerList = trainingService.findNotAssignedActiveTrainersToTrainee(username);
@@ -89,7 +95,8 @@ public class TraineeController {
 
   @PutMapping("/setting/trainers")
   @ResponseStatus(HttpStatus.OK)
-  @ApiOperation("Update Trainee's trainers")
+  @Operation(summary = "Update Trainee's trainers", description = "Update Trainee's trainers")
+  @SecurityRequirement(name = "Bearer Authentication")
   public List<TrainerDtoForTrainee> updateTrainerList(@RequestParam("username") @NotBlank
                                                       @Size(min = 2, max = 60) String username,
                                                       @RequestParam("trainingDate") @NotBlank String trainingDate,
@@ -102,7 +109,8 @@ public class TraineeController {
 
   @GetMapping("/trainings")
   @ResponseStatus(HttpStatus.OK)
-  @ApiOperation("Find Trainee's trainings")
+  @Operation(summary = "Find Trainee's trainings", description = "Find Trainee's trainings")
+  @SecurityRequirement(name = "Bearer Authentication")
   public List<TrainingTraineeResponse> findTrainingsList(@RequestParam("username") @NotBlank @Size(min = 2, max = 60)
                                                          String username,
                                                          @RequestParam(required = false)
@@ -118,7 +126,8 @@ public class TraineeController {
 
   @PatchMapping("/toggle-activation")
   @ResponseStatus(HttpStatus.OK)
-  @ApiOperation("Activate or deactivate a Trainee's profile")
+  @Operation(summary = "toggle a Trainee's profile", description = "toggle a Trainee's profile")
+  @SecurityRequirement(name = "Bearer Authentication")
   public void toggleActivation(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username,
                                @RequestParam("active") @NotNull boolean isActive) {
     customRequestsCounter.increment();

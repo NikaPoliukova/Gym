@@ -11,12 +11,12 @@ import com.epam.upskill.entity.Trainer;
 import com.epam.upskill.entity.TrainingType;
 import com.epam.upskill.exception.UserNotFoundException;
 import com.epam.upskill.security.Principal;
+import com.epam.upskill.service.HashPassService;
 import com.epam.upskill.service.TrainerService;
 import com.epam.upskill.service.UserService;
 import com.epam.upskill.util.UserUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +28,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class TrainerServiceImpl implements TrainerService {
-  private final PasswordEncoder passwordEncoder;
+  private final HashPassService hashPassService;
   private final TrainerRepository trainerRepository;
   private final UserService userService;
   private final TraineeConverter traineeConverter;
@@ -51,7 +51,7 @@ public class TrainerServiceImpl implements TrainerService {
   @Override
   @Transactional
   public Trainer findByUsernameAndPassword(String username, String password) {
-    var hashedPassword = passwordEncoder.encode(password);
+    var hashedPassword = hashPassService.hashPass(password);
     return trainerRepository.findByUsernameAndPassword(username, hashedPassword).orElseThrow(()
         -> new UserNotFoundException(username));
 
@@ -70,12 +70,12 @@ public class TrainerServiceImpl implements TrainerService {
     var username = UserUtils.createUsername(trainerRegistration.firstName(), trainerRegistration.lastName(),
         userService.findAll());
     var password = UserUtils.generateRandomPassword();
-    var hashedPassword = passwordEncoder.encode(password);
+    var hashedPassword = hashPassService.hashPass(password);
     Trainer trainer = new Trainer();
     TrainingType trainingType = trainingRepository.findTrainingTypeByName(trainerRegistration.specialization());
     fillInTheTrainer(trainerRegistration, username, hashedPassword, trainer, trainingType);
     var savedTrainer = trainerRepository.save(trainer);
-    return new com.epam.upskill.security.Principal(savedTrainer.getUsername(),password);
+    return new com.epam.upskill.security.Principal(savedTrainer.getUsername(), password);
   }
 
   @Override
