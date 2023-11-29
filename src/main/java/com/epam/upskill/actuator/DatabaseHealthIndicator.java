@@ -1,5 +1,6 @@
 package com.epam.upskill.actuator;
 
+import com.epam.upskill.exception.ConnectionException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -19,23 +20,15 @@ public class DatabaseHealthIndicator implements HealthIndicator {
   @Override
   public Health health() {
     try (Connection connection = dataSource.getConnection()) {
-      boolean isDatabaseUp = true;
-
-      if (isDatabaseUp) {
-        return Health.up()
-            .withDetail("database", connection.getMetaData().getDatabaseProductName())
-            .withDetail("url", connection.getMetaData().getURL())
-            .withDetail("user", connection.getMetaData().getUserName())
-            .build();
-      } else {
-        return Health.down()
-            .withDetail("error", "Database is not available")
-            .build();
-      }
-    } catch (SQLException e) {
-      return Health.down()
-          .withDetail("error", "Error connecting to the database: " + e.getMessage())
+      return Health.up()
+          .withDetail("database", connection.getMetaData().getDatabaseProductName())
+          .withDetail("url", connection.getMetaData().getURL())
+          .withDetail("user", connection.getMetaData().getUserName())
           .build();
+
+    } catch (SQLException e) {
+      throw new ConnectionException("No connection");
     }
+
   }
 }

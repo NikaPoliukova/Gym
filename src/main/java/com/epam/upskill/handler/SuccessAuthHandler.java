@@ -25,6 +25,8 @@ public class SuccessAuthHandler extends SimpleUrlAuthenticationSuccessHandler {
   private static final String TOKEN_NAME = "JWT";
   private static final String REFRESH_TOKEN_NAME = "JWT-REFRESH";
   private static final long EXPIRATION = Duration.ofHours(10).toSeconds();
+  public static final String REDIRECT_URL = "http://localhost:8091/home";
+
   private final BruteForceService bruteForceService;
   private final JwtUtils jwtUtils;
   private final UserRepository userRepository;
@@ -37,38 +39,55 @@ public class SuccessAuthHandler extends SimpleUrlAuthenticationSuccessHandler {
     } else {
       var token = jwtUtils.getAccessTokenFromRequest(request);
       var refreshToken = jwtUtils.getRefreshTokenFromRequest(request);
-      if (token == null && refreshToken == null) {
-        var user = userRepository.findByUsername(authentication.getName());
-        String tokenNew = jwtUtils.generateAccessToken(user.get());
-        String refreshTokenNew = jwtUtils.generateRefreshToken(user.get().getUsername());
-        deleteCookies(request, response, TOKEN_NAME);
-        deleteCookies(request, response, REFRESH_TOKEN_NAME);
-        final Cookie cookieAccess = new Cookie(TOKEN_NAME, tokenNew);
-        final Cookie cookieRefresh = new Cookie(REFRESH_TOKEN_NAME, refreshTokenNew);
-        Arrays.asList(cookieRefresh, cookieAccess)
-            .forEach(cookie -> {
-              cookie.setPath("/");
-              cookie.setHttpOnly(true);
-              cookie.setMaxAge((int) EXPIRATION);
-            });
-        response.addCookie(cookieAccess);
-        response.addCookie(cookieRefresh);
-        response.setStatus(HttpStatus.OK.value());
-        setAuthentication(tokenNew);
-        getRedirectStrategy().sendRedirect(request, response, "http://localhost:8091/home");
-      }
+      checkTokens(response, authentication, token, refreshToken);
+      getRedirectStrategy().sendRedirect(request, response, REDIRECT_URL);
     }
   }
 
+  private void checkTokens(HttpServletResponse response, Authentication authentication, String token,
+                           String refreshToken) {
+    if (token == null && refreshToken == null) {
+      var user = userRepository.findByUsername(authentication.getName());
+      var tokenNew = jwtUtils.generateAccessToken(user.get());
+      var refreshTokenNew = jwtUtils.generateRefreshToken(user.get().getUsername());
+      cleanCookies(response);
+      final Cookie cookieAccess = new Cookie(TOKEN_NAME, tokenNew);
+      final Cookie cookieRefresh = new Cookie(REFRESH_TOKEN_NAME, refreshTokenNew);
+      addTokensInCookies(cookieAccess, cookieRefresh);
+      addTokensToResponse(response, cookieAccess, cookieRefresh);
+      setAuthentication(tokenNew);
+    }
+  }
+
+  private static void addTokensInCookies(Cookie cookieAccess, Cookie cookieRefresh) {
+    Arrays.asList(cookieRefresh, cookieAccess)
+        .forEach(cookie -> {
+          cookie.setPath("/");
+          cookie.setHttpOnly(true);
+          cookie.setMaxAge((int) EXPIRATION);
+        });
+  }
+
+  private static void addTokensToResponse(HttpServletResponse response, Cookie cookieAccess, Cookie cookieRefresh) {
+    response.addCookie(cookieAccess);
+    response.addCookie(cookieRefresh);
+    response.setStatus(HttpStatus.OK.value());
+  }
+
+  private void cleanCookies(HttpServletResponse response) {
+    deleteCookies(response, TOKEN_NAME);
+    deleteCookies(response, REFRESH_TOKEN_NAME);
+  }
+
   private void setAuthentication(String token) {
-    String userName = jwtUtils.getUsernameFromToken(token);
-    Authentication authentication = new UsernamePasswordAuthenticationToken(userName, null, null);
+    var userName = jwtUtils.getUsernameFromToken(token);
+    var authentication = new UsernamePasswordAuthenticationToken(userName, null, null);
     SecurityContextHolder.getContext().setAuthentication(authentication);
   }
 
-  private void deleteCookies(HttpServletRequest request, HttpServletResponse response, String... cookieNames) {
+  private void deleteCookies(HttpServletResponse response, String... cookieNames) {
     for (String cookieName : cookieNames) {
-      Cookie cookie = new Cookie(cookieName, null);
+      var cookie = new Cookie(cookieName, null);
       cookie.setPath("/");
       cookie.setMaxAge(0);
       response.addCookie(cookie);

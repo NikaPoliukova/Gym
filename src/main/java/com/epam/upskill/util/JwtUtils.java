@@ -8,12 +8,13 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
 
+import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.security.Key;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -22,14 +23,13 @@ import java.util.Date;
 @Slf4j
 @Component
 public class JwtUtils {
-  // @Value("${security.secretKey}")
-//  private static String secretKey;
-  @Value("${security.refresh_secret}")
-  private static String jwtRefreshSecret;
+  public static final String JWT_REFRESH = "JWT-REFRESH";
+  public static final String JWT = "JWT";
 
-  String secretKey = "111111111111122222222222222224444444444444444444444444444444444444tyutghfcjdecuijednklfcmed" +
-      "fbdsziokplfhivokfplddcgdvgcvdduhvuifmklvmdklmvkfhgvuihfuid8";
+  private static final String secretKey = "111111111111122222222222222224444444444444444444444444444444444444ty" +
+      "utghfcjdecuijednklfcmedfbdsziokplfhivokfplddcgdvgcvdduhvuifmklvmdklmvkfhgvuihfuid8";
 
+  private final Key secret = getSecretKeySpec();
 
   public String generateAccessToken(User user) {
     Claims claims = Jwts.claims().setSubject(user.getUsername());
@@ -38,7 +38,7 @@ public class JwtUtils {
     return Jwts.builder()
         .setClaims(claims)
         .setExpiration(expirationDate)
-        .signWith(SignatureAlgorithm.HS512, secretKey)
+        .signWith(secret, SignatureAlgorithm.HS512)
         .compact();
   }
 
@@ -47,12 +47,12 @@ public class JwtUtils {
     return Jwts.builder()
         .setSubject(username)
         .setExpiration(expirationDate)
-        .signWith(SignatureAlgorithm.HS512, secretKey)
+        .signWith(secret, SignatureAlgorithm.HS512)
         .compact();
   }
 
   public String getRefreshTokenFromRequest(HttpServletRequest request) {
-    Cookie cookie = WebUtils.getCookie(request, "JWT-REFRESH");
+    Cookie cookie = WebUtils.getCookie(request, JWT_REFRESH);
     if (cookie != null) {
       return cookie.getValue();
     }
@@ -60,7 +60,7 @@ public class JwtUtils {
   }
 
   public String getAccessTokenFromRequest(HttpServletRequest request) {
-    Cookie cookie = WebUtils.getCookie(request, "JWT");
+    Cookie cookie = WebUtils.getCookie(request, JWT);
     if (cookie != null) {
       return cookie.getValue();
     }
@@ -71,8 +71,9 @@ public class JwtUtils {
   public String refreshAccessToken(String expiredToken) {
     Claims claims;
     try {
-      claims = Jwts.parser()
+      claims = Jwts.parserBuilder()
           .setSigningKey(secretKey)
+          .build()
           .parseClaimsJws(expiredToken)
           .getBody();
     } catch (ExpiredJwtException e) {
@@ -83,14 +84,17 @@ public class JwtUtils {
         .builder()
         .setClaims(claims)
         .setExpiration(expirationDate)
-        .signWith(SignatureAlgorithm.HS512, secretKey)
+        .signWith(secret, SignatureAlgorithm.HS512)
         .compact();
   }
 
 
   public boolean validateToken(String token) {
     try {
-      Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+      Jwts.parserBuilder()
+          .setSigningKey(secretKey)
+          .build()
+          .parseClaimsJws(token);
       return true;
     } catch (Exception ex) {
       return false;
@@ -98,8 +102,9 @@ public class JwtUtils {
   }
 
   public String getUsernameFromToken(String token) {
-    Claims claims = Jwts.parser()
+    Claims claims = Jwts.parserBuilder()
         .setSigningKey(secretKey)
+        .build()
         .parseClaimsJws(token)
         .getBody();
     return claims.getSubject();
@@ -113,8 +118,9 @@ public class JwtUtils {
   private Date getExpirationDateFromToken(String token) {
     Claims claims;
     try {
-      claims = Jwts.parser()
+      claims = Jwts.parserBuilder()
           .setSigningKey(secretKey)
+          .build()
           .parseClaimsJws(token)
           .getBody();
     } catch (ExpiredJwtException e) {
@@ -127,5 +133,10 @@ public class JwtUtils {
     LocalDateTime now = LocalDateTime.now();
     Instant accessExpirationInstant = now.plusMinutes(min).atZone(ZoneId.systemDefault()).toInstant();
     return Date.from(accessExpirationInstant);
+  }
+
+  private SecretKeySpec getSecretKeySpec() {
+    byte[] secretKeyBytes = secretKey.getBytes();
+    return new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS512.getJcaName());
   }
 }

@@ -1,9 +1,6 @@
 package com.epam.upskill.handler;
 
-import com.epam.upskill.exception.AuthenticationException;
-import com.epam.upskill.exception.OperationFailedException;
-import com.epam.upskill.exception.RegistrationException;
-import com.epam.upskill.exception.UserNotFoundException;
+import com.epam.upskill.exception.*;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -54,6 +51,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @ResponseBody
   public String handleDateTimeParseException(MethodArgumentTypeMismatchException ex) {
     return "Invalid date, enter in the format \"yyyy-mm-dd\"";
+  }
+
+  @ExceptionHandler(ConnectionException.class)
+  @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+  @ResponseBody
+  public String handleConnectionFailedException(ConnectionException ex) {
+    return "ex";
   }
 
   @ExceptionHandler(EntityNotFoundException.class)

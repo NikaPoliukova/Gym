@@ -10,13 +10,7 @@ public class BruteForceService {
 
   public boolean isAccountLocked(HttpServletRequest request, String username) {
     HttpSession session = request.getSession();
-    var isLocked = (Long) session.getAttribute(username + "_locked");
     Long unlockTime = (Long) session.getAttribute(username + "_unlockTime");
-    if (isLocked == null && unlockTime == null) {
-      return false;
-    }
-    if (unlockTime > System.currentTimeMillis()) {
-      return false;
-    } else return true;
+    return unlockTime == null || unlockTime > System.currentTimeMillis();
   }
 }
