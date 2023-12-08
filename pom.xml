@@ -21,9 +21,9 @@
         <jackson-databind.version>2.13.1</jackson-databind.version>
         <spring-boot-starter-web.version>2.7.5</spring-boot-starter-web.version>
         <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
-        <lombok-mapstruct.version>0.2.0</lombok-mapstruct.version>
         <spring.cloud.starter.openfeign>3.1.4</spring.cloud.starter.openfeign>
         <feign.httpclient>11.8</feign.httpclient>
+        <lombok-mapstruct.version>0.2.0</lombok-mapstruct.version>
     </properties>
     <dependencies>
         <dependency>
@@ -54,11 +54,7 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
             <version>${jackson-databind.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct</artifactId>
-            <version>${org.mapstruct.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
@@ -99,11 +95,6 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
             <version>5.5.6.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.5.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -168,11 +159,7 @@
             <artifactId>springdoc-openapi-ui</artifactId>
             <version>1.6.11</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
-            <version>${spring-boot-starter-web.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
@@ -216,11 +203,7 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
             <version>3.1.4</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
-            <version>3.1.4</version>
-        </dependency>
+
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>

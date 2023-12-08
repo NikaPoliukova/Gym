@@ -67,12 +67,12 @@ public class TrainerServiceImpl implements TrainerService {
   @Override
   @Transactional
   public Principal saveTrainer(TrainerRegistration trainerRegistration) {
-    var username = UserUtils.createUsername(trainerRegistration.firstName(), trainerRegistration.lastName(),
+    var username = UserUtils.createUsername(trainerRegistration.getFirstName(), trainerRegistration.getLastName(),
         userService.findAll());
     var password = UserUtils.generateRandomPassword();
     var hashedPassword = hashPassService.hashPass(password);
     Trainer trainer = new Trainer();
-    TrainingType trainingType = trainingRepository.findTrainingTypeByName(trainerRegistration.specialization());
+    TrainingType trainingType = trainingRepository.findTrainingTypeByName(trainerRegistration.getSpecialization());
     fillInTheTrainer(trainerRegistration, username, hashedPassword, trainer, trainingType);
     var savedTrainer = trainerRepository.save(trainer);
     return new Principal(savedTrainer.getUsername(), password);
@@ -120,8 +120,8 @@ public class TrainerServiceImpl implements TrainerService {
 
   private static void fillInTheTrainer(TrainerRegistration trainerRegistration, String username, String password,
                                        Trainer trainer, TrainingType trainingType) {
-    trainer.setFirstName(trainerRegistration.firstName());
-    trainer.setLastName(trainerRegistration.lastName());
+    trainer.setFirstName(trainerRegistration.getFirstName());
+    trainer.setLastName(trainerRegistration.getLastName());
     trainer.setUsername(username);
     trainer.setPassword(password);
     trainer.setActive(true);

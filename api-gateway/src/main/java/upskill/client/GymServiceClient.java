@@ -10,146 +10,132 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import upskill.dto.*;
+import upskill.entity.Training;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
 
 
-
 @Validated
-@FeignClient(name = "gym", url = "${services.gym.url}")
+@FeignClient(name = "gym-service")
 public interface GymServiceClient {
 
   @PostMapping("/registration/trainee")
   @ResponseStatus(HttpStatus.CREATED)
   @ApiOperation("Register a new trainee")
-  public Principal traineeRegistration(@RequestParam("firstName") @NotBlank @Size(min = 2, max = 30) String firstName,
-                                       @RequestParam("lastName") @NotBlank @Size(min = 2, max = 30) String lastName,
-                                       @RequestParam(required = false) @Size(min = 2) String address,
-                                       @RequestParam(required = false)
-                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateOfBirth);
+  Principal traineeRegistration(@RequestBody TraineeRegistration traineeRegistration);
 
   @PostMapping("/registration/trainer")
   @ResponseStatus(HttpStatus.CREATED)
   @ApiOperation("Register a new trainer")
-  Principal trainerRegistration(@RequestParam("firstName") @NotBlank @Size(min = 2, max = 30) String firstName,
-                                @RequestParam("lastName") @NotBlank @Size(min = 2, max = 30) String lastName,
-                                @RequestParam("specialization") @NotBlank String specialization);
+  Principal trainerRegistration(@RequestBody TrainerRegistration trainerRegistration);
 
   //trainee controller
   @GetMapping("/trainees/trainee")
   @ResponseStatus(HttpStatus.OK)
   @Operation(summary = "Get Trainee", description = "Get Trainee")
   @SecurityRequirement(name = "Bearer Authentication")
-  TraineeResponse getTrainee(@RequestParam("username") @NotBlank String username);
+  TraineeResponse getTrainee(@RequestParam("username") String username);
 
   @PutMapping("/trainees/trainee/setting/profile")
   @ResponseStatus(HttpStatus.OK)
   @Operation(summary = "Update Trainee profile", description = "Update Trainee profile")
   @SecurityRequirement(name = "Bearer Authentication")
-  TraineeUpdateResponse updateTrainee(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username,
-                                      @RequestParam("firstName") @Size(min = 2, max = 30) String firstName,
-                                      @RequestParam("lastName") @Size(min = 2, max = 30) String lastName,
-                                      @RequestParam(required = false)
+  TraineeUpdateResponse updateTrainee(@RequestParam("username") String username,
+                                      @RequestParam("firstName") String firstName,
+                                      @RequestParam("lastName") String lastName,
+                                      @RequestParam(value = "dateOfBirth", required = false)
                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateOfBirth,
-                                      @RequestParam(value = "address", required = false) @Size(min = 5) String address,
-                                      @RequestParam("isActive") @NotNull boolean isActive);
+                                      @RequestParam(value = "address", required = false) String address,
+                                      @RequestParam("isActive") boolean isActive);
 
   @Operation(summary = "Delete user", description = "Delete Trainee by username")
   @SecurityRequirement(name = "Bearer Authentication")
   @DeleteMapping("/trainees")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  void deleteTrainee(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username);
+  void deleteTrainee(@RequestParam("username") String username);
 
   @GetMapping("/trainees/not-active-trainers")
   @ResponseStatus(HttpStatus.OK)
   @Operation(summary = "Find not assigned active trainers for a Trainee",
       description = "Find not assigned active trainers for a Trainee")
   @SecurityRequirement(name = "Bearer Authentication")
-  List<TrainerDtoForTrainee> findNotActiveTrainers(@RequestParam("username") @NotBlank
-                                                   @Size(min = 2, max = 60) String username);
+  List<TrainerDtoForTrainee> findNotActiveTrainers(@RequestParam("username") String username);
 
   @PutMapping("/trainees/setting/trainers")
   @ResponseStatus(HttpStatus.OK)
   @Operation(summary = "Update Trainee's trainers", description = "Update Trainee's trainers")
   @SecurityRequirement(name = "Bearer Authentication")
-  List<TrainerDtoForTrainee> updateTrainerList(@RequestParam("username") @NotBlank
-                                               @Size(min = 2, max = 60) String username,
-                                               @RequestParam("trainingDate") @NotBlank String trainingDate,
-                                               @RequestParam("trainingName") @NotBlank String trainingName,
-                                               @RequestBody @NotEmpty List<TrainersDtoList> list);
+  List<TrainerDtoForTrainee> updateTrainerList(@RequestParam("username") String username,
+                                               @RequestParam("trainingDate") String trainingDate,
+                                               @RequestParam("trainingName") String trainingName,
+                                               @RequestBody List<TrainersDtoList> list);
 
   @GetMapping("/trainees/trainings")
   @ResponseStatus(HttpStatus.OK)
   @Operation(summary = "Find Trainee's trainings", description = "Find Trainee's trainings")
   @SecurityRequirement(name = "Bearer Authentication")
-  List<TrainingTraineeResponse> findTrainingsList(@RequestParam("username") @NotBlank @Size(min = 2, max = 60)
-                                                  String username,
-                                                  @RequestParam(required = false)
+  List<TrainingTraineeResponse> findTrainingsList(@RequestParam("username") String username,
+                                                  @RequestParam(value = "periodFrom", required = false)
                                                   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodFrom,
-                                                  @RequestParam(required = false)
+                                                  @RequestParam(value = "periodTo", required = false)
                                                   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodTo,
-                                                  @RequestParam(required = false) String trainerName,
-                                                  @RequestParam(required = false) String trainingType);
+                                                  @RequestParam(value = "trainerName", required = false) String trainerName,
+                                                  @RequestParam(value = "trainingType", required = false) String trainingType);
 
   @PatchMapping("/trainees/toggle-activation")
   @ResponseStatus(HttpStatus.OK)
   @Operation(summary = "toggle a Trainee's profile", description = "toggle a Trainee's profile")
   @SecurityRequirement(name = "Bearer Authentication")
-  void toggleActivation(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username,
-                        @RequestParam("active") @NotNull boolean isActive);
+  void toggleActivation(@RequestParam("username") String username,
+                        @RequestParam("active") boolean isActive);
 
   //trainer controller
-  @GetMapping("/trainers/trainer")
+  @GetMapping("/api/v1/trainers/trainer")
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Get Trainer by username")
-  TrainerResponse getTrainer(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username);
+  TrainerResponse getTrainer(@RequestParam("username") String username);
 
 
   @PutMapping("/trainers/trainer/setting/profile")
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Update Trainer's profile")
-  TrainerUpdateResponse updateTrainer(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username,
-                                      @RequestParam("firstName") @NotBlank @Size(min = 2, max = 30) String firstName,
-                                      @RequestParam("lastName") @NotBlank @Size(min = 2, max = 30) String lastName,
-                                      @RequestParam("specialization") @NotBlank String specialization,
-                                      @RequestParam("isActive") @NotNull boolean isActive);
+  TrainerUpdateResponse updateTrainer(@RequestParam("username") String username,
+                                      @RequestParam("firstName") String firstName,
+                                      @RequestParam("lastName") String lastName,
+                                      @RequestParam("specialization") String specialization,
+                                      @RequestParam("isActive") boolean isActive);
 
 
   @GetMapping("/trainers/trainer/trainings")
   @ApiOperation("Find Trainer's trainings")
-  List<TrainingTrainerResponse> findTrainerTrainingsList(@RequestParam("username") @NotBlank
-                                                         @Size(min = 2, max = 60) String username,
-                                                         @RequestParam(required = false)
+  List<TrainingTrainerResponse> findTrainerTrainingsList(@RequestParam("username") String username,
+                                                         @RequestParam(value = "periodFrom", required = false)
                                                          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                                                          LocalDate periodFrom,
-                                                         @RequestParam(required = false)
+                                                         @RequestParam(value = "periodTo", required = false)
                                                          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                                                          LocalDate periodTo,
-                                                         @RequestParam(required = false) String traineeName);
+                                                         @RequestParam(value = "traineeName", required = false)
+                                                         String traineeName);
 
   @PatchMapping("/trainers/trainer/toggle-activation")
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Activate or deactivate Trainer's profile")
-  void toggleActivationTrainer(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username,
-                               @RequestParam("active") @NotNull boolean isActive);
+  void toggleActivationTrainer(@RequestParam("username") String username,
+                               @RequestParam("active") boolean isActive);
 
   //training controller
 
   @PostMapping("/trainings/new-training")
   @ResponseStatus(HttpStatus.CREATED)
   @ApiOperation("Save training")
-  void saveTraining(@RequestBody @Valid TrainingRequest trainingRequest);
+  Training saveTraining(@RequestBody TrainingRequest trainingRequest);
 
   @PostMapping("/trainings/training")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @ApiOperation("delete training")
-  void deleteTraining(@RequestBody @Valid TrainingRequestDto trainingRequest);
+  void deleteTraining(@RequestBody TrainingRequestDto trainingRequest);
 
   @ApiOperation("Get a list of training types")
   @ResponseStatus(HttpStatus.OK)
@@ -161,8 +147,7 @@ public interface GymServiceClient {
   @PutMapping("/users/user/setting/login")
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Change login")
-  void changeLogin(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username,
-                   @RequestParam("oldPassword") @NotBlank @Size(min = 10, max = 10) String oldPassword,
-                   @RequestParam("newPassword") @NotBlank @Size(min = 10, max = 10, message = "New password must" +
-                       " be 10 characters") String newPassword);
+  void changeLogin(@RequestParam("username") String username,
+                   @RequestParam("oldPassword") String oldPassword,
+                   @RequestParam("newPassword") String newPassword);
 }

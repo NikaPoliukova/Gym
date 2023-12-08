@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: gym
+    name: gym-service
   config:
     activate:
       on-profile: default
@@ -12,7 +12,10 @@ spring:
     username: postgres
     password: nikucha666
     driver-class-name: org.postgresql.Driver
-
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
   jpa:
     show-sql: true
 
@@ -44,16 +47,20 @@ management:
 
 secret: "SECRET"
 
-feign:
-  client:
-    config:
-      domain:
-        connectTimeout: 5000
-        readTimeout: 3000
+#feign:
+#  client:
+#    config:
+#      domain:
+#        connectTimeout: 5000
+#        readTimeout: 3000
 
 eureka:
   client:
     serviceUrl:
-      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+      defaultZone: ${EUREKA_URI:http://127.0.0.1:8761/eureka}
   instance:
-    preferIpAddress: true
+    hostname: 127.0.0.1
+    preferIpAddress: false
+#ribbon:
+#  eureka:
+#    enabled: true

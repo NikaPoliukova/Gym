@@ -8,11 +8,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import upskill.dto.TrainerTrainingDtoForSave;
+import upskill.dto.TrainingRequestDto;
 import upskill.entity.TrainerTraining;
 import upskill.service.TrainerWorkloadService;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
@@ -24,53 +26,53 @@ import java.time.LocalDate;
 public class TrainerWorkloadController {
   private final TrainerWorkloadService workloadService;
 
-  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE,
-      value = "/new-training")
+  @PostMapping("/new-training")
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Save training")
-  public void saveTraining(@RequestParam("trainerUsername") @NotBlank @Size(min = 2, max = 60) String trainerUsername,
-                           @RequestParam("firstName") @NotBlank @Size(min = 2, max = 30) String firstName,
-                           @RequestParam("lastName") @NotBlank @Size(min = 2, max = 30) String lastName,
-                           @RequestParam("trainingName") @NotBlank @Size(min = 2, max = 100) String trainingName,
-                           @RequestParam("trainingDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate trainingDate,
-                           @RequestParam("trainingType") @NotBlank String trainingType,
-                           @RequestParam("trainingDuration") @NotNull int duration) {
-    var trainingRequest = TrainerTraining.builder()
-        .trainerUsername(trainerUsername)
-        .firstName(firstName)
-        .lastName(lastName)
-        .trainingName(trainingName)
-        .trainingDate(trainingDate)
-        .trainingType(trainingType)
-        .trainingDuration(duration)
-        .build();
+  public void saveTraining(@Valid @RequestBody TrainerTrainingDtoForSave trainingDto) {
+    var trainingRequest = convertToTrainingRequest(trainingDto);
     workloadService.save(trainingRequest);
   }
+
 
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("delete training")
-  public void deleteTraining(@RequestParam("trainerUsername") @NotBlank @Size(min = 2, max = 60) String trainerUsername,
-                             @RequestParam("trainingName") @NotBlank @Size(min = 2, max = 100) String trainingName,
-                             @RequestParam("trainingDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate trainingDate,
-                             @RequestParam("trainingType") @NotBlank String trainingType,
-                             @RequestParam("trainingDuration") @NotNull int duration) {
-    var trainingRequest = TrainerTraining.builder()
-        .trainerUsername(trainerUsername)
-        .trainingName(trainingName)
-        .trainingDate(trainingDate)
-        .trainingType(trainingType)
-        .trainingDuration(duration).build();
+  public void deleteTraining(@Valid @RequestBody TrainingRequestDto trainingDto) {
+    var trainingRequest = convertToTrainingRequest(trainingDto);
     workloadService.delete(trainingRequest);
   }
 
   @ApiOperation("Get a summary duration")
   @ResponseStatus(HttpStatus.OK)
-  @GetMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping
   Integer getTrainerWorkload(@RequestParam("trainerUsername") @NotBlank @Size(min = 2, max = 60) String trainerUsername,
+                             @RequestParam("periodFrom")
                              @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodFrom,
-                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodTo,
-                             @RequestParam(required = false) @Size(min = 2) String trainingType) {
+                             @RequestParam("periodTo") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodTo,
+                             @RequestParam(value = "trainingType", required = false) @Size(min = 2) String trainingType) {
     return workloadService.getTrainerWorkload(trainerUsername, periodFrom, periodTo, trainingType);
   }
+
+  private static TrainerTraining convertToTrainingRequest(TrainingRequestDto trainingDto) {
+    return TrainerTraining.builder()
+        .trainerUsername(trainingDto.getTrainerUsername())
+        .trainingName(trainingDto.getTrainingName())
+        .trainingDate(trainingDto.getTrainingDate())
+        .trainingType(trainingDto.getTrainingType())
+        .trainingDuration(trainingDto.getDuration()).build();
+  }
+
+  private static TrainerTraining convertToTrainingRequest(TrainerTrainingDtoForSave trainingDto) {
+    return TrainerTraining.builder()
+        .trainerUsername(trainingDto.getTrainerUsername())
+        .firstName(trainingDto.getFirstName())
+        .lastName(trainingDto.getLastName())
+        .trainingName(trainingDto.getTrainingName())
+        .trainingDate(trainingDto.getTrainingDate())
+        .trainingType(trainingDto.getTrainingType())
+        .trainingDuration(trainingDto.getDuration())
+        .build();
+  }
+
 }

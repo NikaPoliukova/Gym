@@ -7,12 +7,12 @@ import org.springframework.transaction.annotation.Transactional;
 import upskill.converter.TraineeConverter;
 import upskill.converter.TrainerConverter;
 import upskill.dao.TraineeRepository;
+import upskill.dto.Principal;
 import upskill.dto.TraineeRegistration;
 import upskill.dto.TraineeUpdateRequest;
 import upskill.dto.TrainerDtoForTrainee;
 import upskill.entity.Trainee;
 import upskill.exception.UserNotFoundException;
-import upskill.dto.Principal;
 import upskill.service.HashPassService;
 import upskill.service.TraineeService;
 import upskill.service.UserService;
@@ -65,7 +65,7 @@ public class TraineeServiceImpl implements TraineeService {
   @Override
   @Transactional
   public Principal saveTrainee(TraineeRegistration traineeDto) {
-    var username = UserUtils.createUsername(traineeDto.firstName(), traineeDto.lastName(),
+    var username = UserUtils.createUsername(traineeDto.getFirstName(), traineeDto.getLastName(),
         userService.findAll());
     var password = UserUtils.generateRandomPassword();
     var hashedPassword = hashPassService.hashPass(password);
@@ -111,8 +111,8 @@ public class TraineeServiceImpl implements TraineeService {
 
   private static void fillInTheTrainee(TraineeRegistration traineeDto, String username, String password,
                                        Trainee trainee) {
-    trainee.setFirstName(traineeDto.firstName());
-    trainee.setLastName(traineeDto.lastName());
+    trainee.setFirstName(traineeDto.getFirstName());
+    trainee.setLastName(traineeDto.getLastName());
     trainee.setPassword(password);
     trainee.setUsername(username);
     trainee.setActive(true);

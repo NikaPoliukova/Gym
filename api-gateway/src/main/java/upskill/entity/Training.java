@@ -1,18 +1,18 @@
 package upskill.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 
-@RequiredArgsConstructor
-@Getter
-@Builder
-@Setter
 @Entity
+@Getter
 @Table(name = "training")
 @AllArgsConstructor
+@NoArgsConstructor
 public class Training {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,19 +39,4 @@ public class Training {
   @ManyToOne
   @JoinColumn(name = "training_type_id")
   private TrainingType trainingType;
-
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    Training training = (Training) o;
-    return id == training.id; // Сравниваем по id
-  }
-
-  @Override
-  public int hashCode() {
-    return (int) (id ^ (id >>> 32));
-  }
-
 }

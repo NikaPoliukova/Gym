@@ -1,21 +1,27 @@
 package upskill.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+
 @Getter
 @Setter
-@Validated
-public class TraineeRegistration {
+@AllArgsConstructor
+@Builder
+public class TrainerTrainingDtoForSave {
+  @NotBlank @Size(min = 2, max = 60) String trainerUsername;
   @NotBlank @Size(min = 2, max = 30) String firstName;
   @NotBlank @Size(min = 2, max = 30) String lastName;
-  @Size(min = 2) String address;
+  @NotBlank @Size(min = 2, max = 100) String trainingName;
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-  LocalDate dateOfBirth;
+  LocalDate trainingDate;
+  @NotBlank String trainingType;
+  @NotNull int duration;
 }
-

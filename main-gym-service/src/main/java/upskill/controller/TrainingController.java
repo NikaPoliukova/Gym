@@ -10,6 +10,7 @@ import upskill.converter.TrainingTypeConverter;
 import upskill.dto.TrainingRequest;
 import upskill.dto.TrainingRequestDto;
 import upskill.dto.TrainingTypeResponse;
+import upskill.entity.Training;
 import upskill.service.TrainingService;
 
 import javax.validation.Valid;
@@ -29,8 +30,8 @@ public class TrainingController {
   @PostMapping("/new-training")
   @ResponseStatus(HttpStatus.CREATED)
   @ApiOperation("Save training")
-  public void saveTraining(@RequestBody @Valid TrainingRequest trainingRequest) {
-    trainingService.saveTraining(trainingRequest);
+  public Training saveTraining(@RequestBody @Valid TrainingRequest trainingRequest) {
+   return trainingService.saveTraining(trainingRequest);
   }
 
   @PostMapping("/training")

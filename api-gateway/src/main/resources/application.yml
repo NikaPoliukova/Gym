@@ -3,17 +3,7 @@ server:
 
 spring:
   application:
-    name: gateway
-  cloud:
-    gateway:
-      discovery:
-        locator:
-          enabled: true
-  main:
-    web-application-type: reactive
-    allow-bean-definition-overriding: true
-
-
+    name: gateway-service
 
   datasource:
     url: jdbc:postgresql://localhost:5432/gym_bd
@@ -24,28 +14,32 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
+    gateway:
+      routes:
+        - id: gym-service
+          uri: lb://gym-service
+          predicates:
+            - Path=/gym-service/**
+          filters:
+            - StripPrefix=1
 
-services:
-  gym:
-    url: 'http://localhost:8091/api/v1'
-  workload:
-    url: 'http://localhost:8092/api/v1/trainer/workload'
-
-feign:
-  client:
-    config:
-      domain:
-        connectTimeout: 5000
-        readTimeout: 3000
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
-  instance:
-    preferIpAddress: true
+        - id: workload-service
+          uri: lb://workload-service
+          predicates:
+            - Path=/workload-service/**
+          filters:
+            - StripPrefix=1
+#ribbon:
+#  eureka:
+#    enabled: true
 
 logging:
   level:
+    com.netflix.loadbalancer: DEBUG
     org.hibernate.SQL: DEBUG
     upskill.logger: DEBUG
     org.springframework.security: DEBUG
@@ -59,3 +53,24 @@ management:
   endpoint:
     health:
       show-details: ALWAYS
+
+secret: "SECRET"
+
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://127.0.0.1:8761/eureka}
+  instance:
+    hostname: 127.0.0.1
+    preferIpAddress: false
+
+#feign:
+#  client:
+#    config:
+#      domain:
+#        connectTimeout: 5000
+#        readTimeout: 3000
+
+
+

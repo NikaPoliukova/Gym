@@ -21,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/trainers/trainer")
+@RequestMapping("/api/v1/trainers/trainer")
 @Validated
 public class TrainerController {
 
@@ -70,7 +70,7 @@ public class TrainerController {
   @PatchMapping("/toggle-actilvation")
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Activate or deactivate Trainer's profile")
-  public void toggleActivation(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username,
+  public void toggleActivationTrainer(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username,
                                @RequestParam("active") @NotNull boolean isActive) {
     var trainer = trainerService.findByUsername(username);
     trainerService.toggleProfileActivation(trainer.getId(), isActive);

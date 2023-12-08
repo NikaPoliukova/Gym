@@ -22,7 +22,7 @@ public class TrainerWorkloadService {
 
   public Integer getTrainerWorkload(String trainerUsername, LocalDate periodFrom, LocalDate periodTo,
                                     String trainingType) {
-    if (periodFrom.isAfter(periodTo)) {
+    if (periodTo.isAfter(periodFrom)) {
       if (trainingType.isEmpty()) {
         List<TrainerTraining> list =
             trainerWorkloadRepository.findByTrainerUsernameAndTrainingDateBetween(trainerUsername, periodFrom, periodTo);
