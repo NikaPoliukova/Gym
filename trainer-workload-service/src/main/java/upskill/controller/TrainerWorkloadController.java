@@ -24,23 +24,26 @@ import java.time.LocalDate;
 @Validated
 @RequestMapping("/api/v1/trainer/workload")
 public class TrainerWorkloadController {
+
   private final TrainerWorkloadService workloadService;
 
-  @PostMapping("/new-training")
-  @ResponseStatus(HttpStatus.OK)
+  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE,
+      value = "/new-training")
+  @ResponseStatus(HttpStatus.CREATED)
   @ApiOperation("Save training")
-  public void saveTraining(@Valid @RequestBody TrainerTrainingDtoForSave trainingDto) {
+  public TrainerTraining saveTraining(@Valid @RequestBody TrainerTrainingDtoForSave trainingDto,
+                                      @RequestHeader("Authorization") String header) {
     var trainingRequest = convertToTrainingRequest(trainingDto);
-    workloadService.save(trainingRequest);
+    return workloadService.save(trainingRequest);
   }
 
 
-  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  @ResponseStatus(HttpStatus.OK)
+  @DeleteMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   @ApiOperation("delete training")
   public void deleteTraining(@Valid @RequestBody TrainingRequestDto trainingDto) {
-    var trainingRequest = convertToTrainingRequest(trainingDto);
-    workloadService.delete(trainingRequest);
+    workloadService.delete(trainingDto);
+
   }
 
   @ApiOperation("Get a summary duration")
@@ -53,15 +56,14 @@ public class TrainerWorkloadController {
                              @RequestParam(value = "trainingType", required = false) @Size(min = 2) String trainingType) {
     return workloadService.getTrainerWorkload(trainerUsername, periodFrom, periodTo, trainingType);
   }
-
-  private static TrainerTraining convertToTrainingRequest(TrainingRequestDto trainingDto) {
-    return TrainerTraining.builder()
-        .trainerUsername(trainingDto.getTrainerUsername())
-        .trainingName(trainingDto.getTrainingName())
-        .trainingDate(trainingDto.getTrainingDate())
-        .trainingType(trainingDto.getTrainingType())
-        .trainingDuration(trainingDto.getDuration()).build();
-  }
+//  private static TrainerTraining convertToTrainingRequest(TrainingRequestDto trainingDto) {
+//    return TrainerTraining.builder()
+//        .trainerUsername(trainingDto.getTrainerUsername())
+//        .trainingName(trainingDto.getTrainingName())
+//        .trainingDate(trainingDto.getTrainingDate())
+//        .trainingType(trainingDto.getTrainingType())
+//        .trainingDuration(trainingDto.getDuration()).build();
+//  }
 
   private static TrainerTraining convertToTrainingRequest(TrainerTrainingDtoForSave trainingDto) {
     return TrainerTraining.builder()

@@ -3,8 +3,8 @@ package upskill.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import upskill.client.GatewayClient;
 import upskill.converter.TrainingConverter;
 import upskill.dao.TrainingRepository;
 import upskill.dto.*;
@@ -15,6 +15,7 @@ import upskill.entity.TrainingType;
 import upskill.exception.OperationFailedException;
 import upskill.exception.TrainingNotFoundException;
 import upskill.exception.UserNotFoundException;
+import upskill.security.JwtUtils;
 import upskill.service.TraineeService;
 import upskill.service.TrainerService;
 import upskill.service.TrainingService;
@@ -31,6 +32,8 @@ public class TrainingServiceImpl implements TrainingService {
   private final TraineeService traineeService;
   private final TrainerService trainerService;
   private final TrainingConverter trainingConverter;
+  private final GatewayClient gatewayClient;
+  private final JwtUtils jwtUtils;
 
   @Override
   @Transactional(readOnly = true)
@@ -41,8 +44,8 @@ public class TrainingServiceImpl implements TrainingService {
   }
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRED)
-  public Training saveTraining(TrainingRequest request) {
+  @Transactional
+  public Training saveTraining(TrainingRequest request, String header) {
     var trainee = traineeService.findByUsername(request.traineeUsername());
     var trainer = trainerService.findByUsername(request.trainerUsername());
     var trainingType = trainingRepository.findTrainingTypeByName(request.trainingType());
@@ -50,7 +53,29 @@ public class TrainingServiceImpl implements TrainingService {
     training.setTrainee(trainee);
     training.setTrainer(trainer);
     training.setTrainingType(trainingType);
-    return trainingRepository.save(training);
+    try {
+      var savedTraining = trainingRepository.save(training);
+      var trainingDto = trainingConverter.toTrainerTrainingDtoForSave(savedTraining);
+      saveTrainingInWorkloadService(trainingDto, header);
+      return savedTraining;
+    } catch (Exception e) {
+      log.error("Error while saving training. Rolling back.", e);
+      throw new OperationFailedException("training", "Failed to save training");
+    }
+  }
+
+  @Override
+  @Transactional
+  public void delete(TrainingRequestDto trainingDto, String header) {
+    var trainer = trainerService.findByUsername(trainingDto.getTrainerUsername());
+    var trainingType = trainingRepository.findTrainingTypeByName(trainingDto.getTrainingType());
+    try {
+      trainingRepository.delete(trainer, trainingType, trainingDto.getTrainingName(), trainingDto.getDuration(),
+          trainingDto.getTrainingDate());
+      deleteTrainingFromWorkloadService(trainingDto, header);
+    } catch (Exception e) {
+      throw new OperationFailedException("training", "delete training");
+    }
   }
 
   @Override
@@ -69,7 +94,7 @@ public class TrainingServiceImpl implements TrainingService {
   @Override
   @Transactional
   public List<Training> findTrainingsByUsernameAndCriteria(long traineeId, String trainingDate, String trainingName) {
-    List<Training> trainings = trainingRepository.findTraineeTrainingsList(traineeId, trainingDate, trainingName);
+    var trainings = trainingRepository.findTraineeTrainingsList(traineeId, trainingDate, trainingName);
     if (trainings.isEmpty()) {
       return Collections.emptyList();
     }
@@ -80,7 +105,7 @@ public class TrainingServiceImpl implements TrainingService {
   @Transactional
   public List<Training> findTrainerTrainings(TrainingTrainerRequest request) {
     var trainerId = trainerService.findByUsername(request.username()).getId();
-    List<Training> trainings = trainingRepository.findTrainerTrainings
+    var trainings = trainingRepository.findTrainerTrainings
         (new TrainingTrainerDto(trainerId, request.periodFrom(), request.periodTo(), request.traineeName()));
     if (trainings.isEmpty()) {
       return Collections.emptyList();
@@ -92,8 +117,8 @@ public class TrainingServiceImpl implements TrainingService {
   @Transactional
   public List<Trainer> findNotAssignedActiveTrainersToTrainee(String username) {
     var traineeId = traineeService.findByUsername(username).getId();
-    List<Trainer> activeTrainers = trainingRepository.getAssignedActiveTrainersToTrainee(traineeId);
-    List<Trainer> trainersList = trainerService.findAll();
+    var activeTrainers = trainingRepository.getAssignedActiveTrainersToTrainee(traineeId);
+    var trainersList = trainerService.findAll();
     return trainersList.stream()
         .filter(trainer -> !activeTrainers.contains(trainer))
         .toList();
@@ -111,30 +136,21 @@ public class TrainingServiceImpl implements TrainingService {
     trainingRepository.delete(training);
   }
 
-  @Override
-  @Transactional
-  public void delete(TrainingRequestDto trainingDto) {
-    try {
-      trainingRepository.delete(trainingDto);
-    } catch (Exception e) {
-      throw new OperationFailedException("training", "delete training");
-    }
-
-  }
 
   @Override
   @Transactional
-  public List<TrainerDtoForTrainee> updateTraineeTrainerList(UpdateTraineeTrainerDto dto) {
-    Trainee trainee = traineeService.findByUsername(dto.username());
+  public List<TrainerDtoForTrainee> updateTraineeTrainerList(UpdateTraineeTrainerDto dto, String header) {
+    var trainee = traineeService.findByUsername(dto.username());
     checkForNewTrainerFor(dto.list());
-    List<Training> trainings = findTrainingsByUsernameAndCriteria(trainee.getId(), dto.trainingDate(), dto.trainingName());
-    Training patternTraining = trainings.get(0);
+    var trainings = findTrainingsByUsernameAndCriteria(trainee.getId(), dto.trainingDate(), dto.trainingName());
+    var patternTraining = trainings.get(0);
     trainings.forEach(trainingRepository::delete);
+
     return dto.list().stream()
         .map(trainerDto -> trainerService.findByUsername(trainerDto.username()))
         .map(newTrainer -> {
-          TrainingRequest trainingRequest = getTrainingRequest(trainee, patternTraining, newTrainer);
-          Training training = saveTraining(trainingRequest);
+          var trainingRequest = getTrainingRequest(trainee, patternTraining, newTrainer);
+          var training = saveTraining(trainingRequest, header);
           return getTrainerResponse(training);
         })
         .toList();
@@ -148,6 +164,14 @@ public class TrainingServiceImpl implements TrainingService {
       throw new TrainingNotFoundException("training not found");
     }
     return training.get();
+  }
+
+  private void deleteTrainingFromWorkloadService(TrainingRequestDto trainingDto, String header) {
+    gatewayClient.deleteTraining(trainingDto, header);
+  }
+
+  private TrainerTraining saveTrainingInWorkloadService(TrainerTrainingDtoForSave trainingDto, String header) {
+    return gatewayClient.saveTraining(trainingDto, header);
   }
 
   private void checkForNewTrainerFor(List<TrainersDtoList> list) {
@@ -179,4 +203,5 @@ public class TrainingServiceImpl implements TrainingService {
         patternTraining.getTrainingDuration()
     );
   }
+
 }

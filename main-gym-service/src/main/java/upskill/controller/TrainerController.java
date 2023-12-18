@@ -2,6 +2,7 @@ package upskill.controller;
 
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -23,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/trainers/trainer")
 @Validated
+@Slf4j
 public class TrainerController {
 
   private final TrainerService trainerService;

@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@ToString
+
 @Builder(builderMethodName = "trainerBuilder")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,5 +25,13 @@ public class Trainer extends User {
   @JsonManagedReference
   @OneToMany(mappedBy = "trainer", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
   private List<Training> trainings = new ArrayList<>();
+
+  @Override
+  public String toString() {
+    return "Trainer{" +
+        "specialization=" + specialization +
+        ", trainings=" + this.getTrainings() +
+        '}';
+  }
 }
 

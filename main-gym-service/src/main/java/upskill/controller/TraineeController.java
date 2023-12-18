@@ -101,9 +101,10 @@ public class TraineeController {
                                                       @Size(min = 2, max = 60) String username,
                                                       @RequestParam("trainingDate") @NotBlank String trainingDate,
                                                       @RequestParam("trainingName") @NotBlank String trainingName,
-                                                      @RequestBody @NotEmpty List<TrainersDtoList> list) {
+                                                      @RequestBody @NotEmpty List<TrainersDtoList> list,
+                                                      @RequestHeader("Authorization") String header) {
     var dto = new UpdateTraineeTrainerDto(username, trainingDate, trainingName, list);
-    return trainingService.updateTraineeTrainerList(dto);
+    return trainingService.updateTraineeTrainerList(dto,header);
 
   }
 

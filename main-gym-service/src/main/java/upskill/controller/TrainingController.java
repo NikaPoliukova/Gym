@@ -30,15 +30,17 @@ public class TrainingController {
   @PostMapping("/new-training")
   @ResponseStatus(HttpStatus.CREATED)
   @ApiOperation("Save training")
-  public Training saveTraining(@RequestBody @Valid TrainingRequest trainingRequest) {
-   return trainingService.saveTraining(trainingRequest);
+  public Training saveTraining(@RequestBody @Valid TrainingRequest trainingRequest,
+                               @RequestHeader("Authorization") String header) {
+    return trainingService.saveTraining(trainingRequest,header);
   }
 
-  @PostMapping("/training")
+  @DeleteMapping("/training")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @ApiOperation("delete training")
-  public void deleteTraining(@RequestBody @Valid TrainingRequestDto trainingRequest) {
-    trainingService.delete(trainingRequest);
+  public void deleteTraining(@RequestBody @Valid TrainingRequestDto trainingRequest ,
+                             @RequestHeader("Authorization") String header) {
+    trainingService.delete(trainingRequest,header);
   }
 
   @ApiOperation("Get a list of training types")

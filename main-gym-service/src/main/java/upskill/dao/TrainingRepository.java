@@ -29,9 +29,12 @@ public interface TrainingRepository extends AbstractRepository<Training> {
   List<TrainingType> findTrainingTypes();
 
   List<Training> findAll();
+
   void delete(Training training);
 
-  void delete(TrainingRequestDto training);
-
   Optional<Training> findTraining(TrainingRequest trainingRequest);
+
+  Optional<Training> findTraining(TrainingRequestDto trainingRequest);
+
+  void delete(Trainer trainer, TrainingType traininigType, String trainingName, int duration, LocalDate trainingDate);
 }

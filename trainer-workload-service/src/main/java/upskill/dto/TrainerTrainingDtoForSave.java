@@ -1,9 +1,6 @@
 package upskill.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotBlank;
@@ -15,6 +12,7 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 @Builder
+@NoArgsConstructor
 public class TrainerTrainingDtoForSave {
   @NotBlank @Size(min = 2, max = 60) String trainerUsername;
   @NotBlank @Size(min = 2, max = 30) String firstName;
@@ -24,4 +22,5 @@ public class TrainerTrainingDtoForSave {
   LocalDate trainingDate;
   @NotBlank String trainingType;
   @NotNull int duration;
+
 }

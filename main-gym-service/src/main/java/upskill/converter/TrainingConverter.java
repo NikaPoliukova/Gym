@@ -8,6 +8,7 @@ import upskill.dto.*;
 import upskill.entity.Trainee;
 import upskill.entity.Trainer;
 import upskill.entity.Training;
+import upskill.entity.TrainingType;
 
 import java.util.List;
 
@@ -34,6 +35,19 @@ public interface TrainingConverter {
   @Mapping(source = "trainee", target = "traineeName", qualifiedByName = "traineeName")
   @Mapping(target = "trainingType", expression = "java(trainingTypeToString(training.getTrainingType().getTrainingTypeName()))")
   TrainingTrainerResponse toTrainerTrainingResponse(Training training);
+
+  @Mapping(source = "trainer.username", target = "trainerUsername")
+  @Mapping(source = "trainer.firstName", target = "firstName")
+  @Mapping(source = "trainer.lastName", target = "lastName")
+  @Mapping(source = "trainingName", target = "trainingName")
+  @Mapping(source = "trainingDate", target = "trainingDate")
+  @Mapping(source = "trainingType", target = "trainingType")
+  @Mapping(source = "trainingDuration", target = "duration")
+  TrainerTrainingDtoForSave toTrainerTrainingDtoForSave(Training training);
+
+  default String mapTrainingType(TrainingType trainingType) {
+    return trainingType.getTrainingTypeName().name();
+  }
 
   List<TrainingTrainerResponse> toTrainerTrainingResponse(List<Training> trainingsList);
 

@@ -54,4 +54,12 @@ public class Training {
     return (int) (id ^ (id >>> 32));
   }
 
+  @Override
+  public String toString() {
+    return "Training(id=" + this.getId() + ", trainingName=" + this.getTrainingName() + ", trainingDate="
+        + this.getTrainingDate() + ", trainingDuration=" + this.getTrainingDuration() + ", trainee="
+        + this.getTrainee().getId()+
+        ", trainer=" + this.getTrainer().getUsername()
+        + ", trainingType=" + this.getTrainingType().getId() + ")";
+  }
 }

@@ -5,42 +5,20 @@ spring:
   application:
     name: gateway-service
 
-  datasource:
-    url: jdbc:postgresql://localhost:5432/gym_bd
-    username: postgres
-    password: nikucha666
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
   cloud:
     loadbalancer:
       ribbon:
         enabled: false
-    gateway:
-      routes:
-        - id: gym-service
-          uri: lb://gym-service
-          predicates:
-            - Path=/gym-service/**
-          filters:
-            - StripPrefix=1
 
-        - id: workload-service
-          uri: lb://workload-service
-          predicates:
-            - Path=/workload-service/**
-          filters:
-            - StripPrefix=1
-#ribbon:
-#  eureka:
-#    enabled: true
+      sleuth:
+        sampler:
+          probability: 1.0
 
+      zipkin:
+        base-url: http://127.0.0.1:9411/
 logging:
   level:
     com.netflix.loadbalancer: DEBUG
-    org.hibernate.SQL: DEBUG
     upskill.logger: DEBUG
     org.springframework.security: DEBUG
     org.springframework.web: DEBUG
@@ -54,8 +32,9 @@ management:
     health:
       show-details: ALWAYS
 
-secret: "SECRET"
-
+#secret: "SECRET"
+jwt:
+  secret: 111111111111122222222222222224444444444444444444444444444444444444tyutghfcjdecuijednklfcmedfbdsziokplfhivokfplddcgdvgcvdduhvuifmklvmdklmvkfhgvuihfuid8
 
 eureka:
   client:
@@ -64,13 +43,5 @@ eureka:
   instance:
     hostname: 127.0.0.1
     preferIpAddress: false
-
-#feign:
-#  client:
-#    config:
-#      domain:
-#        connectTimeout: 5000
-#        readTimeout: 3000
-
 
 

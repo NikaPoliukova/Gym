@@ -10,7 +10,10 @@ import upskill.entity.Training;
 import upskill.entity.TrainingType;
 
 import javax.persistence.*;
-import javax.persistence.criteria.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -130,22 +133,6 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     entityManager.remove(training);
   }
 
-  @Override
-  public void delete(TrainingRequestDto training) {
-    log.debug("Deleting training " + training);
-    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-    CriteriaDelete<Training> delete = cb.createCriteriaDelete(Training.class);
-    Root<Training> trainingRoot = delete.from(Training.class);
-    Predicate predicate = cb.and(
-        cb.equal(trainingRoot.get("trainerUsername"), training.getTrainerUsername()),
-        cb.equal(trainingRoot.get("trainingName"), training.getTrainingName()),
-        cb.equal(trainingRoot.get("trainingDate"), training.getTrainingDate()),
-        cb.equal(trainingRoot.get("trainingType"), training.getTrainingType()),
-        cb.equal(trainingRoot.get("duration"), training.getDuration())
-    );
-    delete.where(predicate);
-    entityManager.createQuery(delete).executeUpdate();
-  }
 
   @Override
   public Optional<Training> findTraining(TrainingRequest trainingRequest) {
@@ -169,6 +156,47 @@ public class TrainingRepositoryImpl implements TrainingRepository {
       return Optional.empty();
     }
   }
+
+  @Override
+  public Optional<Training> findTraining(TrainingRequestDto trainingRequest) {
+    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+    CriteriaQuery<Training> query = cb.createQuery(Training.class);
+    Root<Training> trainingRoot = query.from(Training.class);
+    Predicate predicate = cb.and(
+        cb.equal(trainingRoot.get("trainerUsername"), trainingRequest.getTrainerUsername()),
+        cb.equal(trainingRoot.get("trainingName"), trainingRequest.getTrainingName()),
+        cb.equal(trainingRoot.get("trainingDate"), trainingRequest.getTrainingDate()),
+        cb.equal(trainingRoot.get("trainingType").get("name"), trainingRequest.getTrainingType()),
+        cb.equal(trainingRoot.get("trainingDuration"), trainingRequest.getDuration())
+    );
+
+    query.select(trainingRoot).where(predicate);
+    try {
+      return Optional.of(entityManager.createQuery(query).getSingleResult());
+    } catch (NoResultException | NonUniqueResultException e) {
+      log.debug("trainee was not found");
+      return Optional.empty();
+    }
+  }
+
+  @Override
+  public void delete(Trainer trainer, TrainingType trainingType, String trainingName,
+                     int duration, LocalDate trainingDate) {
+    String jpql = "DELETE FROM Training t WHERE " +
+        "t.trainer = :trainer " +
+        "AND t.trainingName = :trainingName " +
+        "AND t.trainingDate = :trainingDate " +
+        "AND t.trainingType = :trainingType " +
+        "AND t.trainingDuration = :duration";
+
+    entityManager.createQuery(jpql)
+        .setParameter("trainer", trainer)
+        .setParameter("trainingName", trainingName)
+        .setParameter("trainingDate", trainingDate)
+        .setParameter("trainingType", trainingType)
+        .setParameter("duration", duration)
+        .executeUpdate();
+    }
 
   private static List<Predicate> getPredicates(TrainingDtoRequest request, CriteriaBuilder cb, Root<Training> trainingRoot) {
     List<Predicate> predicates = new ArrayList<>();

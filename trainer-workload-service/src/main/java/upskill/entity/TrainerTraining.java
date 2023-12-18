@@ -5,8 +5,9 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDate;
 
+
 @AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 @Getter
 @Builder
 @Setter
@@ -14,27 +15,42 @@ import java.time.LocalDate;
 @Table(name = "trainer_training")
 public class TrainerTraining {
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  long id;
+  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  @Column(name = "id_")
+  private long id;
 
   @Column(name = "trainer_name")
-  String trainerUsername;
+  private String trainerUsername;
 
   @Column(name = "first_name")
-  String firstName;
+  private String firstName;
 
   @Column(name = "last_name")
-  String lastName;
+  private String lastName;
 
   @Column(name = "training_name")
-  String trainingName;
+  private String trainingName;
 
   @Column(name = "date")
-  LocalDate trainingDate;
+  private LocalDate trainingDate;
 
   @Column(name = "type")
-  String trainingType;
+  private String trainingType;
 
   @Column(name = "duration")
-  int trainingDuration;
+  private int trainingDuration;
+
+  @Override
+  public String toString() {
+    return "TrainerTraining{" +
+        "id=" + id +
+        ", trainerUsername='" + trainerUsername + '\'' +
+        ", firstName='" + firstName + '\'' +
+        ", lastName='" + lastName + '\'' +
+        ", trainingName='" + trainingName + '\'' +
+        ", trainingDate=" + trainingDate +
+        ", trainingType='" + trainingType + '\'' +
+        ", trainingDuration=" + trainingDuration +
+        '}';
+  }
 }

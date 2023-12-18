@@ -10,7 +10,7 @@ import java.util.List;
 public interface TrainingService {
   Training findTrainingById(long trainingId);
 
-  Training saveTraining(TrainingRequest trainingRequest);
+  Training saveTraining(TrainingRequest request, String header);
 
   List<Training> findTrainingsByUsernameAndCriteria(TrainingTraineeRequest request);
 
@@ -24,9 +24,10 @@ public interface TrainingService {
 
   void delete(Training training);
 
-  List<TrainerDtoForTrainee> updateTraineeTrainerList(UpdateTraineeTrainerDto dto);
+  List<TrainerDtoForTrainee> updateTraineeTrainerList(UpdateTraineeTrainerDto dto, String header);
 
-  void delete(TrainingRequestDto trainingRequest) ;
+  void delete(TrainingRequestDto trainingRequest, String header);
 
   Training findTraining(TrainingRequest trainingRequest);
+
 }

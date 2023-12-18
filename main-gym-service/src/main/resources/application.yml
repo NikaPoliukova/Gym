@@ -16,8 +16,43 @@ spring:
     loadbalancer:
       ribbon:
         enabled: false
+
+    openfeign:
+      circuitbreaker:
+        enabled: true
+        alphanumeric-ids:
+          enabled: true
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      deleteTrainingCircuit:
+        baseConfig: default
+      saveTrainingCircuit:
+        baseConfig: default
+    configs:
+      default:
+        registerHealthIndicator: true
+        slidingWindowSize: 1
+        minimumNumberOfCalls: 1
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 5000
+        failureRateThreshold: 50
+        eventConsumerBufferSize: 10
+  timelimiter:
+    instances:
+      deleteTrainingCircuit:
+        timeoutDuration: 5000
+      saveTrainingCircuit:
+        timeoutDuration: 5000
   jpa:
     show-sql: true
+  sleuth:
+    sampler:
+      probability: 1.0
+
+  zipkin:
+    base-url: http://127.0.0.1:9411/
 
 hibernate:
   dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -28,6 +63,9 @@ logging:
     org.hibernate.SQL: DEBUG
     upskill.logger: DEBUG
     org.springframework.web: DEBUG
+    org. resilience4j: DEBUG
+
+
 
 management:
   endpoints:
@@ -37,6 +75,8 @@ management:
   endpoint:
     health:
       show-details: ALWAYS
+    circuitbreakers:
+      enabled: true
   metrics:
     export:
       prometheus:
@@ -47,13 +87,6 @@ management:
 
 secret: "SECRET"
 
-#feign:
-#  client:
-#    config:
-#      domain:
-#        connectTimeout: 5000
-#        readTimeout: 3000
-
 eureka:
   client:
     serviceUrl:
@@ -61,6 +94,3 @@ eureka:
   instance:
     hostname: 127.0.0.1
     preferIpAddress: false
-#ribbon:
-#  eureka:
-#    enabled: true

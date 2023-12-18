@@ -1,4 +1,4 @@
-package upskill.security;
+package upskill.security;//package upskill.security;
 
 
 import io.jsonwebtoken.Claims;
@@ -25,7 +25,7 @@ import java.util.Date;
 @Component
 public class JwtUtils {
   public static final String JWT_REFRESH = "JWT-REFRESH";
-  public static final String JWT = "JWT";
+  public static final String JWT = "Bearer";
 
   private static final String secretKey = "111111111111122222222222222224444444444444444444444444444444444444ty" +
       "utghfcjdecuijednklfcmedfbdsziokplfhivokfplddcgdvgcvdduhvuifmklvmdklmvkfhgvuihfuid8";
@@ -73,7 +73,7 @@ public class JwtUtils {
     Claims claims;
     try {
       claims = Jwts.parserBuilder()
-          .setSigningKey(secretKey)
+          .setSigningKey(secret)
           .build()
           .parseClaimsJws(expiredToken)
           .getBody();
@@ -93,7 +93,7 @@ public class JwtUtils {
   public boolean validateToken(String token) {
     try {
       Jwts.parserBuilder()
-          .setSigningKey(secretKey)
+          .setSigningKey(secret)
           .build()
           .parseClaimsJws(token);
       return true;
@@ -104,7 +104,7 @@ public class JwtUtils {
 
   public String getUsernameFromToken(String token) {
     Claims claims = Jwts.parserBuilder()
-        .setSigningKey(secretKey)
+        .setSigningKey(secret)
         .build()
         .parseClaimsJws(token)
         .getBody();
@@ -120,7 +120,7 @@ public class JwtUtils {
     Claims claims;
     try {
       claims = Jwts.parserBuilder()
-          .setSigningKey(secretKey)
+          .setSigningKey(secret)
           .build()
           .parseClaimsJws(token)
           .getBody();

@@ -3,6 +3,7 @@ package upskill.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import upskill.dao.TrainerWorkloadRepository;
+import upskill.dto.TrainingRequestDto;
 import upskill.entity.TrainerTraining;
 import upskill.exception.IncorrectDateException;
 
@@ -15,10 +16,9 @@ public class TrainerWorkloadService {
 
   private final TrainerWorkloadRepository trainerWorkloadRepository;
 
-  public TrainerTraining save(TrainerTraining trainingRequest) {
-    return trainerWorkloadRepository.save(trainingRequest);
+  public TrainerTraining save(TrainerTraining trainerTraining) {
+    return trainerWorkloadRepository.save(trainerTraining);
   }
-
 
   public Integer getTrainerWorkload(String trainerUsername, LocalDate periodFrom, LocalDate periodTo,
                                     String trainingType) {
@@ -42,14 +42,13 @@ public class TrainerWorkloadService {
         .sum();
   }
 
-  public TrainerTraining getTrainerTraining(TrainerTraining trainingRequest) {
-    return
-        trainerWorkloadRepository.findByTrainerUsernameAndTrainingNameAndTrainingDateAndTrainingTypeAndTrainingDuration
-            (trainingRequest.getTrainerUsername(), trainingRequest.getTrainingName(), trainingRequest.getTrainingDate(),
-                trainingRequest.getTrainingType(), trainingRequest.getTrainingDuration());
+  public TrainerTraining getTrainerTraining(TrainingRequestDto trainingRequest) {
+    return trainerWorkloadRepository.findByTrainerUsernameAndTrainingNameAndTrainingDateAndTrainingTypeAndTrainingDuration
+        (trainingRequest.getTrainerUsername(), trainingRequest.getTrainingName(), trainingRequest.getTrainingDate(),
+            trainingRequest.getTrainingType(), trainingRequest.getDuration());
   }
 
-  public void delete(TrainerTraining trainingRequest) {
+  public void delete(TrainingRequestDto trainingRequest) {
     TrainerTraining training = getTrainerTraining(trainingRequest);
     trainerWorkloadRepository.delete(training);
   }

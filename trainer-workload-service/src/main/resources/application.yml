@@ -27,7 +27,12 @@ spring:
     console:
       enabled: true
       path: /h2-console
+  sleuth:
+    sampler:
+      probability: 1.0
 
+  zipkin:
+    base-url: http://127.0.0.1:9411/
 logging:
   level:
     org.hibernate.SQL: DEBUG
@@ -52,9 +57,3 @@ eureka:
 ribbon:
   eureka:
     enabled: true
-#feign:
-#  client:
-#    config:
-#      domain:
-#        connectTimeout: 5000
-#        readTimeout: 3000
