@@ -11,6 +11,7 @@ import reactor.core.publisher.Mono;
 import upskill.security.JwtUtil;
 
 import java.net.URI;
+import java.util.Objects;
 
 @RefreshScope
 @Component
@@ -21,8 +22,9 @@ public class JwtTokenFilterForWorkload implements GatewayFilter {
 
   @Override
   public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-    var token = exchange.getRequest().getHeaders().get("Authorization").get(0);
-    if (token != null && jwtUtil.validateToken(jwtUtil.extractToken(token))) {
+    var header = Objects.requireNonNull(exchange.getRequest().getHeaders().get("Authorization")).get(0);
+    var token = jwtUtil.extractToken(header);
+    if (token != null && jwtUtil.validateToken(token)) {
       exchange.getResponse().setStatusCode(HttpStatus.OK);
     } else {
       exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);

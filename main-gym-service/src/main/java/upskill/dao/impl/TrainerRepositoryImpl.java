@@ -22,7 +22,6 @@ public class TrainerRepositoryImpl implements TrainerRepository {
   @PersistenceContext
   private EntityManager entityManager;
 
-
   @Override
   public Trainer save(Trainer trainer) {
     log.debug("Creating Trainer: " + trainer);
@@ -32,15 +31,15 @@ public class TrainerRepositoryImpl implements TrainerRepository {
 
   @Override
   public List<Trainer> findByIsActive() {
-    String jpql = "SELECT t FROM Trainer t  WHERE t.isActive = :isActive";
-    TypedQuery<Trainer> query = entityManager.createQuery(jpql, Trainer.class);
+    var jpql = "SELECT t FROM Trainer t  WHERE t.isActive = :isActive";
+   var query = entityManager.createQuery(jpql, Trainer.class);
     query.setParameter("isActive", true);
     return query.getResultList();
   }
 
   @Override
   public List<Trainee> findTraineesForTrainer(long trainerId) {
-    TypedQuery<Trainee> query = entityManager.createQuery(
+   var query = entityManager.createQuery(
         "SELECT DISTINCT t.trainee FROM Training t WHERE t.trainer.id = :trainerId", Trainee.class);
     query.setParameter("trainerId", trainerId);
     return query.getResultList();

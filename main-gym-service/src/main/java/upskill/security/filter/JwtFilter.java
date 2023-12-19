@@ -21,7 +21,6 @@ public class JwtFilter extends OncePerRequestFilter {
   private final JwtUtils jwtUtils;
   private static final String TOKEN_NAME = "Bearer";
 
-
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
@@ -29,17 +28,12 @@ public class JwtFilter extends OncePerRequestFilter {
     var refreshToken = jwtUtils.getRefreshTokenFromRequest(request);
     if (token != null && jwtUtils.validateToken(token)) {
       setAuthentication(token);
-      //response.sendRedirect("/home");
     } else if (token != null && refreshToken != null && jwtUtils.isTokenExpired(token)
         && jwtUtils.validateToken(refreshToken)) {
       final var newAccessToken = jwtUtils.refreshAccessToken(token);
       setAuthentication(newAccessToken);
       setAccessTokenInCookie(response, newAccessToken);
-     // response.sendRedirect("/home");
     }
-//    else {
-//      response.sendRedirect("/login");
-//    }
     filterChain.doFilter(request, response);
   }
 

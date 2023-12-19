@@ -24,7 +24,6 @@ public class TraineeRepositoryImpl implements TraineeRepository {
   @PersistenceContext
   private EntityManager entityManager;
 
-
   @Override
   public Trainee save(Trainee trainee) {
     log.debug("Creating Trainee: " + trainee);

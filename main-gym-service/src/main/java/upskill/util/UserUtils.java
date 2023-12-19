@@ -22,7 +22,7 @@ public class UserUtils {
     if (StringUtils.isAnyBlank(firstName, lastName)) {
       throw new IllegalArgumentException("First name or last name must not be null or empty");
     }
-    String username = String.format("%s.%s", firstName, lastName);
+    var username = String.format("%s.%s", firstName, lastName);
     return isUsernameUnique(users, username) ? username : username + calculateUsernameCounter(users, username);
   }
 
@@ -39,7 +39,7 @@ public class UserUtils {
   }
 
   public static LocalDate getLocalDate(String dateOfBirth) {
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     return LocalDate.parse(dateOfBirth, formatter);
   }
 }

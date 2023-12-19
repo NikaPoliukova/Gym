@@ -15,7 +15,6 @@ import upskill.entity.TrainingType;
 import upskill.exception.OperationFailedException;
 import upskill.exception.TrainingNotFoundException;
 import upskill.exception.UserNotFoundException;
-import upskill.security.JwtUtils;
 import upskill.service.TraineeService;
 import upskill.service.TrainerService;
 import upskill.service.TrainingService;
@@ -33,14 +32,12 @@ public class TrainingServiceImpl implements TrainingService {
   private final TrainerService trainerService;
   private final TrainingConverter trainingConverter;
   private final GatewayClient gatewayClient;
-  private final JwtUtils jwtUtils;
 
   @Override
   @Transactional(readOnly = true)
   public Training findTrainingById(long trainingId) {
     return trainingRepository.findById(trainingId).orElseThrow(()
         -> new OperationFailedException(" training id", "find training by id"));
-
   }
 
   @Override
@@ -50,9 +47,7 @@ public class TrainingServiceImpl implements TrainingService {
     var trainer = trainerService.findByUsername(request.trainerUsername());
     var trainingType = trainingRepository.findTrainingTypeByName(request.trainingType());
     var training = trainingConverter.toTraining(request, new Training());
-    training.setTrainee(trainee);
-    training.setTrainer(trainer);
-    training.setTrainingType(trainingType);
+    setParamsToTraining(trainee, trainer, trainingType, training);
     try {
       var savedTraining = trainingRepository.save(training);
       var trainingDto = trainingConverter.toTrainerTrainingDtoForSave(savedTraining);
@@ -204,4 +199,9 @@ public class TrainingServiceImpl implements TrainingService {
     );
   }
 
+  private static void setParamsToTraining(Trainee trainee, Trainer trainer, TrainingType trainingType, Training training) {
+    training.setTrainee(trainee);
+    training.setTrainer(trainer);
+    training.setTrainingType(trainingType);
+  }
 }

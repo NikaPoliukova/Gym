@@ -56,14 +56,6 @@ public class TrainerWorkloadController {
                              @RequestParam(value = "trainingType", required = false) @Size(min = 2) String trainingType) {
     return workloadService.getTrainerWorkload(trainerUsername, periodFrom, periodTo, trainingType);
   }
-//  private static TrainerTraining convertToTrainingRequest(TrainingRequestDto trainingDto) {
-//    return TrainerTraining.builder()
-//        .trainerUsername(trainingDto.getTrainerUsername())
-//        .trainingName(trainingDto.getTrainingName())
-//        .trainingDate(trainingDto.getTrainingDate())
-//        .trainingType(trainingDto.getTrainingType())
-//        .trainingDuration(trainingDto.getDuration()).build();
-//  }
 
   private static TrainerTraining convertToTrainingRequest(TrainerTrainingDtoForSave trainingDto) {
     return TrainerTraining.builder()

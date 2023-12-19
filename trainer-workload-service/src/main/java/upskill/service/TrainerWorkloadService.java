@@ -22,18 +22,14 @@ public class TrainerWorkloadService {
 
   public Integer getTrainerWorkload(String trainerUsername, LocalDate periodFrom, LocalDate periodTo,
                                     String trainingType) {
-    if (periodTo.isAfter(periodFrom)) {
-      if (trainingType.isEmpty()) {
-        List<TrainerTraining> list =
-            trainerWorkloadRepository.findByTrainerUsernameAndTrainingDateBetween(trainerUsername, periodFrom, periodTo);
-        return getSumOfTrainingDurations(list);
-      } else {
-        List<TrainerTraining> listByType =
-            trainerWorkloadRepository.findByTrainerUsernameAndTrainingDateBetweenAndTrainingType(trainerUsername,
-                periodFrom, periodTo, trainingType);
-        return getSumOfTrainingDurations(listByType);
-      }
-    } else throw new IncorrectDateException("incorrect period");
+    if (periodTo.isBefore(periodFrom)) {
+      throw new IncorrectDateException("Incorrect period");
+    }
+    List<TrainerTraining> list = trainingType.isEmpty()
+        ? trainerWorkloadRepository.findByTrainerUsernameAndTrainingDateBetween(trainerUsername, periodFrom, periodTo)
+        : trainerWorkloadRepository.findByTrainerUsernameAndTrainingDateBetweenAndTrainingType(
+        trainerUsername, periodFrom, periodTo, trainingType);
+    return getSumOfTrainingDurations(list);
   }
 
   private int getSumOfTrainingDurations(List<TrainerTraining> trainingList) {
@@ -43,13 +39,13 @@ public class TrainerWorkloadService {
   }
 
   public TrainerTraining getTrainerTraining(TrainingRequestDto trainingRequest) {
-    return trainerWorkloadRepository.findByTrainerUsernameAndTrainingNameAndTrainingDateAndTrainingTypeAndTrainingDuration
+     return trainerWorkloadRepository.findByTrainerUsernameAndTrainingNameAndTrainingDateAndTrainingTypeAndTrainingDuration
         (trainingRequest.getTrainerUsername(), trainingRequest.getTrainingName(), trainingRequest.getTrainingDate(),
             trainingRequest.getTrainingType(), trainingRequest.getDuration());
   }
 
   public void delete(TrainingRequestDto trainingRequest) {
-    TrainerTraining training = getTrainerTraining(trainingRequest);
+    var training = getTrainerTraining(trainingRequest);
     trainerWorkloadRepository.delete(training);
   }
 }

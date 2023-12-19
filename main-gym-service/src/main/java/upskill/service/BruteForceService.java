@@ -9,8 +9,8 @@ import javax.servlet.http.HttpSession;
 public class BruteForceService {
 
   public boolean isAccountLocked(HttpServletRequest request, String username) {
-    HttpSession session = request.getSession();
-    Long unlockTime = (Long) session.getAttribute(username + "_unlockTime");
+    var session = request.getSession();
+    var unlockTime = (Long) session.getAttribute(username + "_unlockTime");
     return unlockTime != null;
   }
 }

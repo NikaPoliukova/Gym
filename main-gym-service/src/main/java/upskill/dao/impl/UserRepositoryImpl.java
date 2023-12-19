@@ -9,7 +9,6 @@ import upskill.exception.UserNotFoundException;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +17,7 @@ import java.util.Optional;
 public class UserRepositoryImpl implements UserRepository {
 
   public static final String USERNAME = "username";
+  public static final String PASSWORD = "password";
   @PersistenceContext
   private EntityManager entityManager;
 
@@ -55,7 +55,7 @@ public class UserRepositoryImpl implements UserRepository {
 
   @Override
   public Optional<User> findByUsername(String username) {
-    TypedQuery<User> query = entityManager.createQuery("SELECT u FROM User u WHERE u.username = :username", User.class);
+    var query = entityManager.createQuery("SELECT u FROM User u WHERE u.username = :username", User.class);
     query.setParameter(USERNAME, username);
     try {
       return Optional.ofNullable(query.getSingleResult());
@@ -71,10 +71,10 @@ public class UserRepositoryImpl implements UserRepository {
 
   @Override
   public Optional<User> findByUsernameAndPassword(String username, String oldPassword) {
-    TypedQuery<User> query = entityManager
+    var query = entityManager
         .createQuery("SELECT u FROM User u WHERE u.username = :username AND u.password = : password", User.class);
     query.setParameter(USERNAME, username);
-    query.setParameter("password", oldPassword);
+    query.setParameter(PASSWORD, oldPassword);
     try {
       return Optional.ofNullable(query.getSingleResult());
     } catch (NoResultException e) {

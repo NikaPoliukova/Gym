@@ -25,7 +25,7 @@ public class SuccessAuthHandler extends SimpleUrlAuthenticationSuccessHandler {
   private static final String TOKEN_NAME = "Bearer";
   private static final String REFRESH_TOKEN_NAME = "JWT-REFRESH";
   private static final long EXPIRATION = Duration.ofHours(10).toSeconds();
-  public static final String REDIRECT_URL = "http://localhost:8091/home";
+
 
   private final BruteForceService bruteForceService;
   private final JwtUtils jwtUtils;
@@ -40,7 +40,6 @@ public class SuccessAuthHandler extends SimpleUrlAuthenticationSuccessHandler {
       var token = jwtUtils.getAccessTokenFromRequest(request);
       var refreshToken = jwtUtils.getRefreshTokenFromRequest(request);
       checkTokens(response, authentication, token, refreshToken);
-      // getRedirectStrategy().sendRedirect(request, response, REDIRECT_URL);
     }
   }
 

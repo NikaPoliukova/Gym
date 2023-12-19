@@ -20,7 +20,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
 
   @Override
   public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
-                                      AuthenticationException exception) throws IOException, ServletException {
+                                      AuthenticationException exception) throws IOException {
     var username = request.getParameter("username");
     var session = request.getSession();
     var attempts = getAttemptsFromSession(session, username).getAndIncrement();

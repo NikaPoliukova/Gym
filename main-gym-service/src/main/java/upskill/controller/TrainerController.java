@@ -64,8 +64,8 @@ public class TrainerController {
                                                                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                                                                 LocalDate periodTo,
                                                                 @RequestParam(required = false) String traineeName) {
-    List<Training> trainingsList = trainingService.findTrainerTrainings(
-        new TrainingTrainerRequest(username, periodFrom, periodTo, traineeName));
+    var trainingsList = trainingService.findTrainerTrainings( new TrainingTrainerRequest(username,
+        periodFrom, periodTo, traineeName));
     return trainingConverter.toTrainerTrainingResponse(trainingsList);
   }
 

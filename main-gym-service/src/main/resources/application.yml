@@ -42,9 +42,9 @@ resilience4j:
   timelimiter:
     instances:
       deleteTrainingCircuit:
-        timeoutDuration: 5000
+        timeoutDuration: 20000
       saveTrainingCircuit:
-        timeoutDuration: 5000
+        timeoutDuration: 20000
   jpa:
     show-sql: true
   sleuth:
@@ -64,8 +64,6 @@ logging:
     upskill.logger: DEBUG
     org.springframework.web: DEBUG
     org. resilience4j: DEBUG
-
-
 
 management:
   endpoints:

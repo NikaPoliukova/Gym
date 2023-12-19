@@ -32,7 +32,6 @@ management:
     health:
       show-details: ALWAYS
 
-#secret: "SECRET"
 jwt:
   secret: 111111111111122222222222222224444444444444444444444444444444444444tyutghfcjdecuijednklfcmedfbdsziokplfhivokfplddcgdvgcvdduhvuifmklvmdklmvkfhgvuihfuid8
 
