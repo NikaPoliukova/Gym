@@ -32,6 +32,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     return "User not authenticated " + ex.getMessage();
   }
 
+  @ExceptionHandler(CustomFeignException.class)
+  @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+  @ResponseBody
+  public String handleFeignException(CustomFeignException ex) {
+    return "Workload service not available " + ex.getMessage();
+  }
+
   @ExceptionHandler(OperationFailedException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody

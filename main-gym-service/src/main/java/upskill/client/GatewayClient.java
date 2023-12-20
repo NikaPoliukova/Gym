@@ -16,7 +16,7 @@ import upskill.dto.TrainingRequestDto;
 
 import javax.validation.Valid;
 
-
+@Deprecated
 @Validated
 @FeignClient(name = "gateway-service")
 public interface GatewayClient {

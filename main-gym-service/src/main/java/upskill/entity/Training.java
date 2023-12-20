@@ -1,6 +1,7 @@
 package upskill.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -33,6 +34,7 @@ public class Training {
   private Trainee trainee;
 
   @ManyToOne
+  @JsonBackReference
   @JoinColumn(name = "trainer_id")
   private Trainer trainer;
 

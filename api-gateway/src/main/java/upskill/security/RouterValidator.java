@@ -1,8 +1,12 @@
 package upskill.security;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -18,5 +22,11 @@ public class RouterValidator {
       request -> openApiEndpoints
           .stream()
           .noneMatch(uri -> request.getURI().getPath().contains(uri));
+
+  public Mono<Void> redirectToLogin(ServerWebExchange exchange) {
+    exchange.getResponse().setStatusCode(HttpStatus.SEE_OTHER);
+    exchange.getResponse().getHeaders().setLocation(URI.create("/gym-service/login"));
+    return exchange.getResponse().setComplete();
+  }
 
 }

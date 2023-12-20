@@ -5,14 +5,14 @@ import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import upskill.security.filter.JwtTokenFilter;
-import upskill.security.filter.JwtTokenFilterForWorkload;
+import upskill.security.filter.CookieJwtFilter;
+import upskill.security.filter.HeaderJwtFilter;
 
 @RequiredArgsConstructor
 @Configuration
 public class GatewayConfig {
-  private final JwtTokenFilter jwtTokenFilter;
-  private final JwtTokenFilterForWorkload jwtTokenFilterForWorkload;
+  private final CookieJwtFilter jwtTokenFilter;
+  private final HeaderJwtFilter jwtTokenFilterForWorkload;
 
   @Bean
   public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
