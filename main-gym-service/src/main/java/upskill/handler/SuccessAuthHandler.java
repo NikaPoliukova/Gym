@@ -10,7 +10,7 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 import upskill.dao.UserRepository;
 import upskill.security.JwtUtils;
-import upskill.service.BruteForceService;
+import upskill.service.bruteForceService.BruteForceService;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;

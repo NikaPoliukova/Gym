@@ -31,8 +31,7 @@ public class TrainerWorkloadController {
       value = "/new-training")
   @ResponseStatus(HttpStatus.CREATED)
   @ApiOperation("Save training")
-  public TrainerTraining saveTraining(@Valid @RequestBody TrainerTrainingDtoForSave trainingDto,
-                                      @RequestHeader("Authorization") String header) {
+  public TrainerTraining saveTraining(@Valid @RequestBody TrainerTrainingDtoForSave trainingDto) {
     var trainingRequest = convertToTrainingRequest(trainingDto);
     return workloadService.save(trainingRequest);
   }

@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import upskill.client.GatewayClient;
 import upskill.converter.TrainingConverter;
 import upskill.dao.TrainingRepository;
 import upskill.dto.*;
@@ -18,6 +17,8 @@ import upskill.exception.UserNotFoundException;
 import upskill.service.TraineeService;
 import upskill.service.TrainerService;
 import upskill.service.TrainingService;
+import upskill.service.messageService.SenderMessagesForDeleteService;
+import upskill.service.messageService.SenderMessagesForSaveService;
 
 import java.util.Collections;
 import java.util.List;
@@ -31,8 +32,8 @@ public class TrainingServiceImpl implements TrainingService {
   private final TraineeService traineeService;
   private final TrainerService trainerService;
   private final TrainingConverter trainingConverter;
-  private final GatewayClient gatewayClient;
-
+  private final SenderMessagesForSaveService messagesForSaveService;
+  private final SenderMessagesForDeleteService messagesForDeleteService;
   @Override
   @Transactional(readOnly = true)
   public Training findTrainingById(long trainingId) {
@@ -51,7 +52,7 @@ public class TrainingServiceImpl implements TrainingService {
     try {
       var savedTraining = trainingRepository.save(training);
       var trainingDto = trainingConverter.toTrainerTrainingDtoForSave(savedTraining);
-      saveTrainingInWorkloadService(trainingDto, header);
+      saveTrainingInWorkloadService(trainingDto);
       return savedTraining;
     } catch (Exception e) {
       log.error("Error while saving training. Rolling back.", e);
@@ -67,7 +68,7 @@ public class TrainingServiceImpl implements TrainingService {
     try {
       trainingRepository.delete(trainer, trainingType, trainingDto.getTrainingName(), trainingDto.getDuration(),
           trainingDto.getTrainingDate());
-      deleteTrainingFromWorkloadService(trainingDto, header);
+      deleteTrainingFromWorkloadService(trainingDto);
     } catch (Exception e) {
       throw new OperationFailedException("training", "delete training");
     }
@@ -131,7 +132,6 @@ public class TrainingServiceImpl implements TrainingService {
     trainingRepository.delete(training);
   }
 
-
   @Override
   @Transactional
   public List<TrainerDtoForTrainee> updateTraineeTrainerList(UpdateTraineeTrainerDto dto, String header) {
@@ -151,7 +151,6 @@ public class TrainingServiceImpl implements TrainingService {
         .toList();
   }
 
-
   @Override
   public Training findTraining(TrainingRequest trainingRequest) {
     var training = trainingRepository.findTraining(trainingRequest);
@@ -161,20 +160,14 @@ public class TrainingServiceImpl implements TrainingService {
     return training.get();
   }
 
-  private void deleteTrainingFromWorkloadService(TrainingRequestDto trainingDto, String header) {
-    gatewayClient.deleteTraining(trainingDto, header);
-  }
-
-  private TrainerTraining saveTrainingInWorkloadService(TrainerTrainingDtoForSave trainingDto, String header) {
-    return gatewayClient.saveTraining(trainingDto, header);
-  }
 
   private void checkForNewTrainerFor(List<TrainersDtoList> list) {
     for (TrainersDtoList tdl : list) {
       try {
         trainerService.findByUsername(tdl.username());
       } catch (UserNotFoundException ex) {
-        throw new OperationFailedException("one of the trainer username was not found", "updateTraineeTrainerList");
+        throw new OperationFailedException("one of the trainer username was not found",
+            "updateTraineeTrainerList");
       }
     }
   }
@@ -186,6 +179,14 @@ public class TrainingServiceImpl implements TrainingService {
         training.getTrainer().getLastName(),
         training.getTrainer().getSpecialization().getTrainingTypeName().toString()
     );
+  }
+
+  private void deleteTrainingFromWorkloadService(TrainingRequestDto trainingDto) {
+   messagesForDeleteService.sendJsonMessage(trainingDto);
+  }
+
+  private void saveTrainingInWorkloadService(TrainerTrainingDtoForSave trainingDto) {
+    messagesForSaveService.sendJsonMessage(trainingDto);
   }
 
   private static TrainingRequest getTrainingRequest(Trainee trainee, Training patternTraining, Trainer newTrainer) {
