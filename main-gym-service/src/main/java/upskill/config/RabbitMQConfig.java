@@ -4,10 +4,7 @@ package upskill.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -22,12 +19,15 @@ import org.springframework.context.annotation.Configuration;
 @EnableRabbit
 public class RabbitMQConfig {
   private static final String exchangeName = "my_exchange";
-
-  private static final String deleteQueue = "queue_for_delete";
+  private static final String deleteQueue = "delete_queue";
   private static final String routingKeyForDelete = "delete_key";
 
-  private static final String saveQueue = "queue_for_save";
+  private static final String saveQueue = "save_queue";
   private static final String routingKeyForSave = "save_key";
+
+  public static final String deadLetterQueue = "dead_letter_queue";
+  private static final String routingKeyForDeadLetter = "dead_letter_key";
+
 
   @Bean
   public TopicExchange exchange() {
@@ -48,7 +48,7 @@ public class RabbitMQConfig {
         .with(routingKeyForSave);
   }
 
-  //for delete
+    //for delete
   @Bean
   public Queue deleteQueue() {
     return new Queue(deleteQueue);
@@ -60,6 +60,22 @@ public class RabbitMQConfig {
         .bind(deleteQueue())
         .to(exchange())
         .with(routingKeyForDelete);
+  }
+
+
+  // Dead Letter
+  @Bean
+  public Queue deadLetterQueue() {
+    return new Queue(deadLetterQueue);
+  }
+
+  @Bean
+  public Declarables deadLetterBindings() {
+    Binding binding = BindingBuilder
+        .bind(deadLetterQueue())
+        .to(exchange())
+        .with(routingKeyForDeadLetter);
+    return new Declarables(deadLetterQueue(), exchange(), binding);
   }
 
   @Bean

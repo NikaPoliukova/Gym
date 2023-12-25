@@ -34,6 +34,7 @@ public class TrainingServiceImpl implements TrainingService {
   private final TrainingConverter trainingConverter;
   private final SenderMessagesForSaveService messagesForSaveService;
   private final SenderMessagesForDeleteService messagesForDeleteService;
+
   @Override
   @Transactional(readOnly = true)
   public Training findTrainingById(long trainingId) {
@@ -182,12 +183,13 @@ public class TrainingServiceImpl implements TrainingService {
   }
 
   private void deleteTrainingFromWorkloadService(TrainingRequestDto trainingDto) {
-   messagesForDeleteService.sendJsonMessage(trainingDto);
+    messagesForDeleteService.sendJsonMessage(trainingDto);
   }
 
   private void saveTrainingInWorkloadService(TrainerTrainingDtoForSave trainingDto) {
     messagesForSaveService.sendJsonMessage(trainingDto);
   }
+
 
   private static TrainingRequest getTrainingRequest(Trainee trainee, Training patternTraining, Trainer newTrainer) {
     return new TrainingRequest(

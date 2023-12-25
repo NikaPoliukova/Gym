@@ -2,31 +2,48 @@ package upskill.config;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 @RequiredArgsConstructor
 @Configuration
+@EnableRabbit
 public class RabbitMQConfig {
   private static final String exchangeName = "my_exchange";
 
-  private static final String deleteQueue = "queue_for_delete";
+  private static final String deleteQueue = "delete_queue";
   private static final String routingKeyForDelete = "delete_key";
 
-  private static final String saveQueue = "queue_for_save";
+  private static final String saveQueue = "save_queue";
   private static final String routingKeyForSave = "save_key";
+
+  public static final String deadLetterQueue = "dead_letter_queue";
+  private static final String routingKeyForDeadLetter = "dead_letter_key";
+
 
   @Bean
   public TopicExchange exchange() {
     return new TopicExchange(exchangeName);
+  }
+
+  @Bean
+  public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+    RabbitTemplate template = new RabbitTemplate(connectionFactory);
+    template.setMessageConverter(messageConverter());
+    return template;
+  }
+
+  @Bean
+  public MessageConverter messageConverter() {
+    ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
+    return new Jackson2JsonMessageConverter(mapper);
   }
 
   //for save
@@ -57,17 +74,20 @@ public class RabbitMQConfig {
         .with(routingKeyForDelete);
   }
 
+
+  // for dead Letter
   @Bean
-  public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
-    RabbitTemplate template = new RabbitTemplate(connectionFactory);
-    template.setMessageConverter(messageConverter());
-    return template;
+  public Queue deadLetterQueue() {
+    return new Queue(deadLetterQueue);
   }
 
   @Bean
-  public MessageConverter messageConverter() {
-    ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
-    return new Jackson2JsonMessageConverter(mapper);
+  public Declarables deadLetterBindings() {
+    Binding binding = BindingBuilder
+        .bind(deadLetterQueue())
+        .to(exchange())
+        .with(routingKeyForDeadLetter);
+    return new Declarables(deadLetterQueue(), exchange(), binding);
   }
 }
 

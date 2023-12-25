@@ -22,6 +22,4 @@ public class SenderMessagesForSaveService {
     log.info(String.format("Json message sent -> %s", trainingDto.toString()));
     rabbitTemplate.convertAndSend(exchangeName, routingKeyForSave, trainingDto);
   }
-
-
 }
