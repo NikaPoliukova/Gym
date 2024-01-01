@@ -39,19 +39,23 @@ public interface TrainingConverter {
   @Mapping(source = "trainer.username", target = "trainerUsername")
   @Mapping(source = "trainer.firstName", target = "firstName")
   @Mapping(source = "trainer.lastName", target = "lastName")
-  @Mapping(source = "trainingName", target = "trainingName")
+  @Mapping(source = "trainer", target = "status", qualifiedByName = "extractTrainerStatus")
   @Mapping(source = "trainingDate", target = "trainingDate")
-  @Mapping(source = "trainingType", target = "trainingType")
   @Mapping(source = "trainingDuration", target = "duration")
   TrainerTrainingDtoForSave toTrainerTrainingDtoForSave(Training training);
-
-  default String mapTrainingType(TrainingType trainingType) {
-    return trainingType.getTrainingTypeName().name();
-  }
 
   List<TrainingTrainerResponse> toTrainerTrainingResponse(List<Training> trainingsList);
 
   List<TrainingTraineeResponse> toTrainingResponse(List<Training> trainingsList);
+
+  @Named("extractTrainerStatus")
+  default boolean extractTrainerStatus(Trainer trainer) {
+    return trainer.isActive();
+  }
+
+  default String mapTrainingType(TrainingType trainingType) {
+    return trainingType.getTrainingTypeName().name();
+  }
 
 
   @Named("traineeName")

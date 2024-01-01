@@ -17,6 +17,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 public class TrainerTrainingDtoForSave {
+
   @NotBlank @Size(min = 2, max = 60)
   String trainerUsername;
   @NotBlank @Size(min = 2, max = 30)
@@ -24,11 +25,10 @@ public class TrainerTrainingDtoForSave {
   @NotBlank @Size(min = 2, max = 30)
   String lastName;
   @NotBlank @Size(min = 2, max = 100)
-  String trainingName;
+  boolean status;
   @JsonDeserialize(using = LocalDateDeserializer.class)
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
   @JsonProperty("trainingDate")
   LocalDate trainingDate;
-  @NotBlank String trainingType;
   @NotNull int duration;
 }

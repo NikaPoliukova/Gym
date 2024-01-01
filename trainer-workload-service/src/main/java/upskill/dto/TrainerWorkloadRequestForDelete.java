@@ -11,18 +11,15 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
-@Getter
-@Setter
+@Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class TrainingRequestDto {
+public class TrainerWorkloadRequestForDelete {
   @NotBlank @Size(min = 2, max = 60) String trainerUsername;
-  @NotBlank @Size(min = 2, max = 100) String trainingName;
   @JsonDeserialize(using = LocalDateDeserializer.class)
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
   @JsonProperty("trainingDate")
   LocalDate trainingDate;
-  @NotBlank String trainingType;
   @NotNull int duration;
 }

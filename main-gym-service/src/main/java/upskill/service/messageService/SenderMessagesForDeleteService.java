@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import upskill.dto.TrainerWorkloadRequestForDelete;
 import upskill.dto.TrainingRequestDto;
 
 @Service
@@ -18,7 +19,7 @@ public class SenderMessagesForDeleteService {
   @Autowired
   private RabbitTemplate rabbitTemplate;
 
-  public void sendJsonMessage(TrainingRequestDto trainingDto) {
+  public void sendJsonMessage(TrainerWorkloadRequestForDelete trainingDto) {
     log.info(String.format("Json message sent -> %s", trainingDto.toString()));
     rabbitTemplate.convertAndSend(exchangeName, routingKeyForDelete, trainingDto);
   }

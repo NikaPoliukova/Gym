@@ -103,6 +103,7 @@ public class TrainerServiceImpl implements TrainerService {
   public void toggleProfileActivation(long trainerId, boolean isActive) {
     var trainer = findById(trainerId);
     trainer.setActive(isActive);
+    //add method with
     trainerRepository.toggleProfileActivation(trainer);
 
   }

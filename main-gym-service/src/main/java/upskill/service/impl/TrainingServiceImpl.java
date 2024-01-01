@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import upskill.converter.TrainerWorkloadRequestForDeleteConverter;
 import upskill.converter.TrainingConverter;
 import upskill.dao.TrainingRepository;
 import upskill.dto.*;
@@ -34,7 +35,7 @@ public class TrainingServiceImpl implements TrainingService {
   private final TrainingConverter trainingConverter;
   private final SenderMessagesForSaveService messagesForSaveService;
   private final SenderMessagesForDeleteService messagesForDeleteService;
-
+  private final TrainerWorkloadRequestForDeleteConverter converter;
   @Override
   @Transactional(readOnly = true)
   public Training findTrainingById(long trainingId) {
@@ -183,7 +184,8 @@ public class TrainingServiceImpl implements TrainingService {
   }
 
   private void deleteTrainingFromWorkloadService(TrainingRequestDto trainingDto) {
-    messagesForDeleteService.sendJsonMessage(trainingDto);
+    var dto = converter.toTrainerWorkloadRequestForDelete(trainingDto);
+    messagesForDeleteService.sendJsonMessage(dto);
   }
 
   private void saveTrainingInWorkloadService(TrainerTrainingDtoForSave trainingDto) {

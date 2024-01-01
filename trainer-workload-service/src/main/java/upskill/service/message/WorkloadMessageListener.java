@@ -6,10 +6,10 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import upskill.controller.TrainerWorkloadController;
 import upskill.dto.DeadLetterMessage;
 import upskill.dto.TrainerTrainingDtoForSave;
-import upskill.dto.TrainingRequestDto;
+import upskill.dto.TrainerWorkloadRequestForDelete;
+import upskill.service.TrainingSummaryService;
 
 @Slf4j
 @Component
@@ -23,32 +23,30 @@ public class WorkloadMessageListener {
 
   @Autowired
   private RabbitTemplate rabbitTemplate;
-  private final TrainerWorkloadController controller;
+  private final TrainingSummaryService service;
 
   @RabbitListener(queues = {saveQueue})
   public void handleMessage(TrainerTrainingDtoForSave trainingDto) {
     try {
       log.info(String.format("Received message -> %s", trainingDto));
-      controller.saveTraining(trainingDto);
+      service.saveTraining(trainingDto);
     } catch (Exception e) {
       sendToDeadLetterQueue(trainingDto);
     }
   }
 
   @RabbitListener(queues = {deleteQueue})
-  public void handleMessage(TrainingRequestDto trainingDto) {
+  public void handleMessage(TrainerWorkloadRequestForDelete trainingDto) {
     try {
       log.info(String.format("Received message -> %s", trainingDto));
-      controller.deleteTraining(trainingDto);
+      service.deleteTraining(trainingDto);
     } catch (Exception e) {
-      var message = new DeadLetterMessage();
-      message.setTraining(trainingDto);
-      message.setException(e.getCause().getMessage());
+      var message = DeadLetterMessage.builder().training(trainingDto).exception(e.getCause().getMessage()).build();
       sendToDeadLetterQueue(message);
     }
   }
 
-  private void sendToDeadLetterQueue(DeadLetterMessage message ) {
+  private void sendToDeadLetterQueue(DeadLetterMessage message) {
     rabbitTemplate.convertAndSend(exchangeName, routingKeyForDeadLetter, message);
   }
 

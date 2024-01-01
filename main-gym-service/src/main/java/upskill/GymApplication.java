@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import upskill.entity.Training;
 
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 @EnableAspectJAutoProxy(proxyTargetClass = true)
@@ -13,6 +14,6 @@ public class GymApplication {
 
   public static void main(String[] args) {
     SpringApplication.run(GymApplication.class, args);
-  }
 
+  }
 }
