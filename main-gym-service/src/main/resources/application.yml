@@ -39,8 +39,8 @@ hibernate:
 logging:
   level:
     org.hibernate.SQL: DEBUG
-#    upskill.logger: DEBUG
-#    org.springframework.web: DEBUG
+    upskill.logger: DEBUG
+    org.springframework.web: DEBUG
     org.springframework.amqp: DEBUG
 
 management:

@@ -33,22 +33,16 @@ public class TrainingSummaryService {
     var duration = dto.getDuration();
 
     trainerOptional.ifPresent(trainer -> {
-      // Найти нужный год и месяц в коллекции
       Optional<YearData> foundYear = trainer.getYearsList().stream()
           .filter(y -> y.getYear() == date.getYear())
           .findFirst();
-
       foundYear.ifPresent(yearData -> {
         Optional<MonthData> foundMonth = yearData.getMonthsList().stream()
             .filter(m -> m.getMonth() == month)
             .findFirst();
-
         foundMonth.ifPresent(monthData -> {
-          // Обновить длительность
           int newDuration = monthData.getTrainingsSummaryDuration() - duration;
           monthData.setTrainingsSummaryDuration(newDuration);
-
-          // Сохранить изменения в базе данных
           mongoTemplate.save(trainer);
         });
       });
