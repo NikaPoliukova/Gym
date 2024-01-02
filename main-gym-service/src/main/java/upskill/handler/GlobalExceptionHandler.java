@@ -32,13 +32,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     return "User not authenticated " + ex.getMessage();
   }
 
-  @ExceptionHandler(CustomFeignException.class)
-  @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
-  @ResponseBody
-  public String handleFeignException(CustomFeignException ex) {
-    return "Workload service not available " + ex.getMessage();
-  }
-
   @ExceptionHandler(OperationFailedException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
@@ -72,6 +65,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @ResponseBody
   public String handleEntityNotFoundException(EntityNotFoundException ex) {
     return " This trainingType was not found" + ex.getMessage();
+  }
+  @ExceptionHandler(TrainingNotFoundException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  @ResponseBody
+  public String handleTrainingNotFoundException(TrainingNotFoundException ex) {
+    return  ex.getMessage();
   }
 
   @ExceptionHandler(IndexOutOfBoundsException.class)

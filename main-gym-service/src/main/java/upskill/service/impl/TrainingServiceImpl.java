@@ -36,6 +36,7 @@ public class TrainingServiceImpl implements TrainingService {
   private final SenderMessagesForSaveService messagesForSaveService;
   private final SenderMessagesForDeleteService messagesForDeleteService;
   private final TrainerWorkloadRequestForDeleteConverter converter;
+
   @Override
   @Transactional(readOnly = true)
   public Training findTrainingById(long trainingId) {
@@ -67,9 +68,12 @@ public class TrainingServiceImpl implements TrainingService {
   public void delete(TrainingRequestDto trainingDto, String header) {
     var trainer = trainerService.findByUsername(trainingDto.getTrainerUsername());
     var trainingType = trainingRepository.findTrainingTypeByName(trainingDto.getTrainingType());
+    var training = trainingRepository.findTraining(trainingDto, trainer, trainingType);
+    if (training.isEmpty()) {
+      throw new TrainingNotFoundException("The training cannot be deleted, it doesn't exist");
+    }
     try {
-      trainingRepository.delete(trainer, trainingType, trainingDto.getTrainingName(), trainingDto.getDuration(),
-          trainingDto.getTrainingDate());
+      trainingRepository.delete(trainingDto, trainer, trainingType);
       deleteTrainingFromWorkloadService(trainingDto);
     } catch (Exception e) {
       throw new OperationFailedException("training", "delete training");
@@ -157,7 +161,7 @@ public class TrainingServiceImpl implements TrainingService {
   public Training findTraining(TrainingRequest trainingRequest) {
     var training = trainingRepository.findTraining(trainingRequest);
     if (training.isEmpty()) {
-      throw new TrainingNotFoundException("training not found");
+      throw new TrainingNotFoundException("Training not found");
     }
     return training.get();
   }

@@ -163,16 +163,16 @@ public class TrainingRepositoryImpl implements TrainingRepository {
   }
 
   @Override
-  public Optional<Training> findTraining(TrainingRequestDto trainingRequest) {
+  public Optional<Training> findTraining(TrainingRequestDto dto, Trainer trainer, TrainingType type) {
     var cb = entityManager.getCriteriaBuilder();
     var query = cb.createQuery(Training.class);
     var trainingRoot = query.from(Training.class);
     var predicate = cb.and(
-        cb.equal(trainingRoot.get(TRAINER_USERNAME), trainingRequest.getTrainerUsername()),
-        cb.equal(trainingRoot.get(TRAINING_NAME), trainingRequest.getTrainingName()),
-        cb.equal(trainingRoot.get(TRAINING_DATE), trainingRequest.getTrainingDate()),
-        cb.equal(trainingRoot.get(TRAINING_TYPE).get(NAME), trainingRequest.getTrainingType()),
-        cb.equal(trainingRoot.get(TRAINING_DURATION), trainingRequest.getDuration())
+        cb.equal(trainingRoot.get(TRAINER), trainer),
+        cb.equal(trainingRoot.get(TRAINING_NAME), dto.getTrainingName()),
+        cb.equal(trainingRoot.get(TRAINING_DATE), dto.getTrainingDate()),
+        cb.equal(trainingRoot.get(TRAINING_TYPE), type),
+        cb.equal(trainingRoot.get(TRAINING_DURATION), dto.getDuration())
     );
     query.select(trainingRoot).where(predicate);
     try {
@@ -184,16 +184,15 @@ public class TrainingRepositoryImpl implements TrainingRepository {
   }
 
   @Override
-  public void delete(Trainer trainer, TrainingType trainingType, String trainingName,
-                     int duration, LocalDate trainingDate) {
+  public void delete(TrainingRequestDto dto, Trainer trainer, TrainingType type) {
     var jpql = "DELETE FROM Training t WHERE t.trainer = :trainer AND t.trainingName = :trainingName " +
         "AND t.trainingDate = :trainingDate AND t.trainingType = :trainingType AND t.trainingDuration = :duration";
     entityManager.createQuery(jpql)
         .setParameter(TRAINER, trainer)
-        .setParameter(TRAINING_NAME, trainingName)
-        .setParameter(TRAINING_DATE, trainingDate)
-        .setParameter(TRAINING_TYPE, trainingType)
-        .setParameter("duration", duration)
+        .setParameter(TRAINING_NAME, dto.getTrainingName())
+        .setParameter(TRAINING_DATE, dto.getTrainingDate())
+        .setParameter(TRAINING_TYPE, type)
+        .setParameter("duration", dto.getDuration())
         .executeUpdate();
   }
 
