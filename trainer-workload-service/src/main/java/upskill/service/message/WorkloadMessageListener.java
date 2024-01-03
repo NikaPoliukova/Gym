@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import upskill.dto.DeadLetterMessage;
 import upskill.dto.TrainerTrainingDtoForSave;
@@ -34,6 +33,7 @@ public class WorkloadMessageListener {
       log.info(String.format("Received message -> %s", trainingDto));
       service.saveTraining(trainingDto);
     } catch (Exception e) {
+      log.error("training wasn't save");
       sendToDeadLetterQueue(trainingDto);
     }
   }
@@ -44,6 +44,7 @@ public class WorkloadMessageListener {
       log.info(String.format("Received message -> %s", trainingDto));
       service.deleteTraining(trainingDto);
     } catch (Exception e) {
+      log.error("training wasn't delete");
       var message = DeadLetterMessage.builder().training(trainingDto).exception(e.getCause().getMessage()).build();
       sendToDeadLetterQueue(message);
     }

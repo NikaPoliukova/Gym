@@ -1,6 +1,8 @@
 package upskill.service;
 
+import com.mongodb.BasicDBObject;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -13,11 +15,15 @@ import upskill.entity.MonthData;
 import upskill.entity.TrainingTrainerSummary;
 import upskill.entity.YearData;
 import upskill.exception.OperationFailedException;
+import upskill.exception.UpdateDurationException;
+import upskill.exception.UpdateMonthException;
+import upskill.exception.UpdateYearException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TrainingSummaryService {
@@ -35,45 +41,104 @@ public class TrainingSummaryService {
       var duration = dto.getDuration();
       var yearData = getYearData(dto, year, month);
       var trainingTrainerSummary = convertToTrainingSummary(dto, List.of(yearData));
-      var trainerOptional = getTrainingTrainerSummary(username);
-      trainerOptional.ifPresentOrElse(
-          trainer -> updateExistingTraining(trainer, year, month, duration),
-          () -> saveTraining(trainingTrainerSummary));
+
+      getTrainingTrainerSummary(username)
+          .ifPresentOrElse(
+              trainer -> updateExistingTraining(trainer, year, month, duration),
+              () -> saveTraining(trainingTrainerSummary)
+          );
     } catch (Exception e) {
+      log.error("Error while saving training.", e);
       throw new OperationFailedException(dto.getTrainerUsername(), "save training");
     }
   }
 
+  //  public void deleteTraining(TrainerWorkloadRequestForDelete dto) {
+//    try {
+//      var trainerOptional = getTrainingTrainerSummary(dto.getTrainerUsername());
+//      var year = dto.getTrainingDate().getYear();
+//      var month = dto.getTrainingDate().getMonth().getValue();
+//      var date = getYearData(dto, year, month);
+//      var duration = dto.getDuration();
+//
+//      trainerOptional.ifPresent(trainer -> {
+//        var foundYear = trainer.getYearsList()
+//            .stream()
+//            .filter(y -> y.getYear() == date.getYear())
+//            .findFirst();
+//        foundYear.ifPresent(yearData -> {
+//          var foundMonth = yearData.getMonthsList()
+//              .stream()
+//              .filter(m -> m.getMonthValue() == month)
+//              .findFirst();
+//          foundMonth.ifPresent(monthData -> {
+//            var newDuration = monthData.getTrainingsSummaryDuration() - duration;
+//            if (newDuration < 0) {
+//              throw new UpdateDurationException();
+//            }
+//            if (newDuration == 0) {
+//              deleteMonth(trainer, yearData, monthData);
+//            } else {
+//              monthData.setTrainingsSummaryDuration(newDuration);
+//              mongoTemplate.save(trainer);
+//            }
+//          });
+//        });
+//      });
+//    } catch (Exception e) {
+//      log.error("Error while deleting training.", e);
+//      throw new OperationFailedException(dto.getTrainerUsername(), "delete training");
+//    }
+//  }
   public void deleteTraining(TrainerWorkloadRequestForDelete dto) {
     try {
-      var trainerOptional = getTrainingTrainerSummary(dto.getTrainerUsername());
-      var year = dto.getTrainingDate().getYear();
-      var month = dto.getTrainingDate().getMonth().getValue();
-      var date = getYearData(dto, year, month);
-      var duration = dto.getDuration();
+      getTrainingTrainerSummary(dto.getTrainerUsername())
+          .ifPresent(trainer -> {
+            var yearData = getYearData(dto, dto.getTrainingDate().getYear(), dto.getTrainingDate().getMonth().getValue());
+            yearData.getMonthsList()
+                .stream()
+                .filter(monthData -> monthData.getMonthValue() == dto.getTrainingDate().getMonth().getValue())
+                .findFirst()
+                .ifPresent(monthData -> {
+                  var newDuration = monthData.getTrainingsSummaryDuration() - dto.getDuration();
+                  if (newDuration < 0) {
+                    throw new UpdateDurationException();
+                  }
 
-      trainerOptional.ifPresent(trainer -> {
-        var foundYear = trainer.getYearsList()
-            .stream()
-            .filter(y -> y.getYear() == date.getYear())
-            .findFirst();
-        foundYear.ifPresent(yearData -> {
-          var foundMonth = yearData.getMonthsList()
-              .stream()
-              .filter(m -> m.getMonthValue() == month)
-              .findFirst();
-          foundMonth.ifPresent(monthData -> {
-            var newDuration = monthData.getTrainingsSummaryDuration() - duration;
-            monthData.setTrainingsSummaryDuration(newDuration);
-            mongoTemplate.save(trainer);
+                  if (newDuration == 0) {
+                    deleteMonth(trainer, yearData, monthData);
+                    if (yearData.getMonthsList().size() == 1) {
+                      deleteYear(trainer, yearData);
+                    }
+                  } else {
+                    monthData.setTrainingsSummaryDuration(newDuration);
+                    mongoTemplate.save(trainer);
+                  }
+                });
           });
-        });
-      });
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("Error while deleting training.", e);
+      throw new OperationFailedException(dto.getTrainerUsername(), "delete training");
     }
   }
 
+  private void deleteYear(TrainingTrainerSummary trainer, YearData yearData) {
+    var query = Query.query(Criteria.where(USERNAME).is(trainer.getUsername())
+        .and(YEARS_LIST_YEAR).is(yearData.getYear()));
+    var update = new Update().pull("yearsList", new BasicDBObject("year", yearData.getYear()));
+    mongoTemplate.updateFirst(query, update, TrainingTrainerSummary.class);
+  }
+
+  private void deleteMonth(TrainingTrainerSummary trainer, YearData yearData, MonthData monthData) {
+    try {
+      var query = Query.query(Criteria.where(USERNAME).is(trainer.getUsername())
+          .and(YEARS_LIST_YEAR).is(yearData.getYear()));
+      var update = new Update().pull(YEARS_AND_MONTH_LISTS, new BasicDBObject("monthValue", monthData.getMonthValue()));
+      mongoTemplate.updateFirst(query, update, TrainingTrainerSummary.class);
+    } catch (Exception e) {
+      throw new UpdateMonthException();
+    }
+  }
 
   private void updateExistingTraining(TrainingTrainerSummary trainer, int year, int month, int duration) {
     var yearDataOptional = trainer.getYearsList()
@@ -97,7 +162,8 @@ public class TrainingSummaryService {
           () -> createNewMonth(trainer, yearData, month, duration)
       );
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("Error while updating existing year.", e);
+      throw new UpdateYearException();
     }
   }
 
@@ -111,9 +177,11 @@ public class TrainingSummaryService {
       var update = new Update().set(YEARS_AND_MONTH_LISTS, trainer.getYearsList().get(0).getMonthsList());
       mongoTemplate.updateFirst(query, update, TrainingTrainerSummary.class);
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("Error while updating existing month.", e);
+      throw new UpdateMonthException();
     }
   }
+
   private Optional<TrainingTrainerSummary> getTrainingTrainerSummary(String username) {
     var query = Query.query(Criteria.where(USERNAME).is(username));
     return Optional.ofNullable(mongoTemplate.findOne(query, TrainingTrainerSummary.class));
@@ -123,14 +191,16 @@ public class TrainingSummaryService {
     try {
       var newMonth = MonthData.builder().monthValue(month).trainingsSummaryDuration(duration).build();
       yearData.getMonthsList().add(newMonth);
-      var query = Query.query(Criteria.where(USERNAME).is(trainer.getUsername())
-          .and(YEARS_LIST_YEAR).is(yearData.getYear()));
+      var query = Query.query(Criteria.where(USERNAME).is(trainer.getUsername()).and(YEARS_LIST_YEAR)
+          .is(yearData.getYear()));
       var update = new Update().set(YEARS_AND_MONTH_LISTS, yearData.getMonthsList());
       mongoTemplate.updateFirst(query, update, TrainingTrainerSummary.class);
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("Error while creating new month.", e);
+      throw new UpdateMonthException();
     }
   }
+
 
   protected void createNewYear(TrainingTrainerSummary trainer, int year, int month, int duration) {
     try {
@@ -148,7 +218,8 @@ public class TrainingSummaryService {
       var update = new Update().addToSet("yearsList", newYear);
       mongoTemplate.updateFirst(query, update, TrainingTrainerSummary.class);
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("Error while creating new year.", e);
+      throw new UpdateYearException();
     }
   }
 
@@ -156,6 +227,7 @@ public class TrainingSummaryService {
     try {
       return trainingRepository.save(dto);
     } catch (Exception e) {
+      log.error("Error while saving training.", e);
       throw new OperationFailedException(dto.getUsername(), "Save training");
     }
   }
