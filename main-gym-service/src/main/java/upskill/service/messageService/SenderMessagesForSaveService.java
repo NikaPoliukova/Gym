@@ -11,8 +11,8 @@ import upskill.dto.TrainerTrainingDtoForSave;
 @RequiredArgsConstructor
 @Slf4j
 public class SenderMessagesForSaveService {
-  private static final String exchangeName = "my_exchange";
-  private static final String routingKeyForSave = "save_key";
+  private static final String EXCHANGE_NAME = "my_exchange";
+  private static final String ROUTING_KEY_FOR_SAVE = "save_key";
 
 
   @Autowired
@@ -20,6 +20,6 @@ public class SenderMessagesForSaveService {
 
   public void sendJsonMessage(TrainerTrainingDtoForSave trainingDto) {
     log.info(String.format("Json message sent -> %s", trainingDto.toString()));
-    rabbitTemplate.convertAndSend(exchangeName, routingKeyForSave, trainingDto);
+    rabbitTemplate.convertAndSend(EXCHANGE_NAME, ROUTING_KEY_FOR_SAVE, trainingDto);
   }
 }

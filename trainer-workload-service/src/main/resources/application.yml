@@ -52,4 +52,3 @@ eureka:
 ribbon:
   eureka:
     enabled: true
-

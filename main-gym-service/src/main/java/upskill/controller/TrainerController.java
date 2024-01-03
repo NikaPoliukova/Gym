@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import upskill.converter.TrainerConverter;
 import upskill.converter.TrainingConverter;
 import upskill.dto.*;
-import upskill.entity.Training;
 import upskill.service.TrainerService;
 import upskill.service.TrainingService;
 

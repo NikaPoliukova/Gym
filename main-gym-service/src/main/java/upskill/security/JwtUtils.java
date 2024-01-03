@@ -27,7 +27,7 @@ public class JwtUtils {
   public static final String JWT_REFRESH = "JWT-REFRESH";
   public static final String JWT = "Bearer";
 
-  private static final String secretKey = "111111111111122222222222222224444444444444444444444444444444444444ty" +
+  private static final String SECRET_KEY = "111111111111122222222222222224444444444444444444444444444444444444ty" +
       "utghfcjdecuijednklfcmedfbdsziokplfhivokfplddcgdvgcvdduhvuifmklvmdklmvkfhgvuihfuid8";
 
   private final Key secret = getSecretKeySpec();
@@ -137,7 +137,7 @@ public class JwtUtils {
   }
 
   private SecretKeySpec getSecretKeySpec() {
-    byte[] secretKeyBytes = secretKey.getBytes();
+    byte[] secretKeyBytes = SECRET_KEY.getBytes();
     return new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS512.getJcaName());
   }
 }

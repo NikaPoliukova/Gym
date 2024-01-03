@@ -16,21 +16,21 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableRabbit
 public class RabbitMQConfig {
-  private static final String exchangeName = "my_exchange";
+  private static final String EXCHANGE_NAME = "my_exchange";
 
-  private static final String deleteQueue = "delete_queue";
-  private static final String routingKeyForDelete = "delete_key";
+  private static final String DELETE_QUEUE = "delete_queue";
+  private static final String ROUTING_KEY_FOR_DELETE = "delete_key";
 
-  private static final String saveQueue = "save_queue";
-  private static final String routingKeyForSave = "save_key";
+  private static final String SAVE_QUEUE = "save_queue";
+  private static final String ROUTING_KEY_FOR_SAVE = "save_key";
 
-  public static final String deadLetterQueue = "dead_letter_queue";
-  private static final String routingKeyForDeadLetter = "dead_letter_key";
+  public static final String DEAD_LETTER_QUEUE = "dead_letter_queue";
+  private static final String ROUTING_KEY_FOR_DEAD_LETTER = "dead_letter_key";
 
 
   @Bean
   public TopicExchange exchange() {
-    return new TopicExchange(exchangeName);
+    return new TopicExchange(EXCHANGE_NAME);
   }
 
   @Bean
@@ -49,7 +49,7 @@ public class RabbitMQConfig {
   //for save
   @Bean
   public Queue saveQueue() {
-    return new Queue(saveQueue);
+    return new Queue(SAVE_QUEUE);
   }
 
   @Bean
@@ -57,13 +57,13 @@ public class RabbitMQConfig {
     return BindingBuilder
         .bind(saveQueue())
         .to(exchange())
-        .with(routingKeyForSave);
+        .with(ROUTING_KEY_FOR_SAVE);
   }
 
   //for delete
   @Bean
   public Queue deleteQueue() {
-    return new Queue(deleteQueue);
+    return new Queue(DELETE_QUEUE);
   }
 
   @Bean
@@ -71,14 +71,14 @@ public class RabbitMQConfig {
     return BindingBuilder
         .bind(deleteQueue())
         .to(exchange())
-        .with(routingKeyForDelete);
+        .with(ROUTING_KEY_FOR_DELETE);
   }
 
 
   // for dead Letter
   @Bean
   public Queue deadLetterQueue() {
-    return new Queue(deadLetterQueue);
+    return new Queue(DEAD_LETTER_QUEUE);
   }
 
   @Bean
@@ -86,7 +86,7 @@ public class RabbitMQConfig {
     Binding binding = BindingBuilder
         .bind(deadLetterQueue())
         .to(exchange())
-        .with(routingKeyForDeadLetter);
+        .with(ROUTING_KEY_FOR_DEAD_LETTER);
     return new Declarables(deadLetterQueue(), exchange(), binding);
   }
 }
