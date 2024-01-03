@@ -6,9 +6,9 @@ import org.springframework.stereotype.Repository;
 import upskill.dao.TraineeRepository;
 import upskill.entity.Trainee;
 import upskill.entity.Trainer;
+import upskill.exception.UserNotFoundException;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.util.List;
@@ -38,7 +38,7 @@ public class TraineeRepositoryImpl implements TraineeRepository {
               Trainee.class)
           .setParameter(USERNAME, username)
           .getSingleResult());
-    } catch (NoResultException ex) {
+    } catch (Exception ex) {
       log.debug("trainee was not found");
       return Optional.empty();
     }

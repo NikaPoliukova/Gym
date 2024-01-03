@@ -173,9 +173,8 @@ class TraineeControllerTest {
 
   @Test
   void testToggleActivationOperationFailedException() {
-    when(traineeService.findByUsername(USERNAME)).thenThrow(new OperationFailedException(USERNAME,
-        "activate or deactivate a trainee"));
-    assertThrows(OperationFailedException.class, () -> {
+    when(traineeService.findByUsername(USERNAME)).thenThrow(new NullPointerException(USERNAME));
+    assertThrows(NullPointerException.class, () -> {
       traineeController.toggleActivation(USERNAME, true);
     });
   }

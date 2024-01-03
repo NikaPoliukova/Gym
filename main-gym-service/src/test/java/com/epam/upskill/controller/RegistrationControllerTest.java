@@ -50,14 +50,6 @@ class RegistrationControllerTest {
 
   }
 
-  private static TraineeRegistration getTraineeRegistration() {
-    TraineeRegistration traineeRegistration = new TraineeRegistration();
-    traineeRegistration.setFirstName(FIRST_NAME);
-    traineeRegistration.setLastName(LAST_NAME);
-    traineeRegistration.setAddress(ADDRESS);
-    traineeRegistration.setDateOfBirth(DATE_OF_BIRTH);
-    return traineeRegistration;
-  }
 
   @Test
   void testTraineeRegistrationFailure() {
@@ -94,4 +86,12 @@ class RegistrationControllerTest {
   }
 
 
+  private static TraineeRegistration getTraineeRegistration() {
+    TraineeRegistration traineeRegistration = new TraineeRegistration();
+    traineeRegistration.setFirstName(FIRST_NAME);
+    traineeRegistration.setLastName(LAST_NAME);
+    traineeRegistration.setAddress(ADDRESS);
+    traineeRegistration.setDateOfBirth(DATE_OF_BIRTH);
+    return traineeRegistration;
+  }
 }

@@ -104,7 +104,7 @@ public class TraineeController {
                                                       @RequestBody @NotEmpty List<TrainersDtoList> list,
                                                       @RequestHeader("Authorization") String header) {
     var dto = new UpdateTraineeTrainerDto(username, trainingDate, trainingName, list);
-    return trainingService.updateTraineeTrainerList(dto,header);
+    return trainingService.updateTraineeTrainerList(dto);
 
   }
 

@@ -7,14 +7,13 @@ import org.springframework.transaction.annotation.Transactional;
 import upskill.converter.TraineeConverter;
 import upskill.dao.TrainerRepository;
 import upskill.dao.TrainingRepository;
+import upskill.dto.Principal;
 import upskill.dto.TraineeDtoForTrainer;
 import upskill.dto.TrainerRegistration;
 import upskill.dto.TrainerUpdateRequest;
-import upskill.entity.Trainee;
 import upskill.entity.Trainer;
 import upskill.entity.TrainingType;
 import upskill.exception.UserNotFoundException;
-import upskill.dto.Principal;
 import upskill.service.HashPassService;
 import upskill.service.TrainerService;
 import upskill.service.UserService;
@@ -54,13 +53,12 @@ public class TrainerServiceImpl implements TrainerService {
     var hashedPassword = hashPassService.hashPass(password);
     return trainerRepository.findByUsernameAndPassword(username, hashedPassword).orElseThrow(()
         -> new UserNotFoundException(username));
-
   }
 
   @Override
   @Transactional
   public List<Trainer> findAll() {
-    List<Trainer> trainerMap = trainerRepository.findAll();
+    var trainerMap = trainerRepository.findAll();
     return trainerMap != null ? trainerMap : Collections.emptyList();
   }
 
@@ -103,7 +101,6 @@ public class TrainerServiceImpl implements TrainerService {
   public void toggleProfileActivation(long trainerId, boolean isActive) {
     var trainer = findById(trainerId);
     trainer.setActive(isActive);
-    //add method with
     trainerRepository.toggleProfileActivation(trainer);
 
   }
@@ -111,7 +108,7 @@ public class TrainerServiceImpl implements TrainerService {
   @Override
   @Transactional
   public List<TraineeDtoForTrainer> findTraineesForTrainer(long id) {
-    List<Trainee> listTrainees = trainerRepository.findTraineesForTrainer(id);
+    var listTrainees = trainerRepository.findTraineesForTrainer(id);
     if (listTrainees.isEmpty()) {
       return Collections.emptyList();
     } else {

@@ -32,7 +32,7 @@ public class TrainingController {
   @ApiOperation("Save training")
   public Training saveTraining(@RequestBody @Valid TrainingRequest trainingRequest,
                                @RequestHeader("Authorization") String header) {
-    return trainingService.saveTraining(trainingRequest,header);
+    return trainingService.saveTraining(trainingRequest);
   }
 
   @DeleteMapping("/training")
@@ -40,7 +40,7 @@ public class TrainingController {
   @ApiOperation("delete training")
   public void deleteTraining(@RequestBody @Valid TrainingRequestDto trainingRequest ,
                              @RequestHeader("Authorization") String header) {
-    trainingService.delete(trainingRequest,header);
+    trainingService.delete(trainingRequest);
   }
 
   @ApiOperation("Get a list of training types")

@@ -1,6 +1,8 @@
 package upskill.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
@@ -11,6 +13,8 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Validated
+@AllArgsConstructor
+@NoArgsConstructor
 public class TraineeRegistration {
   @NotBlank @Size(min = 2, max = 30) String firstName;
   @NotBlank @Size(min = 2, max = 30) String lastName;

@@ -46,7 +46,7 @@ public class TrainingServiceImpl implements TrainingService {
 
   @Override
   @Transactional
-  public Training saveTraining(TrainingRequest request, String header) {
+  public Training saveTraining(TrainingRequest request) {
     var trainee = traineeService.findByUsername(request.traineeUsername());
     var trainer = trainerService.findByUsername(request.trainerUsername());
     var trainingType = trainingRepository.findTrainingTypeByName(request.trainingType());
@@ -65,7 +65,7 @@ public class TrainingServiceImpl implements TrainingService {
 
   @Override
   @Transactional
-  public void delete(TrainingRequestDto trainingDto, String header) {
+  public void delete(TrainingRequestDto trainingDto) {
     var trainer = trainerService.findByUsername(trainingDto.getTrainerUsername());
     var trainingType = trainingRepository.findTrainingTypeByName(trainingDto.getTrainingType());
     var training = trainingRepository.findTraining(trainingDto, trainer, trainingType);
@@ -140,7 +140,7 @@ public class TrainingServiceImpl implements TrainingService {
 
   @Override
   @Transactional
-  public List<TrainerDtoForTrainee> updateTraineeTrainerList(UpdateTraineeTrainerDto dto, String header) {
+  public List<TrainerDtoForTrainee> updateTraineeTrainerList(UpdateTraineeTrainerDto dto) {
     var trainee = traineeService.findByUsername(dto.username());
     checkForNewTrainerFor(dto.list());
     var trainings = findTrainingsByUsernameAndCriteria(trainee.getId(), dto.trainingDate(), dto.trainingName());
@@ -151,7 +151,7 @@ public class TrainingServiceImpl implements TrainingService {
         .map(trainerDto -> trainerService.findByUsername(trainerDto.username()))
         .map(newTrainer -> {
           var trainingRequest = getTrainingRequest(trainee, patternTraining, newTrainer);
-          var training = saveTraining(trainingRequest, header);
+          var training = saveTraining(trainingRequest);
           return getTrainerResponse(training);
         })
         .toList();
@@ -192,7 +192,7 @@ public class TrainingServiceImpl implements TrainingService {
     messagesForDeleteService.sendJsonMessage(dto);
   }
 
-  private void saveTrainingInWorkloadService(TrainerTrainingDtoForSave trainingDto) {
+  public void saveTrainingInWorkloadService(TrainerTrainingDtoForSave trainingDto) {
     messagesForSaveService.sendJsonMessage(trainingDto);
   }
 
@@ -208,7 +208,7 @@ public class TrainingServiceImpl implements TrainingService {
     );
   }
 
-  private static void setParamsToTraining(Trainee trainee, Trainer trainer, TrainingType trainingType, Training training) {
+  public static void setParamsToTraining(Trainee trainee, Trainer trainer, TrainingType trainingType, Training training) {
     training.setTrainee(trainee);
     training.setTrainer(trainer);
     training.setTrainingType(trainingType);

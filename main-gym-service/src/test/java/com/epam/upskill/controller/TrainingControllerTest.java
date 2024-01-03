@@ -47,7 +47,7 @@ class TrainingControllerTest {
   @Test
   void testSaveTrainingSuccess() {
     TrainingRequest trainingRequest = getTrainingRequest();
-    when(trainingService.saveTraining(trainingRequest, "header")).thenReturn(new Training());
+    when(trainingService.saveTraining(trainingRequest)).thenReturn(new Training());
     trainingController.saveTraining(trainingRequest, "header");
   }
 
@@ -55,7 +55,7 @@ class TrainingControllerTest {
   @Test
   void testSaveTrainingFailure() {
     TrainingRequest trainingRequest = getTrainingRequest();
-    when(trainingService.saveTraining(trainingRequest, "header")).thenThrow(new OperationFailedException(TRAINING_NAME +
+    when(trainingService.saveTraining(trainingRequest)).thenThrow(new OperationFailedException(TRAINING_NAME +
         "with date " + DATE, "Save training"));
     assertThrows(OperationFailedException.class, () -> {
       trainingController.saveTraining(trainingRequest, "header");
