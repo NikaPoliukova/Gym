@@ -30,6 +30,7 @@ public class TrainingSummaryService {
   public static final String USERNAME = "username";
   public static final String YEARS_LIST_YEAR = "yearsList.year";
   public static final String YEARS_AND_MONTH_LISTS = "yearsList.$.monthsList";
+  public static final String YEARS_LIST = "yearsList";
   private final MongoTemplate mongoTemplate;
   private final TrainerTrainingRepository trainingRepository;
 
@@ -53,43 +54,6 @@ public class TrainingSummaryService {
     }
   }
 
-  //  public void deleteTraining(TrainerWorkloadRequestForDelete dto) {
-//    try {
-//      var trainerOptional = getTrainingTrainerSummary(dto.getTrainerUsername());
-//      var year = dto.getTrainingDate().getYear();
-//      var month = dto.getTrainingDate().getMonth().getValue();
-//      var date = getYearData(dto, year, month);
-//      var duration = dto.getDuration();
-//
-//      trainerOptional.ifPresent(trainer -> {
-//        var foundYear = trainer.getYearsList()
-//            .stream()
-//            .filter(y -> y.getYear() == date.getYear())
-//            .findFirst();
-//        foundYear.ifPresent(yearData -> {
-//          var foundMonth = yearData.getMonthsList()
-//              .stream()
-//              .filter(m -> m.getMonthValue() == month)
-//              .findFirst();
-//          foundMonth.ifPresent(monthData -> {
-//            var newDuration = monthData.getTrainingsSummaryDuration() - duration;
-//            if (newDuration < 0) {
-//              throw new UpdateDurationException();
-//            }
-//            if (newDuration == 0) {
-//              deleteMonth(trainer, yearData, monthData);
-//            } else {
-//              monthData.setTrainingsSummaryDuration(newDuration);
-//              mongoTemplate.save(trainer);
-//            }
-//          });
-//        });
-//      });
-//    } catch (Exception e) {
-//      log.error("Error while deleting training.", e);
-//      throw new OperationFailedException(dto.getTrainerUsername(), "delete training");
-//    }
-//  }
   public void deleteTraining(TrainerWorkloadRequestForDelete dto) {
     try {
       getTrainingTrainerSummary(dto.getTrainerUsername())
@@ -122,14 +86,14 @@ public class TrainingSummaryService {
     }
   }
 
-  private void deleteYear(TrainingTrainerSummary trainer, YearData yearData) {
+  protected void deleteYear(TrainingTrainerSummary trainer, YearData yearData) {
     var query = Query.query(Criteria.where(USERNAME).is(trainer.getUsername())
         .and(YEARS_LIST_YEAR).is(yearData.getYear()));
-    var update = new Update().pull("yearsList", new BasicDBObject("year", yearData.getYear()));
+    var update = new Update().pull(YEARS_LIST, new BasicDBObject("year", yearData.getYear()));
     mongoTemplate.updateFirst(query, update, TrainingTrainerSummary.class);
   }
 
-  private void deleteMonth(TrainingTrainerSummary trainer, YearData yearData, MonthData monthData) {
+  protected void deleteMonth(TrainingTrainerSummary trainer, YearData yearData, MonthData monthData) {
     try {
       var query = Query.query(Criteria.where(USERNAME).is(trainer.getUsername())
           .and(YEARS_LIST_YEAR).is(yearData.getYear()));
@@ -140,7 +104,7 @@ public class TrainingSummaryService {
     }
   }
 
-  private void updateExistingTraining(TrainingTrainerSummary trainer, int year, int month, int duration) {
+  protected void updateExistingTraining(TrainingTrainerSummary trainer, int year, int month, int duration) {
     var yearDataOptional = trainer.getYearsList()
         .stream()
         .filter(yearData -> yearData.getYear() == year)
@@ -215,7 +179,7 @@ public class TrainingSummaryService {
       newYear.getMonthsList().add(newMonth);
       trainer.getYearsList().add(newYear);
       var query = Query.query(Criteria.where(USERNAME).is(trainer.getUsername()));
-      var update = new Update().addToSet("yearsList", newYear);
+      var update = new Update().addToSet(YEARS_LIST, newYear);
       mongoTemplate.updateFirst(query, update, TrainingTrainerSummary.class);
     } catch (Exception e) {
       log.error("Error while creating new year.", e);

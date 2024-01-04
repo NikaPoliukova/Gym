@@ -63,7 +63,7 @@ public class TrainerController {
                                                                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                                                                 LocalDate periodTo,
                                                                 @RequestParam(required = false) String traineeName) {
-    var trainingsList = trainingService.findTrainerTrainings( new TrainingTrainerRequest(username,
+    var trainingsList = trainingService.findTrainerTrainings(new TrainingTrainerRequest(username,
         periodFrom, periodTo, traineeName));
     return trainingConverter.toTrainerTrainingResponse(trainingsList);
   }
@@ -72,7 +72,7 @@ public class TrainerController {
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Activate or deactivate Trainer's profile")
   public void toggleActivationTrainer(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username,
-                               @RequestParam("active") @NotNull boolean isActive) {
+                                      @RequestParam("active") @NotNull boolean isActive) {
     var trainer = trainerService.findByUsername(username);
     trainerService.toggleProfileActivation(trainer.getId(), isActive);
   }

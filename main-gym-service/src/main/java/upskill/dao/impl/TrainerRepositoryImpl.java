@@ -9,7 +9,6 @@ import upskill.entity.Trainer;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,14 +31,14 @@ public class TrainerRepositoryImpl implements TrainerRepository {
   @Override
   public List<Trainer> findByIsActive() {
     var jpql = "SELECT t FROM Trainer t  WHERE t.isActive = :isActive";
-   var query = entityManager.createQuery(jpql, Trainer.class);
+    var query = entityManager.createQuery(jpql, Trainer.class);
     query.setParameter("isActive", true);
     return query.getResultList();
   }
 
   @Override
   public List<Trainee> findTraineesForTrainer(long trainerId) {
-   var query = entityManager.createQuery(
+    var query = entityManager.createQuery(
         "SELECT DISTINCT t.trainee FROM Training t WHERE t.trainer.id = :trainerId", Trainee.class);
     query.setParameter("trainerId", trainerId);
     return query.getResultList();

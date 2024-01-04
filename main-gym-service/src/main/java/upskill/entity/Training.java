@@ -1,7 +1,6 @@
 package upskill.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -60,7 +59,7 @@ public class Training {
   public String toString() {
     return "Training(id=" + this.getId() + ", trainingName=" + this.getTrainingName() + ", trainingDate="
         + this.getTrainingDate() + ", trainingDuration=" + this.getTrainingDuration() + ", trainee="
-        + this.getTrainee().getId()+
+        + this.getTrainee().getId() +
         ", trainer=" + this.getTrainer().getUsername()
         + ", trainingType=" + this.getTrainingType().getId() + ")";
   }

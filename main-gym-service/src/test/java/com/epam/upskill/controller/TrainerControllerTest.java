@@ -24,7 +24,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class TrainerControllerTest {
@@ -76,11 +75,11 @@ class TrainerControllerTest {
         new TrainerUpdateRequest(USERNAME, FIRST_NAME, LAST_NAME, SPECIALIZATION, true);
     Trainer trainer = new Trainer();
     trainer.setActive(true);
-    TrainerUpdateResponse expectedResponse  = new TrainerUpdateResponse(USERNAME, FIRST_NAME, LAST_NAME,
+    TrainerUpdateResponse expectedResponse = new TrainerUpdateResponse(USERNAME, FIRST_NAME, LAST_NAME,
         "YOGA", true, new ArrayList<>());
     trainer.setUsername(USERNAME);
     when(trainerService.update(updateRequest)).thenReturn(trainer);
-    when(trainerConverter.toTrainerUpdateResponse(trainer, trainerService)).thenReturn(expectedResponse );
+    when(trainerConverter.toTrainerUpdateResponse(trainer, trainerService)).thenReturn(expectedResponse);
     TrainerUpdateResponse result =
         trainerController.updateTrainer(USERNAME, FIRST_NAME, LAST_NAME, SPECIALIZATION, true);
     assertNotNull(result);

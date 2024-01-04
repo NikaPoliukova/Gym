@@ -44,6 +44,7 @@ public class JwtUtil {
     }
     return null;
   }
+
   public String extractToken(String authorizationHeader) {
     return authorizationHeader.substring(7);
   }

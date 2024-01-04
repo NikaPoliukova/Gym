@@ -70,8 +70,8 @@ class TraineeControllerTest {
   void testGetTrainee() {
     Trainee trainee = new Trainee();
     when(traineeService.findByUsername(USERNAME)).thenReturn(trainee);
-    TraineeResponse expectedResponse = new TraineeResponse(FIRST_NAME,LAST_NAME,
-        LocalDate.now().minusYears(15),ADDRESS,true,new ArrayList<>());
+    TraineeResponse expectedResponse = new TraineeResponse(FIRST_NAME, LAST_NAME,
+        LocalDate.now().minusYears(15), ADDRESS, true, new ArrayList<>());
     when(traineeConverter.toTraineeResponse(trainee, traineeService)).thenReturn(expectedResponse);
     TraineeResponse result = traineeController.getTrainee(USERNAME);
     assertEquals(expectedResponse, result);

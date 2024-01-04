@@ -34,7 +34,7 @@ public interface TrainingRepository extends AbstractRepository<Training> {
 
   Optional<Training> findTraining(TrainingRequest trainingRequest);
 
-  Optional<Training> findTraining(TrainingRequestDto dto,Trainer trainer, TrainingType type);
+  Optional<Training> findTraining(TrainingRequestDto dto, Trainer trainer, TrainingType type);
 
   void delete(TrainingRequestDto dto, Trainer trainer, TrainingType type);
 }

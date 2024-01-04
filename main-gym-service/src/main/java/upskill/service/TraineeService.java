@@ -1,10 +1,10 @@
 package upskill.service;
 
+import upskill.dto.Principal;
 import upskill.dto.TraineeRegistration;
 import upskill.dto.TraineeUpdateRequest;
 import upskill.dto.TrainerDtoForTrainee;
 import upskill.entity.Trainee;
-import upskill.dto.Principal;
 
 import java.util.List;
 

@@ -66,11 +66,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   public String handleEntityNotFoundException(EntityNotFoundException ex) {
     return " This trainingType was not found" + ex.getMessage();
   }
+
   @ExceptionHandler(TrainingNotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @ResponseBody
   public String handleTrainingNotFoundException(TrainingNotFoundException ex) {
-    return  ex.getMessage();
+    return ex.getMessage();
   }
 
   @ExceptionHandler(IndexOutOfBoundsException.class)

@@ -22,7 +22,6 @@ public class WorkloadMessageListener {
   private static final String ROUTING_KEY_FOR_DEAD_LETTER = "dead_letter_key";
 
 
-
   @Autowired
   private RabbitTemplate rabbitTemplate;
   private final TrainingSummaryService service;

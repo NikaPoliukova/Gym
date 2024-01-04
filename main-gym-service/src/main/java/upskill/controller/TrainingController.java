@@ -38,7 +38,7 @@ public class TrainingController {
   @DeleteMapping("/training")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @ApiOperation("delete training")
-  public void deleteTraining(@RequestBody @Valid TrainingRequestDto trainingRequest ,
+  public void deleteTraining(@RequestBody @Valid TrainingRequestDto trainingRequest,
                              @RequestHeader("Authorization") String header) {
     trainingService.delete(trainingRequest);
   }
