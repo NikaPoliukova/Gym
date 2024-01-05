@@ -22,6 +22,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     return ex.getMessage();
   }
 
+  @ExceptionHandler(IncorrectDateException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ResponseBody
+  public String handleUpdateMonthException(IncorrectDateException ex) {
+    return ex.getMessage();
+  }
+
   @ExceptionHandler(UpdateMonthException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody

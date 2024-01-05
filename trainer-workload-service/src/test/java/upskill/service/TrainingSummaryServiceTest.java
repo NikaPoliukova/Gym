@@ -16,11 +16,14 @@ import upskill.dto.TrainerWorkloadRequestForDelete;
 import upskill.entity.MonthData;
 import upskill.entity.TrainingTrainerSummary;
 import upskill.entity.YearData;
+import upskill.exception.OperationFailedException;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 
@@ -46,17 +49,26 @@ class TrainingSummaryServiceTest {
   }
 
   @Test
-  void testDeleteTraining() {
+  void testDeleteTraining_DurationTooLow() {
     // Arrange
     var dto = getTrainerWorkloadRequestForDelete();
-    var trainer = getTrainingTrainerSummary();
-    when(mongoTemplate.findOne(any(Query.class), eq(TrainingTrainerSummary.class)))
-        .thenReturn(trainer);
-    // Act
-    trainingSummaryService.deleteTraining(dto);
-    // Assert
-    assertEquals(0, trainer.getYearsList().get(0).getMonthsList().get(0).getTrainingsSummaryDuration());
-    verify(mongoTemplate, times(1)).save(any());
+    var trainerSummary = getTrainingTrainerSummary();
+    when(trainingSummaryService.getTrainingTrainerSummary(dto.getTrainerUsername()))
+        .thenReturn(Optional.of(trainerSummary));
+    trainerSummary.getYearsList().get(0).getMonthsList().get(0).setTrainingsSummaryDuration(5);
+    // Act & Assert
+    assertThrows(OperationFailedException.class, () -> trainingSummaryService.deleteTraining(dto));
+    verify(mongoTemplate, never()).save(any());
+  }
+
+  @Test
+  void testDeleteTraining_NoTrainerSummary() {
+    // Arrange
+    var dto = new TrainerWorkloadRequestForDelete();
+    when(trainingSummaryService.getTrainingTrainerSummary(dto.getTrainerUsername())).thenReturn(Optional.empty());
+    // Act & Assert
+    assertThrows(OperationFailedException.class, () -> trainingSummaryService.deleteTraining(dto));
+    verify(mongoTemplate, never()).save(any());
   }
 
   @Test
