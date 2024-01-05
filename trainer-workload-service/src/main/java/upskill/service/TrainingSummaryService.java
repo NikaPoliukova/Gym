@@ -85,8 +85,18 @@ public class TrainingSummaryService {
   }
 
   public Integer getTrainerWorkload(String trainerUsername, int year, int month) {
-    var duration = trainingRepository.getTrainerWorkload(trainerUsername, year, month);
-    return duration.orElse(0);
+    var trainingSummary = trainingRepository.findByUsernameAndYearAndMonth(trainerUsername, year, month);
+    return trainingSummary.map(training ->
+        training.getYearsList().stream()
+            .filter(yearData -> yearData.getYear() == year)
+            .findFirst()
+            .flatMap(yearData -> yearData.getMonthsList().stream()
+                .filter(monthData -> monthData.getMonthValue() == month)
+                .findFirst()
+                .map(MonthData::getTrainingsSummaryDuration)
+            )
+            .orElse(0)
+    ).orElse(0);
   }
 
   protected void updateExistingMonth(TrainingTrainerSummary trainer, YearData yearData, MonthData monthData,
