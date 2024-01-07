@@ -11,14 +11,16 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import upskill.dao.TrainerTrainingRepository;
+import upskill.dto.TrainerWorkloadRequestForDelete;
 import upskill.entity.MonthData;
 import upskill.entity.TrainingTrainerSummary;
 import upskill.entity.YearData;
 import upskill.exception.OperationFailedException;
 import upskill.service.config.TestMongoConfig;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -104,7 +106,7 @@ class TrainingSummaryServiceIntegrationTest {
   @Test
   void createNewMonth_ShouldAddNewMonth() {
     // Arrange
-    TrainingTrainerSummary training =  service.findByUsername(USERNAME)
+    TrainingTrainerSummary training = service.findByUsername(USERNAME)
         .orElseThrow(() -> new RuntimeException("Training not found"));
     YearData existingYear = training.getYearsList().get(0);
     TrainingSummaryService.DtoForCreateNewMonth dto =
@@ -123,6 +125,62 @@ class TrainingSummaryServiceIntegrationTest {
     assertEquals(NEW_MONTH, newMonth.getMonthValue());
     assertEquals(DURATION, newMonth.getTrainingsSummaryDuration());
   }
+
+  @Test
+  void deleteTraining_ShouldDeleteYearAndMonthData() {
+    // Arrange
+    var training = service.getTrainingTrainerSummary(USERNAME);
+    var yearDate = training.get().getYearsList().get(0);
+    var monthDate = yearDate.getMonthsList().get(0);
+    var date = LocalDate.of(yearDate.getYear(), monthDate.getMonthValue(), 1);
+    var dto = new TrainerWorkloadRequestForDelete(training.get().getUsername(), date, 1);
+    // Act
+    service.deleteTraining(dto);
+    // Assert
+    var updatedTraining = service.getTrainingTrainerSummary(dto.getTrainerUsername());
+    assertEquals(0, updatedTraining.get().getYearsList().size(), "Training should be deleted");
+  }
+//
+//  @Test
+//  void deleteTraining_ShouldUpdateMonthDataDuration() {
+//    // Arrange
+//    TrainerWorkloadRequestForDelete dto = prepareTestData();
+//    int originalDuration = dto.getDuration();
+//    trainingSummaryService.createNewMonth(prepareCreateNewMonthDto(dto), originalDuration);
+//
+//    // Act
+//    trainingSummaryService.deleteTraining(dto);
+//
+//    // Assert
+//    Optional<TrainingTrainerSummary> updatedTraining = trainingSummaryService.getTrainingTrainerSummary(dto.getTrainerUsername());
+//    assertTrue(updatedTraining.isPresent(), "Training should exist");
+//    List<YearData> yearsList = updatedTraining.get().getYearsList();
+//    assertEquals(1, yearsList.size(), "There should be one year");
+//    List<MonthData> monthsList = yearsList.get(0).getMonthsList();
+//    assertEquals(1, monthsList.size(), "There should be one month");
+//    MonthData updatedMonth = monthsList.get(0);
+//    assertEquals(originalDuration - dto.getDuration(), updatedMonth.getTrainingsSummaryDuration(),
+//        "MonthData duration should be updated");
+//  }
+//
+//  @Test
+//  void deleteTraining_ShouldNotDeleteYearDataIfOtherMonthsExist() {
+//    // Arrange
+//    TrainerWorkloadRequestForDelete dto = prepareTestData();
+//    trainingSummaryService.createNewMonth(prepareCreateNewMonthDto(dto), dto.getDuration() - 1);
+//
+//    // Act
+//    trainingSummaryService.deleteTraining(dto);
+//
+//    // Assert
+//    Optional<TrainingTrainerSummary> updatedTraining = trainingSummaryService.getTrainingTrainerSummary(dto.getTrainerUsername());
+//    assertTrue(updatedTraining.isPresent(), "Training should exist");
+//    List<YearData> yearsList = updatedTraining.get().getYearsList();
+//    assertEquals(1, yearsList.size(), "There should be one year");
+//    List<MonthData> monthsList = yearsList.get(0).getMonthsList();
+//    assertEquals(1, monthsList.size(), "There should be one month");
+//  }
+
 }
 
 

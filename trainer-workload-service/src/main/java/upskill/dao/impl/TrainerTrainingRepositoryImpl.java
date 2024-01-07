@@ -1,5 +1,6 @@
 package upskill.dao.impl;
 
+import com.mongodb.BasicDBObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
@@ -33,6 +34,23 @@ public class TrainerTrainingRepositoryImpl implements TrainerTrainingRepositoryC
   public void createNewMonth(String username, YearData yearData) {
     var query = Query.query(Criteria.where(USERNAME).is(username).and(YEARS_LIST_YEAR).is(yearData.getYear()));
     var update = new Update().addToSet(YEARS_AND_MONTH_LISTS, new Document("$each", yearData.getMonthsList()));
+    mongoTemplate.updateFirst(query, update, TrainingTrainerSummary.class);
+  }
+
+  @Override
+  public void deleteMonth(String trainingId, int year, int month) {
+    Query query = new Query(Criteria.where("_id").is(trainingId)
+        .and("yearsList.year").is(year)
+        .and("yearsList.monthsList.monthValue").is(month));
+    Update update = new Update().pull("yearsList.$.monthsList", new BasicDBObject("monthValue", month));
+    mongoTemplate.updateFirst(query, update, TrainingTrainerSummary.class);
+  }
+
+  @Override
+  public void deleteYear(String trainingId, int year) {
+    Query query = new Query(Criteria.where("_id").is(trainingId)
+        .and("yearsList.year").is(year));
+    Update update = new Update().pull("yearsList", new BasicDBObject("year", year));
     mongoTemplate.updateFirst(query, update, TrainingTrainerSummary.class);
   }
 }

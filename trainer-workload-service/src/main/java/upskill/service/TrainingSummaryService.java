@@ -108,10 +108,7 @@ public class TrainingSummaryService {
 
   protected void deleteYear(TrainingTrainerSummary trainer, YearData yearData) {
     try {
-      List<YearData> updatedYearList = new ArrayList<>(trainer.getYearsList());
-      updatedYearList.remove(yearData);
-      trainer.setYearsList(updatedYearList);
-      trainingRepository.save(trainer);
+      trainingRepositoryImpl.deleteYear(trainer.getId(), yearData.getYear());
     } catch (Exception e) {
       log.error("Error while deleting year.", e);
       throw new UpdateYearException();
@@ -120,25 +117,27 @@ public class TrainingSummaryService {
 
   protected void deleteMonth(DtoForDelete dto) {
     try {
-      var updatedMonthsList = new ArrayList<>(dto.yearData().getMonthsList());
-      updatedMonthsList.remove(dto.monthData);
-      var yearDate = dto.yearData;
-      dto.training.getYearsList().remove(dto.yearData);
-      yearDate.setMonthsList(updatedMonthsList);
-      dto.training.getYearsList().add(yearDate);
-      trainingRepository.save(dto.training);
+      trainingRepositoryImpl.deleteMonth(dto.training.getId(),
+          dto.yearData.getYear(), dto.monthData.getMonthValue());
+//      var updatedMonthsList = new ArrayList<>(dto.yearData().getMonthsList());
+//      updatedMonthsList.remove(dto.monthData);
+//      var yearDate = dto.yearData;
+//      dto.training.getYearsList().remove(dto.yearData);
+//      yearDate.setMonthsList(updatedMonthsList);
+//      dto.training.getYearsList().add(yearDate);
+//      trainingRepository.save(dto.training);
     } catch (Exception e) {
       log.error("Error while deleting month.", e);
       throw new UpdateMonthException();
     }
   }
 
-
+  //++
   protected Optional<TrainingTrainerSummary> getTrainingTrainerSummary(String username) {
     return trainingRepository.findByUsername(username);
   }
 
-
+  //++
   protected void createNewMonth(DtoForCreateNewMonth dto) {
     try {
       var newMonth = MonthData.builder().monthValue(dto.month).trainingsSummaryDuration(dto.duration).build();
