@@ -1,192 +1,130 @@
 package upskill.service;
 
-import com.mongodb.BasicDBObject;
-import org.junit.jupiter.api.BeforeEach;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import upskill.dao.TrainerTrainingRepository;
-import upskill.dto.TrainerTrainingDtoForSave;
-import upskill.dto.TrainerWorkloadRequestForDelete;
 import upskill.entity.MonthData;
 import upskill.entity.TrainingTrainerSummary;
 import upskill.entity.YearData;
 import upskill.exception.OperationFailedException;
+import upskill.service.config.TestMongoConfig;
 
-import java.time.LocalDate;
-import java.util.Collections;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-
-class TrainingSummaryServiceTest {
-
-  public static final String TEST_TRAINER = "testTrainer";
-  public static final int DURATION = 30;
+@SpringBootTest
+@RequiredArgsConstructor
+@ActiveProfiles("test")
+@ContextConfiguration(classes = TestMongoConfig.class)
+@TestPropertySource(properties = "spring.config.activate.on-profile=test")
+@TestPropertySource(locations = "classpath:application-test.yml")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+class TrainingSummaryServiceIntegrationTest {
+  public static final String USERNAME = "Nika.Trainer";
+  public static final TrainingTrainerSummary TRAINING_TRAINER_SUMMARY =
+      new TrainingTrainerSummary("Nika.Trainer", "Nika", "Trainer",
+          true, new ArrayList<>());
+  public static final int DURATION = 60;
   public static final int MONTH = 1;
-  public static final int YEAR = 2022;
-  public static final String USERNAME = "username";
-  @Mock
-  private MongoTemplate mongoTemplate;
+  public static final int NEW_YEAR = 2030;
+  public static final int NEW_MONTH = 3;
 
-  @Mock
+  @Autowired
+  private TrainingSummaryService service;
+  @Autowired
   private TrainerTrainingRepository trainingRepository;
+  @MockBean
+  private RabbitTemplate rabbitTemplate;
 
-  @InjectMocks
-  private TrainingSummaryService trainingSummaryService;
-
-  @BeforeEach
-  void setUp() {
-    MockitoAnnotations.openMocks(this);
-  }
 
   @Test
-  void testDeleteTraining_DurationTooLow() {
+  void saveTraining_ShouldPersistData() {
     // Arrange
-    var dto = getTrainerWorkloadRequestForDelete();
-    var trainerSummary = getTrainingTrainerSummary();
-    when(trainingSummaryService.getTrainingTrainerSummary(dto.getTrainerUsername()))
-        .thenReturn(Optional.of(trainerSummary));
-    trainerSummary.getYearsList().get(0).getMonthsList().get(0).setTrainingsSummaryDuration(5);
-    // Act & Assert
-    assertThrows(OperationFailedException.class, () -> trainingSummaryService.deleteTraining(dto));
-    verify(mongoTemplate, never()).save(any());
-  }
-
-  @Test
-  void testDeleteTraining_NoTrainerSummary() {
-    // Arrange
-    var dto = new TrainerWorkloadRequestForDelete();
-    when(trainingSummaryService.getTrainingTrainerSummary(dto.getTrainerUsername())).thenReturn(Optional.empty());
-    // Act & Assert
-    assertThrows(OperationFailedException.class, () -> trainingSummaryService.deleteTraining(dto));
-    verify(mongoTemplate, never()).save(any());
-  }
-
-  @Test
-  void testSaveTraining() {
-    // Arrange
-    var dto = getTrainerTrainingDtoForSave();
-    when(mongoTemplate.findOne(any(Query.class), eq(TrainingTrainerSummary.class)))
-        .thenReturn(null);
+    TrainingTrainerSummary dto = TRAINING_TRAINER_SUMMARY;
     // Act
-    trainingSummaryService.saveTraining(dto);
+    TrainingTrainerSummary savedTraining = service.saveTraining(dto);
     // Assert
-    verify(trainingRepository, times(1)).save(any());
+    assertNotNull(savedTraining.getId());
+    assertEquals(dto.getUsername(), savedTraining.getUsername());
   }
-
-//  @Test
-//  void testUpdateExistingMonth() {
-//    // Arrange
-//    var trainer = getTrainingTrainerSummary();
-//    when(mongoTemplate.findOne(any(Query.class), eq(TrainingTrainerSummary.class)))
-//        .thenReturn(trainer);
-//    // Act
-//    trainingSummaryService.updateExistingMonth(trainer, trainer.getYearsList().get(0),
-//        new MonthData(MONTH, 150),
-//        DURATION);
-//    // Assert
-//    assertEquals(30, trainer.getYearsList().get(0).getMonthsList().get(0).getTrainingsSummaryDuration());
-//    verify(mongoTemplate, times(1)).updateFirst(any(Query.class), any(Update.class),
-//        eq(TrainingTrainerSummary.class));
-//  }
-
-//  @Test
-//  void testUpdateExistingYear_WhenYearExists() {
-//    // Arrange
-//    var trainer = getTrainingTrainerSummary();
-//    when(mongoTemplate.findOne(any(Query.class), eq(TrainingTrainerSummary.class)))
-//        .thenReturn(trainer);
-//    // Act
-//    trainingSummaryService.updateExistingYear(trainer, trainer.getYearsList().get(0), MONTH, DURATION);
-//    // Assert
-//    assertEquals(60, trainer.getYearsList().get(0).getMonthsList().get(0).getTrainingsSummaryDuration());
-//    verify(mongoTemplate, times(1)).updateFirst(any(Query.class), any(Update.class),
-//        eq(TrainingTrainerSummary.class));
-//  }
-
-//  @Test
-//  void testUpdateExistingYear_WhenYearDoesNotExist() {
-//    // Arrange
-//    var trainer = getTrainingTrainerSummary();
-//    when(mongoTemplate.findOne(any(Query.class), eq(TrainingTrainerSummary.class)))
-//        .thenReturn(trainer);
-//    // Act
-//    trainingSummaryService.updateExistingYear(trainer, getYear(), MONTH, DURATION);
-//    // Assert
-//    assertEquals(1, trainer.getYearsList().size());
-//    assertEquals(30, trainer.getYearsList().get(0).getMonthsList().get(0).getTrainingsSummaryDuration());
-//    verify(mongoTemplate, times(1)).updateFirst(any(Query.class), any(Update.class),
-//        eq(TrainingTrainerSummary.class));
-//  }
 
   @Test
-  void testDeleteYear() {
-    // Arrange
-    var trainer = getTrainingTrainerSummary();
+  void saveTraining_ShouldThrowExceptionOnFailure() {
+    // Act & Assert
+    assertThrows(OperationFailedException.class, () -> service.saveTraining(TRAINING_TRAINER_SUMMARY));
+  }
+
+  @Test
+  void findByUsername_ShouldReturnEmptyOptionalIfNotFound() {
     // Act
-    trainingSummaryService.deleteYear(trainer, getYear());
+    var notFoundTraining = service.findByUsername("nonexistentUsername");
     // Assert
-    var expectedQuery = Query.query(Criteria.where(USERNAME).is(TEST_TRAINER).and("yearsList.year")
-        .is(YEAR));
-    var expectedUpdate = new Update().pull("yearsList", new BasicDBObject("year", YEAR));
-    verify(mongoTemplate, times(1)).updateFirst(expectedQuery, expectedUpdate,
-        TrainingTrainerSummary.class);
-  }
-//
-//  @Test
-//  void testDeleteMonth() {
-//    // Arrange
-//    var trainer = getTrainingTrainerSummary();
-//    var monthData = new MonthData(MONTH, DURATION);
-//    // Act
-//    trainingSummaryService.deleteMonth(new (trainer, getYear(), monthData));
-//    // Assert
-//    var expectedQuery = Query.query(Criteria.where(USERNAME).is(TEST_TRAINER)
-//        .and("yearsList.year").is(YEAR));
-//    var expectedUpdate = new Update().pull("yearsList.$.monthsList", new BasicDBObject("monthValue", MONTH));
-//    verify(mongoTemplate, times(1)).updateFirst(expectedQuery, expectedUpdate,
-//        TrainingTrainerSummary.class);
-//  }
-
-
-  private static TrainerTrainingDtoForSave getTrainerTrainingDtoForSave() {
-    var dto = new TrainerTrainingDtoForSave();
-    dto.setTrainerUsername(TEST_TRAINER);
-    dto.setTrainingDate(prepareDate());
-    dto.setDuration(DURATION);
-    return dto;
+    assertTrue(notFoundTraining.isEmpty());
   }
 
-  private static YearData getYear() {
-    return new YearData(YEAR, Collections.singletonList(new MonthData(MONTH,
-        DURATION)));
-  }
-
-  private static LocalDate prepareDate() {
-    return LocalDate.of(YEAR, MONTH, 1);
-  }
-
-  private static TrainingTrainerSummary getTrainingTrainerSummary() {
-    var trainer = new TrainingTrainerSummary();
-    trainer.setUsername(TEST_TRAINER);
-    trainer.setYearsList(Collections.singletonList(getYear()));
-    return trainer;
+  @Test
+  void findByUsername_ShouldReturnTrainingTrainerSummary() {
+    // Act
+    var foundTraining = service.findByUsername(USERNAME);
+    // Assert
+    assertTrue(foundTraining.isPresent());
+    assertEquals(USERNAME, foundTraining.get().getUsername());
   }
 
 
-  private static TrainerWorkloadRequestForDelete getTrainerWorkloadRequestForDelete() {
-    var dto = new TrainerWorkloadRequestForDelete();
-    dto.setTrainerUsername(TEST_TRAINER);
-    dto.setTrainingDate(prepareDate());
-    dto.setDuration(DURATION);
-    return dto;
+  @Test
+  void createNewYear_ShouldAddNewYear() {
+    // Arrange
+    TrainingSummaryService.UpdateParamsDto dto = new TrainingSummaryService.UpdateParamsDto(TRAINING_TRAINER_SUMMARY,
+        NEW_YEAR, MONTH, DURATION);
+    // Act
+    service.createNewYear(dto);
+    // Assert
+    TrainingTrainerSummary updatedTraining = service.findByUsername(USERNAME)
+        .orElseThrow(() -> new RuntimeException("Training not found"));
+    assertEquals(1, updatedTraining.getYearsList().size());
+    YearData newYear = updatedTraining.getYearsList().get(0);
+    assertEquals(NEW_YEAR, newYear.getYear());
+    assertEquals(1, newYear.getMonthsList().size());
+    MonthData newMonth = newYear.getMonthsList().get(0);
+    assertEquals(MONTH, newMonth.getMonthValue());
+    assertEquals(DURATION, newMonth.getTrainingsSummaryDuration());
+  }
+
+  @Test
+  void createNewMonth_ShouldAddNewMonth() {
+    // Arrange
+    TrainingTrainerSummary training =  service.findByUsername(USERNAME)
+        .orElseThrow(() -> new RuntimeException("Training not found"));
+    YearData existingYear = training.getYearsList().get(0);
+    TrainingSummaryService.DtoForCreateNewMonth dto =
+        new TrainingSummaryService.DtoForCreateNewMonth(training, existingYear, NEW_MONTH, DURATION);
+    // Act
+    service.createNewMonth(dto);
+    // Assert
+    TrainingTrainerSummary updatedTraining = service.findByUsername(USERNAME)
+        .orElseThrow(() -> new RuntimeException("Training not found"));
+
+    assertEquals(1, updatedTraining.getYearsList().size());
+    YearData updatedYear = updatedTraining.getYearsList().get(0);
+
+    assertEquals(2, updatedYear.getMonthsList().size());
+    MonthData newMonth = updatedYear.getMonthsList().get(1);
+    assertEquals(NEW_MONTH, newMonth.getMonthValue());
+    assertEquals(DURATION, newMonth.getTrainingsSummaryDuration());
   }
 }
+
+
+
+

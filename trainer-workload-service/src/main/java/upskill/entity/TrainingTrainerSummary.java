@@ -32,4 +32,12 @@ public class TrainingTrainerSummary {
   @NotNull(message = "Status cannot be null")
   private boolean status;
   private List<YearData> yearsList;
+
+  public TrainingTrainerSummary(String username, String firstName, String lastName, boolean status, List<YearData> yearsList) {
+    this.username = username;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.status = status;
+    this.yearsList = yearsList;
+  }
 }

@@ -13,4 +13,5 @@ public interface TrainerTrainingRepository extends MongoRepository<TrainingTrain
 
   @Query("{'username': ?0, 'yearsList.year': ?1, 'yearsList.monthsList.monthValue': ?2}")
   Optional<TrainingTrainerSummary> findByUsernameAndYearAndMonth(String username, int year, int monthValue);
+
 }

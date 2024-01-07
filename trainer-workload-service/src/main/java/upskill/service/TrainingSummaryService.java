@@ -1,11 +1,10 @@
 package upskill.service;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import upskill.dao.TrainerTrainingRepository;
+import upskill.dao.TrainerTrainingRepositoryCustom;
 import upskill.dto.TrainerTrainingDtoForSave;
 import upskill.dto.TrainerWorkloadRequestForDelete;
 import upskill.entity.MonthData;
@@ -26,6 +25,7 @@ import java.util.Optional;
 public class TrainingSummaryService {
 
   private final TrainerTrainingRepository trainingRepository;
+  private final TrainerTrainingRepositoryCustom trainingRepositoryImpl;
 
   public void saveTraining(TrainerTrainingDtoForSave dto) {
     try {
@@ -70,12 +70,8 @@ public class TrainingSummaryService {
     }
   }
 
-
-  private void deleteMonthAndYearIfEmpty(DtoForDelete dto) {
-    deleteMonth(dto);
-    if (dto.training.getYearsList().size() == 1) {
-      deleteYear(dto.training, dto.yearData);
-    }
+  public Optional<TrainingTrainerSummary> findByUsername(String username) {
+    return trainingRepository.findByUsername(username);
   }
 
   public Integer getTrainerWorkload(String trainerUsername, int year, int month) {
@@ -137,6 +133,60 @@ public class TrainingSummaryService {
     }
   }
 
+
+  protected Optional<TrainingTrainerSummary> getTrainingTrainerSummary(String username) {
+    return trainingRepository.findByUsername(username);
+  }
+
+
+  protected void createNewMonth(DtoForCreateNewMonth dto) {
+    try {
+      var newMonth = MonthData.builder().monthValue(dto.month).trainingsSummaryDuration(dto.duration).build();
+      dto.yearData.getMonthsList().add(newMonth);
+      trainingRepositoryImpl.createNewMonth(dto.training.getUsername(), dto.yearData);
+    } catch (Exception e) {
+      log.error("Error while creating new month.", e);
+      throw new UpdateMonthException();
+    }
+  }
+
+  //++
+  protected void createNewYear(UpdateParamsDto dto) {
+    try {
+      var newYear = YearData.builder().year(dto.year).build();
+      var newMonth = MonthData.builder()
+          .monthValue(dto.month)
+          .trainingsSummaryDuration(dto.duration)
+          .build();
+      if (newYear.getMonthsList() == null) {
+        newYear.setMonthsList(new ArrayList<>());
+      }
+      newYear.getMonthsList().add(newMonth);
+      trainingRepositoryImpl.createYear(dto.training.getUsername(), newYear);
+    } catch (
+        Exception e) {
+      log.error("Error while creating new year.", e);
+      throw new UpdateYearException();
+    }
+  }
+
+  //++
+  public TrainingTrainerSummary saveTraining(TrainingTrainerSummary dto) {
+    try {
+      return trainingRepository.save(dto);
+    } catch (Exception e) {
+      log.error("Error while saving training.", e);
+      throw new OperationFailedException(dto.getUsername(), "Save training");
+    }
+  }
+
+  private void deleteMonthAndYearIfEmpty(DtoForDelete dto) {
+    deleteMonth(dto);
+    if (dto.training.getYearsList().size() == 1) {
+      deleteYear(dto.training, dto.yearData);
+    }
+  }
+
   protected void updateExistingYear(DtoForCreateNewMonth dto) {
     try {
       var monthDataOptional = dto.yearData.getMonthsList()
@@ -150,50 +200,6 @@ public class TrainingSummaryService {
     } catch (Exception e) {
       log.error("Error while updating existing year.", e);
       throw new UpdateYearException();
-    }
-  }
-
-  protected Optional<TrainingTrainerSummary> getTrainingTrainerSummary(String username) {
-    return trainingRepository.findByUsername(username);
-  }
-
-  protected void createNewMonth(DtoForCreateNewMonth dto) {
-    try {
-      var newMonth = MonthData.builder().monthValue(dto.month).trainingsSummaryDuration(dto.duration).build();
-      dto.yearData.getMonthsList().add(newMonth);
-      trainingRepository.save(dto.training);
-    } catch (Exception e) {
-      log.error("Error while creating new month.", e);
-      throw new UpdateMonthException();
-    }
-  }
-
-  protected void createNewYear(UpdateParamsDto dto) {
-    try {
-      var newYear = YearData.builder().year(dto.year).build();
-      var newMonth = MonthData.builder()
-          .monthValue(dto.month)
-          .trainingsSummaryDuration(dto.duration)
-          .build();
-      if (newYear.getMonthsList() == null) {
-        newYear.setMonthsList(new ArrayList<>());
-      }
-      newYear.getMonthsList().add(newMonth);
-      dto.training.getYearsList().add(newYear);
-      trainingRepository.save(dto.training);
-    } catch (
-        Exception e) {
-      log.error("Error while creating new year.", e);
-      throw new UpdateYearException();
-    }
-  }
-
-  public TrainingTrainerSummary saveTraining(TrainingTrainerSummary dto) {
-    try {
-      return trainingRepository.save(dto);
-    } catch (Exception e) {
-      log.error("Error while saving training.", e);
-      throw new OperationFailedException(dto.getUsername(), "Save training");
     }
   }
 
@@ -243,7 +249,7 @@ public class TrainingSummaryService {
         .build();
   }
 
-  private record UpdateDataDto(
+  public record UpdateDataDto(
       TrainingTrainerSummary training,
       YearData yearData,
       MonthData monthData,
@@ -251,7 +257,7 @@ public class TrainingSummaryService {
   ) {
   }
 
-  private record UpdateParamsDto(
+  public record UpdateParamsDto(
       TrainingTrainerSummary training,
       int year,
       int month,
@@ -264,21 +270,10 @@ public class TrainingSummaryService {
       MonthData monthData) {
   }
 
-  @Data
-  @AllArgsConstructor
-  private class DtoForDeleteMonth {
-    TrainingTrainerSummary training;
-    List<MonthData> monthList;
-    MonthData monthData;
-
-  }
-
-  private record DtoForCreateNewMonth(
+  public record DtoForCreateNewMonth(
       TrainingTrainerSummary training,
       YearData yearData,
       int month,
       int duration) {
   }
-
-
 }
