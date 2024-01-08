@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import upskill.dao.TrainerTrainingRepositoryCustom;
 import upskill.entity.TrainingTrainerSummary;
 import upskill.entity.YearData;
+import upskill.service.TrainingSummaryService;
 
 @Slf4j
 @Repository
@@ -42,15 +43,26 @@ public class TrainerTrainingRepositoryImpl implements TrainerTrainingRepositoryC
     Query query = new Query(Criteria.where("_id").is(trainingId)
         .and("yearsList.year").is(year)
         .and("yearsList.monthsList.monthValue").is(month));
-    Update update = new Update().pull("yearsList.$.monthsList", new BasicDBObject("monthValue", month));
+    Update update = new Update().pull(YEARS_AND_MONTH_LISTS, new BasicDBObject("monthValue", month));
     mongoTemplate.updateFirst(query, update, TrainingTrainerSummary.class);
   }
 
   @Override
   public void deleteYear(String trainingId, int year) {
     Query query = new Query(Criteria.where("_id").is(trainingId)
-        .and("yearsList.year").is(year));
-    Update update = new Update().pull("yearsList", new BasicDBObject("year", year));
+        .and(YEARS_LIST_YEAR).is(year));
+    Update update = new Update().pull(YEARS_LIST, new BasicDBObject("year", year));
+    mongoTemplate.updateFirst(query, update, TrainingTrainerSummary.class);
+  }
+
+  @Override
+  public void updateDuration(TrainingSummaryService.UpdateParamsDto dto) {
+    var query = new Query(Criteria.where(USERNAME).is(dto.training().getUsername())
+        .and(YEARS_LIST_YEAR).is(dto.year())
+        .and("yearsList.monthsList.monthValue").is(dto.month()));
+    var update = new Update().set("yearsList.$.monthsList.$[elem].trainingsSummaryDuration", dto.duration())
+        .filterArray(Criteria.where("elem.monthValue").is(dto.month()));
+
     mongoTemplate.updateFirst(query, update, TrainingTrainerSummary.class);
   }
 }

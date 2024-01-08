@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.TypeAlias;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -19,6 +21,9 @@ import java.util.List;
 @Builder
 @Document(collection = "TrainingsSummary")
 @TypeAlias("TrainingTrainerSummary")
+@CompoundIndexes({
+    @CompoundIndex(name = "firstName_lastName_index", def = "{'firstName' : 1, 'lastName' : 1}")
+})
 public class TrainingTrainerSummary {
   @org.springframework.data.annotation.Id
   private String id;
