@@ -38,7 +38,8 @@ public class TrainingTrainerSummary {
   private boolean status;
   private List<YearData> yearsList;
 
-  public TrainingTrainerSummary(String username, String firstName, String lastName, boolean status, List<YearData> yearsList) {
+  public TrainingTrainerSummary(String username, String firstName, String lastName, boolean status,
+                                List<YearData> yearsList) {
     this.username = username;
     this.firstName = firstName;
     this.lastName = lastName;

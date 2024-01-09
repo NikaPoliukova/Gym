@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import upskill.dto.DeadLetterMessage;
 import upskill.dto.TrainerTrainingDtoForSave;
@@ -12,6 +13,7 @@ import upskill.dto.TrainerWorkloadRequestForDelete;
 import upskill.service.TrainingSummaryService;
 
 @Slf4j
+@Profile("!test")
 @Component
 @RequiredArgsConstructor
 public class WorkloadMessageListener {

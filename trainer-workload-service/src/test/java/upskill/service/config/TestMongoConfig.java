@@ -2,7 +2,6 @@ package upskill.service.config;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -15,7 +14,6 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-@Slf4j
 @Configuration
 @EnableMongoRepositories(basePackages = "upskill.dao")
 @Profile("test")
@@ -38,7 +36,7 @@ public class TestMongoConfig extends AbstractMongoClientConfiguration {
     return database;
   }
 
-  @Override
+    @Override
   public MongoClient mongoClient() {
     return MongoClients.create(String.format("mongodb://%s:%d", host, port));
   }
