@@ -1,0 +1,59 @@
+server:
+  port: 8092
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: Test
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
+
+  sleuth:
+    sampler:
+      probability: 1.0
+
+  zipkin:
+    base-url: http://127.0.0.1:9411/
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+logging:
+  level:
+    .org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate=DEBUG:
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://127.0.0.1:8761/eureka}
+  instance:
+    hostname: 127.0.0.1
+    preferIpAddress: false
+ribbon:
+  eureka:
+    enabled: true
