@@ -1,11 +1,14 @@
 package upskill.handler;
 
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import upskill.exception.*;
@@ -102,11 +105,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     return "training type was not found";
   }
 
-
   @ExceptionHandler(Exception.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   @ResponseBody
   public ErrorResponse handleException(Exception ex) {
     return new ErrorResponse("Internal Server Error", ex.getMessage());
+  }
+
+  @Override
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ResponseBody
+  protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    String errorMessage = "Validation failed. Check the request parameters.";
+    return ResponseEntity.status(status).body(errorMessage);
   }
 }

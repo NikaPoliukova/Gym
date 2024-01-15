@@ -91,13 +91,10 @@ public class TrainerServiceImplTest {
     Trainer mockTrainer = new Trainer();
     mockTrainer.setUsername(USERNAME);
     mockTrainer.setPassword(hashedPassword);
-    // Мокируем поведение hashPassService
     when(hashPassService.hashPass(PASSWORD)).thenReturn(hashedPassword);
-    // Мокируем поведение trainerRepository
     when(trainerRepository.findByUsernameAndPassword(USERNAME, hashedPassword)).thenReturn(Optional.of(mockTrainer));
     // Act
     Trainer resultTrainer = trainerService.findByUsernameAndPassword(USERNAME, PASSWORD);
-
     // Assert
     assertEquals(mockTrainer, resultTrainer);
   }
