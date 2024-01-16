@@ -79,7 +79,7 @@ public class SuccessAuthHandler extends SimpleUrlAuthenticationSuccessHandler {
     deleteCookies(response, REFRESH_TOKEN_NAME);
   }
 
-  private void setAuthentication(String token) {
+  public void setAuthentication(String token) {
     var userName = jwtUtils.getUsernameFromToken(token);
     var authentication = new UsernamePasswordAuthenticationToken(userName, null, null);
     SecurityContextHolder.getContext().setAuthentication(authentication);

@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class RegistrationStepDefinitions {
 
-  private final String baseUrl = "http://localhost:8080/api/v1/registration";
   private ResponseEntity<Principal> response;
   private Response badResponse;
   private TraineeRegistration validTraineeRegistration;
@@ -39,8 +38,8 @@ public class RegistrationStepDefinitions {
 
   @Given("the trainee registration request with valid data")
   public void givenTraineeRegistrationRequestWithValidData() {
-    validTraineeRegistration = new TraineeRegistration("Jon", "Trainee", "Street 1",
-        LocalDate.of(1995, 2, 13));
+    validTraineeRegistration = new TraineeRegistration("OLA", "TRAINEE", "Street 1",
+        LocalDate.of(1992, 2, 13));
   }
 
   @Given("the trainer registration request with valid data")
@@ -54,10 +53,11 @@ public class RegistrationStepDefinitions {
         null);
   }
 
-    @Given("the trainer registration request with invalid data")
+  @Given("the trainer registration request with invalid data")
   public void givenTrainerRegistrationRequestWithInvalidData() {
     invalidTrainerRegistration = new TrainerRegistration("Jon", "Trainer", null);
   }
+
   @When("the trainee registration API saved with valid data")
   public void whenTraineeRegistrationApiIsCalledWithValidData() {
     principal = traineeService.saveTrainee(validTraineeRegistration);

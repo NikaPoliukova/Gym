@@ -47,10 +47,14 @@ public class UserServiceImpl implements UserService {
   @Override
   @Transactional
   public void updatePassword(UserUpdatePass userUpdatePass) {
-    var hashedPassword = hashPassService.hashPass(userUpdatePass.oldPassword());
-    var user = findByUsernameAndPassword(userUpdatePass.username(), hashedPassword);
-    user.setPassword(hashPassService.hashPass(userUpdatePass.newPassword()));
-    userRepository.update(user);
+    var user = findByUsername(userUpdatePass.username());
+    if (hashPassService.verify(userUpdatePass.oldPassword(), user.getPassword())) {
+      user.setPassword(hashPassService.hashPass(userUpdatePass.newPassword()));
+      userRepository.update(user);
+    } else {
+      throw new UserNotFoundException(userUpdatePass.username());
+    }
+
   }
 
   @Override

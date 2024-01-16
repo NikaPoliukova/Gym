@@ -37,7 +37,7 @@ public class SecurityConfig {
         .cors().and()
         .csrf().disable()
         .authorizeRequests(requests -> requests
-            .antMatchers("/gym-service/api/v1/registration/**", "/api/v1/registration/**",
+           .antMatchers("/gym-service/api/v1/registration/**", "/api/v1/registration/**",
                 "/login", "/actuator/**", "/swagger-ui/**",
                 "/v3/api-docs/**").permitAll()
             .anyRequest().authenticated()

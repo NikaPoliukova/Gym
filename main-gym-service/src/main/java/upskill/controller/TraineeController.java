@@ -66,11 +66,10 @@ public class TraineeController {
                                              @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateOfBirth,
                                              @RequestParam(value = "address", required = false) @Size(min = 5) String address,
                                              @RequestParam("isActive") @NotNull boolean isActive) {
-    TraineeUpdateRequest traineeUpdateRequest = new TraineeUpdateRequest(username, firstName, lastName, dateOfBirth,
+    var traineeUpdateRequest = new TraineeUpdateRequest(username, firstName, lastName, dateOfBirth,
         address, isActive);
     var trainee = traineeService.updateTrainee(traineeUpdateRequest);
     return converter.toTraineeUpdateResponse(trainee, traineeService);
-
   }
 
   @Operation(summary = "Delete user", description = "Delete Trainee by username")
