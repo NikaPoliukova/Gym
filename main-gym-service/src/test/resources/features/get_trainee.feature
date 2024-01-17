@@ -1,12 +1,18 @@
-Feature: get trainee
+Feature: Get trainee API
 
   Scenario: Successful get Trainee
-    Given user with username
-    When the user sends a GET request to obtain information about the trainee
+    Given the user enter username for get trainee
+      | username        |
+      | Test2.Trainee29 |
+    And prepare token for request for trainee
+    When The user send a GET request to get information about the trainee
     Then the response contains information about the trainee
-    And we get the status response code 200
+    Then response status code should be 200
 
-  Scenario: Try to find Trainee, but he not found
-    Given user with incorrect username
-    When the user sends a GET request to obtain information about the trainee
-    And we get the status response code 400
+  Scenario: Try to find Trainee with incorrect username
+    Given the user enter username for get trainee
+      | username           |
+      | 84541451.Trainee29 |
+    And prepare token for request for trainee
+    When The user send a GET request to get information about the trainee
+    Then response status code should be 404

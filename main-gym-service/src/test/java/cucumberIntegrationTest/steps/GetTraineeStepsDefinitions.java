@@ -1,50 +1,73 @@
 package cucumberIntegrationTest.steps;
 
+import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import upskill.exception.UserNotFoundException;
-import upskill.service.TraineeService;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import upskill.dto.TraineeResponse;
+import upskill.security.JwtUtils;
 
+import javax.servlet.http.Cookie;
+import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
-import static org.springframework.test.util.AssertionErrors.assertNotNull;
 
 public class GetTraineeStepsDefinitions {
-  @Autowired
-  private TraineeService traineeService;
   private String username;
-  private ResponseEntity<Object> response;
+  @Autowired
+  private JwtUtils jwtUtils;
+  private String token;
+  private Cookie cookie;
+  private Response response;
+  private String baseUri = "http://localhost:8091/api/v1/trainees";
 
-  @Given("user with username")
-  public void givenUserWithUsername() {
-   username = "PAVEL.TRAINEE";
-  }
-  @Given("user with incorrect username")
-  public void givenUserWithInvalidUsername() {
-    username = "Incorrect.Name";
+  @Given("the user enter username for get trainee")
+  public void theUserEnterUsernameForGetTrainee(DataTable dataTable) {
+    List<Map<String, String>> traineeDataList = dataTable.asMaps(String.class, String.class);
+    Map<String, String> userData = traineeDataList.get(0);
+    username = userData.get("username");
   }
 
-  @When("the user sends a GET request to obtain information about the trainee")
-  public void whenUserRequestsTraineeData() {
-    try {
-      var trainee = traineeService.findByUsername(username);
-      response = ResponseEntity.status(HttpStatus.OK).body(trainee);
-    } catch (UserNotFoundException e) {
-      response = ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
+  @And("prepare token for request for trainee")
+  public void prepareTokenForRequestForTrainee() {
+    token = jwtUtils.generateAccessTokenForTest(username);
+    var authentication = new UsernamePasswordAuthenticationToken(username, null, null);
+    SecurityContextHolder.getContext().setAuthentication(authentication);
+
+    cookie = new Cookie("Bearer", token);
+    cookie.setPath("/");
+    cookie.setHttpOnly(true);
+    cookie.setMaxAge((int) Duration.ofHours(10).toSeconds());
+  }
+
+  @When("The user send a GET request to get information about the trainee")
+  public void theUserSendAGETRequestToGetInformationAboutTheTrainee() {
+    response = RestAssured
+        .given()
+        .contentType(ContentType.URLENC)
+        .cookie("Bearer", token)
+        .header("Authorization", "Bearer " + token)
+        .formParam("username", username)
+        .get(baseUri + "/trainee");
   }
 
   @Then("the response contains information about the trainee")
-  public void thenResponseContainsTraineeData() {
-    assertNotNull("Expected Trainee", response.getBody());
+  public void theResponseContainsInformationAboutTheTrainee() {
+    assertThat(response.getBody().as(TraineeResponse.class)).isNotNull();
   }
 
-  @And("we get the status response code {int}")
-  public void andResponseStatusIs(int expectedStatus) {
-    assertEquals("Expected status code", expectedStatus, response.getStatusCodeValue());
+  @Then("response status code should be {int}")
+  public void responseStatusCodeShouldBe(int expectedStatus) {
+    assertEquals("expected status", expectedStatus, response.getStatusCode());
   }
 }

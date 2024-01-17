@@ -51,4 +51,5 @@ public class UpdateTraineeStepDefinitions {
   public void andResponseStatusIs(int expectedStatus) {
     assertEquals("Expected status code", expectedStatus, response.getStatusCodeValue());
   }
+
 }
