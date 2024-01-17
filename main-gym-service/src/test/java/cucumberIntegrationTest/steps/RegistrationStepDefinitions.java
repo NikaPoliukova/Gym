@@ -1,115 +1,83 @@
 package cucumberIntegrationTest.steps;
 
+import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import upskill.dto.Principal;
+import org.junit.Assert;
 import upskill.dto.TraineeRegistration;
 import upskill.dto.TrainerRegistration;
-import upskill.service.TraineeService;
-import upskill.service.TrainerService;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.test.util.AssertionErrors.assertEquals;
 
 public class RegistrationStepDefinitions {
 
-  private ResponseEntity<Principal> response;
-  private Response badResponse;
+  private Response response;
+
   private TraineeRegistration validTraineeRegistration;
-  private Principal principal;
-
-  private TraineeRegistration invalidTraineeRegistration;
-  private TrainerRegistration invalidTrainerRegistration;
   private TrainerRegistration validTrainerRegistration;
-  @Autowired
-  private TraineeService traineeService;
-  @Autowired
-  private TrainerService trainerService;
+  private String baseUri = "http://localhost:8091/api/v1/registration";
 
-  @Given("the trainee registration request with valid data")
-  public void givenTraineeRegistrationRequestWithValidData() {
-    validTraineeRegistration = new TraineeRegistration("OLA", "TRAINEE", "Street 1",
-        LocalDate.of(1992, 2, 13));
+  @Given("the user provides the following trainee registration data")
+  public void theUserProvidesTheFollowingTraineeRegistrationData(DataTable dataTable) {
+    List<Map<String, String>> traineeDataList = dataTable.asMaps(String.class, String.class);
+
+    for (Map<String, String> traineeData : traineeDataList) {
+      String firstName = traineeData.get("firstName");
+      String lastName = traineeData.get("lastName");
+      String address = traineeData.get("address");
+      LocalDate dateOfBirth = LocalDate.parse(traineeData.get("dateOfBirth"));
+      validTraineeRegistration = new TraineeRegistration(firstName, lastName, address, dateOfBirth);
+    }
   }
 
-  @Given("the trainer registration request with valid data")
-  public void givenTrainerRegistrationRequestWithValidData() {
-    validTrainerRegistration = new TrainerRegistration("Jon", "Trainer", "YOGA");
+  @Given("the user provides the following trainer registration data")
+  public void theUserProvidesTheFollowingTrainerRegistrationData(DataTable dataTable) {
+    List<Map<String, String>> trainerDataList = dataTable.asMaps(String.class, String.class);
+    for (Map<String, String> trainerData : trainerDataList) {
+      String firstName = trainerData.get("firstName");
+      String lastName = trainerData.get("lastName");
+      String specialization = trainerData.get("specialization");
+      validTrainerRegistration = new TrainerRegistration(firstName, lastName, specialization);
+    }
   }
 
-  @Given("the trainee registration request with invalid data")
-  public void givenTraineeRegistrationRequestWithInvalidData() {
-    invalidTraineeRegistration = new TraineeRegistration(null, null, "Street 1",
-        null);
+  @When("the user makes a POST request for save trainee")
+  public void theUserMakesAPOSTRequestToTrainee() {
+    response = RestAssured
+        .given()
+        .contentType("application/json")
+        .body(validTraineeRegistration)
+        .post(baseUri + "/trainee");
   }
 
-  @Given("the trainer registration request with invalid data")
-  public void givenTrainerRegistrationRequestWithInvalidData() {
-    invalidTrainerRegistration = new TrainerRegistration("Jon", "Trainer", null);
-  }
-
-  @When("the trainee registration API saved with valid data")
-  public void whenTraineeRegistrationApiIsCalledWithValidData() {
-    principal = traineeService.saveTrainee(validTraineeRegistration);
-    response = ResponseEntity.status(HttpStatus.CREATED).body(principal);
-  }
-
-  @When("the trainer registration API saved with valid data")
-  public void whenTrainerRegistrationApiIsCalledWithValidData() {
-    principal = trainerService.saveTrainer(validTrainerRegistration);
-    response = ResponseEntity.status(HttpStatus.CREATED).body(principal);
-  }
-
-  @When("I submit the trainee registration request")
-  public void whenTraineeRegistrationApiIsCalledWithInvalidData() {
-    badResponse = RestAssured.given()
-        .contentType(ContentType.JSON)
-        .header("Jenkins-Crumb", "")
-        .body(invalidTraineeRegistration)
-        .post("/api/v1/registration/trainee");
-  }
-
-
-  @When("I submit the trainer registration request")
-  public void whenTrainerRegistrationApiIsCalledWithInvalidData() {
-    badResponse = RestAssured.given()
-        .contentType(ContentType.JSON)
-        .header("Jenkins-Crumb", "")
-        .body(invalidTrainerRegistration)
-        .post("/api/v1/registration/trainer");
+  @When("the user makes a POST request for save trainer")
+  public void theUserMakesAPOSTRequestForSaveTrainer() {
+    response = RestAssured
+        .given()
+        .contentType("application/json")
+        .body(validTrainerRegistration)
+        .post(baseUri + "/trainer");
   }
 
   @Then("the response status code should be {int}")
-  public void thenResponseStatusCodeShouldBe(int expectedStatusCode) {
-    assertEquals(HttpStatus.CREATED.value(), response.getStatusCodeValue());
+  public void theResponseStatusCodeShouldBe(int expectedStatus) {
+    assertEquals("expected status", expectedStatus, response.getStatusCode());
   }
 
-  @Then("the response should have status code {int}")
-  public void the_response_should_contain_a_validation_error_message(int expectedStatusCode) {
-    int actualStatusCode = badResponse.getStatusCode();
-    assertEquals(expectedStatusCode, actualStatusCode);
-  }
-
-  @And("the response should contain the trainee's details")
-  public void andResponseShouldContainTraineeDetails() {
+  @And("the response should contain Principal object")
+  public void theResponseShouldContainPrincipalObjectWithUsernameAndPassword() {
     assertNotNull(response.getBody());
-    assertEquals(HttpStatus.CREATED.value(), response.getStatusCodeValue());
-  }
-
-  @And("the response should contain the trainer's details")
-  public void andResponseShouldContainTrainerDetails() {
-    assertNotNull(response.getBody());
-    assertEquals(HttpStatus.CREATED.value(), response.getStatusCodeValue());
+    Assert.assertNotNull("Username should be present", response.jsonPath().get("username"));
+    Assert.assertNotNull("Password should be present", response.jsonPath().get("password"));
   }
 
 

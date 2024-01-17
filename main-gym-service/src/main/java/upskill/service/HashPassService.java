@@ -16,7 +16,7 @@ public class HashPassService {
   }
 
   public boolean verify(String password, String hashPass) {
-    final BCrypt.Result verify = BCrypt.verifyer().verify(password.getBytes(), hashPass.getBytes());
+    final BCrypt.Result verify = BCrypt.verifyer().verify(password.toCharArray(), hashPass.toCharArray());
     return verify.verified;
   }
 

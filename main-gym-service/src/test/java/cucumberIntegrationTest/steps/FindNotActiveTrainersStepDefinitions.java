@@ -10,21 +10,17 @@ import upskill.entity.Trainer;
 import upskill.exception.UserNotFoundException;
 import upskill.service.TraineeService;
 import upskill.service.TrainingService;
-import upskill.service.UserService;
 
 import java.util.List;
 
 import static org.springframework.test.util.AssertionErrors.assertEquals;
+import static org.springframework.test.util.AssertionErrors.assertNotNull;
 
 public class FindNotActiveTrainersStepDefinitions {
   private ResponseEntity<Object> response;
   private String username;
   @Autowired
   private TrainingService trainingService;
-  @Autowired
-  private UserService userService;
-  @Autowired
-  private TraineeService traineeService;
   private List<Trainer> list;
 
   @Given("the trainee's username for finding trainers")
@@ -40,6 +36,11 @@ public class FindNotActiveTrainersStepDefinitions {
     } catch (UserNotFoundException e) {
       response = ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
+  }
+
+  @Then("the response contains list inactive trainers")
+  public void thenResponseContainsErrorMessage() {
+    assertNotNull("Expected list of trainers", response.getBody());
   }
 
   @Then("the expected status response code {int}")

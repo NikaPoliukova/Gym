@@ -1,25 +1,35 @@
 Feature: Registration API
 
-  Scenario: Successful trainee registration
-    Given the trainee registration request with valid data
-    When the trainee registration API saved with valid data
+  Scenario: Successfully register a new trainee
+    Given the user provides the following trainee registration data
+      | firstName | lastName | address    | dateOfBirth |
+      | My        | Trainee  | Street 125 | 2000-01-01  |
+      | Test2     | Trainee2 | Street 126 | 1998-05-15  |
+    When the user makes a POST request for save trainee
     Then the response status code should be 201
-    And the response should contain the trainee's details
+    And the response should contain Principal object
 
-  Scenario: Trainee registration with invalid data
-    Given the trainee registration request with invalid data
-    When I submit the trainee registration request
-    Then the response should have status code 403
-
-  Scenario: Successful trainer registration
-    Given the trainer registration request with valid data
-    When the trainer registration API saved with valid data
+  Scenario: Successfully register a new trainer
+    Given the user provides the following trainer registration data
+      | firstName | lastName | specialization |
+      | Test      | Trainer  | YOGA           |
+      | Test2     | Trainer  | SWIMMING       |
+    When the user makes a POST request for save trainer
     Then the response status code should be 201
-    And the response should contain the trainer's details
+    And the response should contain Principal object
 
-  Scenario: Trainer registration with invalid data
-    Given the trainer registration request with invalid data
-    When I submit the trainer registration request
-    Then the response should have status code 403
+  Scenario: Registration trainee with invalid data
+    Given the user provides the following trainee registration data
+      | firstName | lastName | address    | dateOfBirth |
+      |           | Trainee1 | Street 125 | 2000-01-01  |
+    When the user makes a POST request for save trainee
+    Then the response status code should be 400
+
+  Scenario: Registration trainer with invalid data
+    Given the user provides the following trainer registration data
+      | firstName | lastName | specialization |
+      |           | Trainer  | GYM            |
+    When the user makes a POST request for save trainer
+    Then the response status code should be 400
 
 

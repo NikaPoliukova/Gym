@@ -1,13 +1,19 @@
-Feature: Login
+Feature: Login API
 
   Scenario: Successful login
-    When the user enters their correct credentials
-    When user click login button
-    Then the user is successfully authenticated
+    Given The user enters login information
+      | username      | password   |
+      | DIMA.TRAINEE2 | NMo7a0j6XL |
+    When the user makes a POST request for login
+    Then the user get status 200
+    And generated access token and set to header
 
 
-  Scenario: User login with invalid credentials
-    When the user enters their incorrect credentials
-    When user click login button with invalid data
-    Then the user failed authenticate
+  Scenario: User login with incorrect credentials
+    Given The user enters login information
+      | username       | password   |
+      | PPPPP.TRAINEE2 | NMo7a0j6XL |
+    When the user makes a POST request for login
+    Then the user get status 302
+
 

@@ -128,14 +128,25 @@ public class JwtUtils {
     return claims.getExpiration();
   }
 
-  private Date generateExpirationDate(int min) {
+  public Date generateExpirationDate(int min) {
     LocalDateTime now = LocalDateTime.now();
     Instant accessExpirationInstant = now.plusMinutes(min).atZone(ZoneId.systemDefault()).toInstant();
     return Date.from(accessExpirationInstant);
   }
 
-  private SecretKeySpec getSecretKeySpec() {
+  public SecretKeySpec getSecretKeySpec() {
     byte[] secretKeyBytes = SECRET_KEY.getBytes();
     return new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS512.getJcaName());
+  }
+
+  public String generateAccessTokenForTest(String username) {
+    Claims claims = Jwts.claims().setSubject(username);
+    claims.put("username", username);
+    Date expirationDate = generateExpirationDate(50);
+    return Jwts.builder()
+        .setClaims(claims)
+        .setExpiration(expirationDate)
+        .signWith(getSecretKeySpec(), SignatureAlgorithm.HS512)
+        .compact();
   }
 }

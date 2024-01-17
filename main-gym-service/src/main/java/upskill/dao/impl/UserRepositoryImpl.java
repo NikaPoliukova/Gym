@@ -55,11 +55,11 @@ public class UserRepositoryImpl implements UserRepository {
 
   @Override
   public Optional<User> findByUsername(String username) {
-    var query = entityManager.createQuery("SELECT u FROM User u WHERE u.username = :username", User.class);
-    query.setParameter(USERNAME, username);
     try {
+      var query = entityManager.createQuery("SELECT u FROM User u WHERE u.username = :username", User.class);
+      query.setParameter(USERNAME, username);
       return Optional.ofNullable(query.getSingleResult());
-    } catch (NoResultException e) {
+    } catch (Exception e) {
       throw new UserNotFoundException(username);
     }
   }

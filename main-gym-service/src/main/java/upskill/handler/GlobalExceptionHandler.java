@@ -4,6 +4,7 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -32,6 +33,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   @ResponseBody
   public String handleAuthenticationException(AuthenticationException ex) {
+    return "User not authenticated " + ex.getMessage();
+  }
+  @ExceptionHandler(InternalAuthenticationServiceException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  @ResponseBody
+  public String handleAuthenticationException(InternalAuthenticationServiceException ex) {
     return "User not authenticated " + ex.getMessage();
   }
 
