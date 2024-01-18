@@ -47,4 +47,5 @@ public class DeleteTraineeStepDefinitions {
   public void thenResponseHasStatusCode(int expectedStatus) {
     assertEquals("Expected status code", expectedStatus, responseEntity.getStatusCodeValue());
   }
+
 }

@@ -60,8 +60,7 @@ public class GetTraineeStepsDefinitions {
         .formParam("username", username)
         .get(baseUri + "/trainee");
   }
-
-  @Then("the response contains information about the trainee")
+@Then("the response contains information about the trainee")
   public void theResponseContainsInformationAboutTheTrainee() {
     assertThat(response.getBody().as(TraineeResponse.class)).isNotNull();
   }

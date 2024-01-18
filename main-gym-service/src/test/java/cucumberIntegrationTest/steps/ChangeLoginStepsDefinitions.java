@@ -56,7 +56,7 @@ public class ChangeLoginStepsDefinitions {
   public void theUserSendAPUTRequestToUpdate() {
     response = RestAssured
         .given()
-        .contentType(ContentType.URLENC)
+        .contentType(ContentType.JSON)
         .cookie("Bearer", token)
         .header("Authorization", "Bearer " + token)
         .formParam("username", username)

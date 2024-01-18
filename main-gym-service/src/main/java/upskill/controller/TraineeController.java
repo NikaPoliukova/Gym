@@ -62,7 +62,7 @@ public class TraineeController {
   public TraineeUpdateResponse updateTrainee(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username,
                                              @RequestParam("firstName") @Size(min = 2, max = 30) String firstName,
                                              @RequestParam("lastName") @Size(min = 2, max = 30) String lastName,
-                                             @RequestParam(required = false)
+                                             @RequestParam(value = "dateOfBirth", required = false)
                                              @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateOfBirth,
                                              @RequestParam(value = "address", required = false) @Size(min = 5) String address,
                                              @RequestParam("isActive") @NotNull boolean isActive) {
