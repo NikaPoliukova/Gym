@@ -56,23 +56,24 @@ public class TrainerController {
   @ApiOperation("Find Trainer's trainings")
   public List<TrainingTrainerResponse> findTrainerTrainingsList(@RequestParam("username") @NotBlank
                                                                 @Size(min = 2, max = 60) String username,
-                                                                @RequestParam(required = false)
+                                                                @RequestParam(value = "periodFrom", required = false)
                                                                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                                                                 LocalDate periodFrom,
-                                                                @RequestParam(required = false)
+                                                                @RequestParam(value = "periodTo", required = false)
                                                                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                                                                 LocalDate periodTo,
-                                                                @RequestParam(required = false) String traineeName) {
+                                                                @RequestParam(value = "traineeName", required = false)
+                                                                String traineeName) {
     var trainingsList = trainingService.findTrainerTrainings(new TrainingTrainerRequest(username,
         periodFrom, periodTo, traineeName));
     return trainingConverter.toTrainerTrainingResponse(trainingsList);
   }
 
-  @PatchMapping("/toggle-actilvation")
+  @PatchMapping("/toggle-activation")
   @ResponseStatus(HttpStatus.OK)
   @ApiOperation("Activate or deactivate Trainer's profile")
   public void toggleActivationTrainer(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username,
-                                      @RequestParam("active") @NotNull boolean isActive) {
+                                      @RequestParam("isActive") @NotNull boolean isActive) {
     var trainer = trainerService.findByUsername(username);
     trainerService.toggleProfileActivation(trainer.getId(), isActive);
   }
