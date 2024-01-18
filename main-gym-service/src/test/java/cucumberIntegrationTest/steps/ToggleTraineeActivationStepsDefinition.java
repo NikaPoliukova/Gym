@@ -20,33 +20,27 @@ import java.util.Map;
 
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 
-public class UpdateTrainerListSteps {
-
-  private String username;
-  private String trainingDate;
-  private String trainingName;
-  private List<Map<String, String>> trainersList;
-  private String trainersListString;
+public class ToggleTraineeActivationStepsDefinition {
   private Response response;
+  private String username;
+  private boolean isActive;
   private String baseUri = "http://localhost:8091/api/v1/trainees";
   @Autowired
   private JwtUtils jwtUtils;
   private String token;
   private Cookie cookie;
 
-  @Given("the user enter params for update list of trainers")
-  public void theUserEnterParamsForUpdateListOfTrainers(DataTable dataTable) {
+
+  @Given("the user provides the following parameters for toggling Trainee's profile activation")
+  public void theUserProvidesTheFollowingParametersForTogglingTraineeSProfileActivation(DataTable dataTable) {
     List<Map<String, String>> data = dataTable.asMaps(String.class, String.class);
-    Map<String, String> firstRow = data.get(0);
-    username = firstRow.get("username");
-    trainingDate = firstRow.get("trainingDate");
-    trainingName = firstRow.get("trainingName");
-    trainersListString = firstRow.get("trainersList");
-    trainersList = List.of(Map.of("username", "TrainerG.TrainerG"));
+    Map<String, String> parameters = data.get(0);
+    username = parameters.get("username");
+    isActive = Boolean.parseBoolean(parameters.get("isActive"));
   }
 
-  @And("prepare token for request for update trainers list for trainee")
-  public void prepareTokenForRequestForUpdateTrainersListForTrainee() {
+  @And("prepare token for request for toggling Trainee's profile activation")
+  public void prepareTokenForRequestForTogglingTraineeSProfileActivation() {
     token = jwtUtils.generateAccessTokenForTest(username);
     var authentication = new UsernamePasswordAuthenticationToken(username, null, null);
     SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -56,22 +50,20 @@ public class UpdateTrainerListSteps {
     cookie.setMaxAge((int) Duration.ofHours(10).toSeconds());
   }
 
-  @When("the user send a PUT request to update list of trainers for trainee")
-  public void theUserSendAPUTRequestToUpdateListOfTrainersForTrainee() {
+  @When("the user send a PATCH request to toggle activation")
+  public void theUserSendAPATCHRequestToToggleActivation() {
     response = RestAssured
         .given()
         .contentType(ContentType.JSON)
         .cookie("Bearer", token)
         .header("Authorization", "Bearer " + token)
-        .queryParam("username", username)
-        .queryParam("trainingDate", trainingDate)
-        .queryParam("trainingName", trainingName)
-        .body(trainersList)
-        .put(baseUri + "/setting/trainers");
+        .param("username", username)
+        .param("isActive", String.valueOf(isActive))
+        .patch(baseUri + "/toggle-activation");
   }
 
-  @Then("response should return status code {int}")
-  public void responseShouldReturnStatusCode(int expectedStatus) {
+  @Then("response status should be return code {int}")
+  public void responseStatusShouldBeReturnCode(int expectedStatus) {
     assertEquals("Expected status code", expectedStatus, response.getStatusCode());
   }
 }

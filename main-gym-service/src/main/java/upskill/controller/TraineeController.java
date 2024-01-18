@@ -111,12 +111,15 @@ public class TraineeController {
   @SecurityRequirement(name = "Bearer Authentication")
   public List<TrainingTraineeResponse> findTrainingsList(@RequestParam("username") @NotBlank @Size(min = 2, max = 60)
                                                          String username,
-                                                         @RequestParam(required = false)
-                                                         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodFrom,
-                                                         @RequestParam(required = false)
+                                                         @RequestParam(value = "periodFrom", required = false)
+                                                         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                                         LocalDate periodFrom,
+                                                         @RequestParam(value = "periodTo", required = false)
                                                          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodTo,
-                                                         @RequestParam(required = false) String trainerName,
-                                                         @RequestParam(required = false) String trainingType) {
+                                                         @RequestParam(value = "trainerName", required = false)
+                                                         String trainerName,
+                                                         @RequestParam(value = "trainingType", required = false)
+                                                         String trainingType) {
     List<Training> trainingsList = trainingService.findTrainingsByUsernameAndCriteria(new TrainingTraineeRequest
         (username, periodFrom, periodTo, trainerName, trainingType));
     return trainingConverter.toTrainingResponse(trainingsList);
@@ -127,7 +130,7 @@ public class TraineeController {
   @Operation(summary = "toggle a Trainee's profile", description = "toggle a Trainee's profile")
   @SecurityRequirement(name = "Bearer Authentication")
   public void toggleActivation(@RequestParam("username") @NotBlank @Size(min = 2, max = 60) String username,
-                               @RequestParam("active") @NotNull boolean isActive) {
+                               @RequestParam("isActive") @NotNull boolean isActive) {
     customRequestsCounter.increment();
     Timer.Sample sample = Timer.start();
     var trainee = traineeService.findByUsername(username);

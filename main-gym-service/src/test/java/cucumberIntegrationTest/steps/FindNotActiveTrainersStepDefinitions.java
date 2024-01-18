@@ -68,4 +68,5 @@ public class FindNotActiveTrainersStepDefinitions {
   public void shouldBeResponseStatusCode(int expectedStatus) {
     assertEquals("Expected status code", expectedStatus, response.getStatusCode());
   }
+
 }
