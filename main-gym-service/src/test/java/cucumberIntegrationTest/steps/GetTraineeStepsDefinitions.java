@@ -43,7 +43,6 @@ public class GetTraineeStepsDefinitions {
     token = jwtUtils.generateAccessTokenForTest(username);
     var authentication = new UsernamePasswordAuthenticationToken(username, null, null);
     SecurityContextHolder.getContext().setAuthentication(authentication);
-
     cookie = new Cookie("Bearer", token);
     cookie.setPath("/");
     cookie.setHttpOnly(true);

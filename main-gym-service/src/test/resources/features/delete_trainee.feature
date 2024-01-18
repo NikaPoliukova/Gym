@@ -1,11 +1,18 @@
-Feature: Delete Trainee
+Feature: Delete Trainee API
 
-  Scenario: Successful delete trainee
-    Given the valid trainee credentials for delete trainee
-    When the user send a DELETE request to delete the trainee
-    Then we get status response code after delete 204
 
-  Scenario: Failed attempt to delete trainee
-    Given the invalid trainee credentials for delete trainee
+  Scenario: Delete Trainee by username
+    Given the user enter username for delete trainee
+      | username      |
+      | OLA.TRAINEE16 |
+    And prepare token for request for delete trainee
     When the user send a DELETE request to delete the trainee
-    Then we get status response code after delete 400
+    Then we should to get response with status code 204
+
+  Scenario: Failed attempt to delete trainee by username
+    Given the user enter username for delete trainee
+      | username          |
+      | Incorrect.TRAINEE |
+    And prepare token for request for delete trainee
+    When the user send a DELETE request to delete the trainee
+    Then we should to get response with status code 404
