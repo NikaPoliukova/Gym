@@ -11,36 +11,43 @@ import io.restassured.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import upskill.dto.TrainingRequestDto;
 import upskill.security.JwtUtils;
 
 import javax.servlet.http.Cookie;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 
-public class ToggleTraineeActivationStepsDefinition {
+public class DeleteTrainingStepsDefinitions {
+  private TrainingRequestDto trainingRequest;
+  private String authorizationHeader;
   private Response response;
-  private String username;
-  private boolean isActive;
-  private String baseUri = "http://localhost:8091/api/v1/trainees";
+  private String username = "Trainer.Trainer";
   @Autowired
   private JwtUtils jwtUtils;
   private String token;
   private Cookie cookie;
+  private String baseUri = "http://localhost:8095/gym-service/api/v1/trainings";
 
 
-  @Given("the user provides the following parameters for toggling Trainee's profile activation")
-  public void theUserProvidesTheFollowingParametersForTogglingTraineeSProfileActivation(DataTable dataTable) {
+  @Given("the user enter params for delete training")
+  public void theUserEnterParamsForDeleteTraining(DataTable dataTable) {
     List<Map<String, String>> data = dataTable.asMaps(String.class, String.class);
-    Map<String, String> parameters = data.get(0);
-    username = parameters.get("username");
-    isActive = Boolean.parseBoolean(parameters.get("isActive"));
+    Map<String, String> trainingDetails = data.get(0);
+    trainingRequest = new TrainingRequestDto(
+        trainingDetails.get("trainerUsername"),
+        trainingDetails.get("trainingName"),
+        LocalDate.parse(trainingDetails.get("trainingDate")),
+        trainingDetails.get("trainingType"),
+        Integer.parseInt(trainingDetails.get("duration")));
   }
 
-  @And("prepare token for request for toggling Trainee's profile activation")
-  public void prepareTokenForRequestForTogglingTraineeSProfileActivation() {
+  @And("prepare token for request for delete training")
+  public void prepareTokenForRequestForDeleteTraining() {
     token = jwtUtils.generateAccessTokenForTest(username);
     var authentication = new UsernamePasswordAuthenticationToken(username, null, null);
     SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -50,20 +57,19 @@ public class ToggleTraineeActivationStepsDefinition {
     cookie.setMaxAge((int) Duration.ofHours(10).toSeconds());
   }
 
-  @When("the user send a PATCH request to toggle activation")
-  public void theUserSendAPATCHRequestToToggleActivation() {
+  @When("the user send a DELETE request for delete training and send request to Secondary microservice")
+  public void theUserSendDeleteRequestForDeleteTrainingAndSendRequestToSecondaryMicroservice() {
     response = RestAssured
         .given()
         .contentType(ContentType.JSON)
         .cookie("Bearer", token)
         .header("Authorization", "Bearer " + token)
-        .param("username", username)
-        .param("isActive", String.valueOf(isActive))
-        .patch(baseUri + "/toggle-activation");
+        .body(trainingRequest)
+        .delete(baseUri + "/training");
   }
 
-  @Then("response status should be return code {int}")
-  public void responseStatusShouldBeReturnCode(int expectedStatus) {
+  @Then("the response code should be return {int}")
+  public void theResponseCodeShouldBeReturn(int expectedStatus) {
     assertEquals("Expected status code", expectedStatus, response.getStatusCode());
   }
 }

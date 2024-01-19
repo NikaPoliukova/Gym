@@ -1,4 +1,4 @@
-package cucumberIntegrationTest.steps;
+package cucumberComponentTest.steps;
 
 
 import com.epam.upskill.config.TestConfig;

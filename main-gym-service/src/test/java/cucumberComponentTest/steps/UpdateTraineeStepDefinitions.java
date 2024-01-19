@@ -1,4 +1,5 @@
-package cucumberIntegrationTest.steps;
+package cucumberComponentTest.steps;
+
 
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.And;
@@ -11,43 +12,45 @@ import io.restassured.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import upskill.dto.TrainerUpdateResponse;
+import upskill.dto.TraineeUpdateResponse;
 import upskill.security.JwtUtils;
 
 import javax.servlet.http.Cookie;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 
-public class UpdateTrainerStepDefinitions {
-
+public class UpdateTraineeStepDefinitions {
   private String username;
   private String firstName;
   private String lastName;
-  private String specialization;
+  private LocalDate dateOfBirth;
+  private String address;
   private boolean isActive;
   private Response response;
-  private String baseUri = "http://localhost:8091/api/v1/trainers/trainer";
+  private String baseUri = "http://localhost:8091/api/v1/trainees";
   @Autowired
   private JwtUtils jwtUtils;
   private String token;
   private Cookie cookie;
 
-  @Given("the user enter params for update trainer profile")
+  @Given("the user enter params for update trainee profile")
   public void theUserEnterParamsForUpdateTraineeProfile(DataTable dataTable) {
-    List<Map<String, String>> trainerDataList = dataTable.asMaps(String.class, String.class);
-    Map<String, String> userData = trainerDataList.get(0);
+    List<Map<String, String>> traineeDataList = dataTable.asMaps(String.class, String.class);
+    Map<String, String> userData = traineeDataList.get(0);
     username = userData.get("username");
     firstName = userData.get("firstName");
     lastName = userData.get("lastName");
-    specialization = userData.get("specialization");
+    dateOfBirth = LocalDate.parse(userData.get("dateOfBirth"));
+    address = userData.get("address");
     isActive = Boolean.parseBoolean(userData.get("isActive"));
   }
 
-  @And("prepare token for request for update trainer")
+  @And("prepare token for request for update trainee")
   public void prepareTokenForRequestForUpdateTrainee() {
     token = jwtUtils.generateAccessTokenForTest(username);
     var authentication = new UsernamePasswordAuthenticationToken(username, null, null);
@@ -58,7 +61,7 @@ public class UpdateTrainerStepDefinitions {
     cookie.setMaxAge((int) Duration.ofHours(10).toSeconds());
   }
 
-  @When("the user send a PUT request to update information about the trainer")
+  @When("the user send a PUT request to update information about the trainee")
   public void theUserSendAPUTRequestToUpdateInformationAboutTheTrainee() {
     response = RestAssured
         .given()
@@ -68,17 +71,19 @@ public class UpdateTrainerStepDefinitions {
         .formParam("username", username)
         .formParam("firstName", firstName)
         .formParam("lastName", lastName)
-        .formParam("specialization", specialization)
+        .formParam("dateOfBirth", dateOfBirth.toString())
+        .formParam("address", address)
         .formParam("isActive", String.valueOf(isActive))
-        .put(baseUri + "/setting/profile");
+        .put(baseUri + "/trainee/setting/profile");
   }
 
-  @And("the response body should contain TrainerUpdateResponse object")
-  public void theResponseBodyShouldContainTrainerUpdateResponseObject() {
-    assertThat(response.getBody().as(TrainerUpdateResponse.class)).isNotNull();
+
+  @And("the response body should contain TraineeUpdateResponse object")
+  public void theResponseBodyShouldContainTraineeUpdateResponseObject() {
+    assertThat(response.getBody().as(TraineeUpdateResponse.class)).isNotNull();
   }
 
-  @Then("we get response which should return status code {int}")
+  @Then("the response should return status code {int}")
   public void theResponseShouldReturnStatusCode(int expectedStatus) {
     assertEquals("Expected status code", expectedStatus, response.getStatusCode());
   }

@@ -32,7 +32,7 @@ public class TrainingController {
   @ApiOperation("Save training")
   public Training saveTraining(@RequestBody @Valid TrainingRequest trainingRequest,
                                @RequestHeader("Authorization") String header) {
-    return trainingService.saveTraining(trainingRequest);
+   return trainingService.saveTraining(trainingRequest);
   }
 
   @DeleteMapping("/training")

@@ -1,4 +1,4 @@
-package cucumberIntegrationTest.steps;
+package cucumberComponentTest.steps;
 
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.And;
