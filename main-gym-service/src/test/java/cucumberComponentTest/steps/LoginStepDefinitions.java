@@ -9,8 +9,6 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.junit.Assert;
-import org.springframework.beans.factory.annotation.Autowired;
-import upskill.service.UserService;
 
 import java.util.List;
 import java.util.Map;
@@ -19,19 +17,19 @@ import static org.springframework.test.util.AssertionErrors.assertEquals;
 
 
 public class LoginStepDefinitions {
-  @Autowired
-  private UserService service;
+  private static final String USERNAME = "username";
+  public static final String PASSWORD = "password";
   private String username;
   private String password;
-  private String baseUri = "http://localhost:8091";
+  private static final String BASE_URI = "http://localhost:8091";
   private Response response;
 
   @Given("The user enters login information")
   public void theUserEntersCorrectLoginInformation(DataTable dataTable) {
     List<Map<String, String>> loginDataList = dataTable.asMaps(String.class, String.class);
     for (Map<String, String> loginData : loginDataList) {
-      username = loginData.get("username");
-      password = loginData.get("password");
+      username = loginData.get(USERNAME);
+      password = loginData.get(PASSWORD);
     }
   }
 
@@ -40,9 +38,9 @@ public class LoginStepDefinitions {
     response = RestAssured
         .given()
         .contentType(ContentType.URLENC)
-        .formParam("username", username)
-        .formParam("password", password)
-        .post(baseUri + "/login");
+        .formParam(USERNAME, username)
+        .formParam(PASSWORD, password)
+        .post(BASE_URI + "/login");
   }
 
   @Then("the user get status {int}")

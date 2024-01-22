@@ -20,21 +20,27 @@ import static org.springframework.test.util.AssertionErrors.assertEquals;
 
 public class RegistrationStepDefinitions {
 
-  private Response response;
+  private static final String FIRST_NAME = "firstName";
+  private static final String LAST_NAME = "lastName";
+  private static final String ADDRESS = "address";
+  private static final String DATE_OF_BIRTH = "dateOfBirth";
+  private static final String SPECIALIZATION = "specialization";
+  private static final String USERNAME = "username";
+  public static final String PASSWORD = "password";
 
+  private Response response;
   private TraineeRegistration validTraineeRegistration;
   private TrainerRegistration validTrainerRegistration;
-  private String baseUri = "http://localhost:8091/api/v1/registration";
+  private static final String BASE_URI = "http://localhost:8091/api/v1/registration";
 
   @Given("the user provides the following trainee registration data")
   public void theUserProvidesTheFollowingTraineeRegistrationData(DataTable dataTable) {
     List<Map<String, String>> traineeDataList = dataTable.asMaps(String.class, String.class);
-
     for (Map<String, String> traineeData : traineeDataList) {
-      String firstName = traineeData.get("firstName");
-      String lastName = traineeData.get("lastName");
-      String address = traineeData.get("address");
-      LocalDate dateOfBirth = LocalDate.parse(traineeData.get("dateOfBirth"));
+      var firstName = traineeData.get(FIRST_NAME);
+      var lastName = traineeData.get(LAST_NAME);
+      var address = traineeData.get(ADDRESS);
+      var dateOfBirth = LocalDate.parse(traineeData.get(DATE_OF_BIRTH));
       validTraineeRegistration = new TraineeRegistration(firstName, lastName, address, dateOfBirth);
     }
   }
@@ -43,9 +49,9 @@ public class RegistrationStepDefinitions {
   public void theUserProvidesTheFollowingTrainerRegistrationData(DataTable dataTable) {
     List<Map<String, String>> trainerDataList = dataTable.asMaps(String.class, String.class);
     for (Map<String, String> trainerData : trainerDataList) {
-      String firstName = trainerData.get("firstName");
-      String lastName = trainerData.get("lastName");
-      String specialization = trainerData.get("specialization");
+      var firstName = trainerData.get(FIRST_NAME);
+      var lastName = trainerData.get(LAST_NAME);
+      var specialization = trainerData.get(SPECIALIZATION);
       validTrainerRegistration = new TrainerRegistration(firstName, lastName, specialization);
     }
   }
@@ -56,7 +62,7 @@ public class RegistrationStepDefinitions {
         .given()
         .contentType("application/json")
         .body(validTraineeRegistration)
-        .post(baseUri + "/trainee");
+        .post(BASE_URI + "/trainee");
   }
 
   @When("the user makes a POST request for save trainer")
@@ -65,7 +71,7 @@ public class RegistrationStepDefinitions {
         .given()
         .contentType("application/json")
         .body(validTrainerRegistration)
-        .post(baseUri + "/trainer");
+        .post(BASE_URI + "/trainer");
   }
 
   @Then("the response status code should be {int}")
@@ -76,9 +82,7 @@ public class RegistrationStepDefinitions {
   @And("the response should contain Principal object")
   public void theResponseShouldContainPrincipalObjectWithUsernameAndPassword() {
     assertNotNull(response.getBody());
-    Assert.assertNotNull("Username should be present", response.jsonPath().get("username"));
-    Assert.assertNotNull("Password should be present", response.jsonPath().get("password"));
+    Assert.assertNotNull("Username should be present", response.jsonPath().get(USERNAME));
+    Assert.assertNotNull("Password should be present", response.jsonPath().get(PASSWORD));
   }
-
-
 }

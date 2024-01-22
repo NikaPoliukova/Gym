@@ -4,7 +4,7 @@ Feature: Registration API
     Given the user provides the following trainee registration data
       | firstName | lastName | address    | dateOfBirth |
       | My        | Trainee  | Street 125 | 2000-01-01  |
-      | Test2     | Trainee2 | Street 126 | 1998-05-15  |
+      | Dima      | Trainee  | Street 126 | 1998-05-15  |
     When the user makes a POST request for save trainee
     Then the response status code should be 201
     And the response should contain Principal object

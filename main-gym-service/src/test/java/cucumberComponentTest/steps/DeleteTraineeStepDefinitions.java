@@ -9,21 +9,20 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import upskill.security.JwtUtils;
 
 import javax.servlet.http.Cookie;
-import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 
 public class DeleteTraineeStepDefinitions {
+  private static final String USERNAME = "username";
+  private static final String AUTHORIZATION = "Authorization";
   private Response response;
   private String username;
-  private String baseUri = "http://localhost:8091/api/v1/trainees";
+  private static final String BASE_URI = "http://localhost:8091/api/v1/trainees";
   @Autowired
   private JwtUtils jwtUtils;
   private String token;
@@ -39,12 +38,7 @@ public class DeleteTraineeStepDefinitions {
   @And("prepare token for request for delete trainee")
   public void prepareTokenForRequestForDeleteTrainee() {
     token = jwtUtils.generateAccessTokenForTest(username);
-    var authentication = new UsernamePasswordAuthenticationToken(username, null, null);
-    SecurityContextHolder.getContext().setAuthentication(authentication);
-    cookie = new Cookie("Bearer", token);
-    cookie.setPath("/");
-    cookie.setHttpOnly(true);
-    cookie.setMaxAge((int) Duration.ofHours(10).toSeconds());
+    jwtUtils.addTokenToCookie(token);
   }
 
   @When("the user send a DELETE request to delete the trainee")
@@ -53,16 +47,10 @@ public class DeleteTraineeStepDefinitions {
         .given()
         .contentType(ContentType.URLENC.withCharset("UTF-8"))
         .cookie("Bearer", token)
-        .header("Authorization", "Bearer " + token)
-        .formParam("username", username)
-        .delete(baseUri);
+        .header(AUTHORIZATION, "Bearer " + token)
+        .formParam(USERNAME, username)
+        .delete(BASE_URI);
   }
-
-  @Then("we get status response code after delete {int}")
-  public void thenResponseHasStatusCode(int expectedStatus) {
-    assertEquals("Expected status code", expectedStatus, response.getStatusCode());
-  }
-
 
   @Then("we should to get response with status code {int}")
   public void weShouldToGetResponseWithStatusCode(int expectedStatus) {

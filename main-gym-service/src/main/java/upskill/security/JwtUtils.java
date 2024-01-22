@@ -6,6 +6,8 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
 import upskill.entity.User;
@@ -14,6 +16,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.security.Key;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -143,10 +146,20 @@ public class JwtUtils {
     Claims claims = Jwts.claims().setSubject(username);
     claims.put("username", username);
     Date expirationDate = generateExpirationDate(50);
+    var authentication = new UsernamePasswordAuthenticationToken(username, null,
+        null);
+    SecurityContextHolder.getContext().setAuthentication(authentication);
     return Jwts.builder()
         .setClaims(claims)
         .setExpiration(expirationDate)
         .signWith(getSecretKeySpec(), SignatureAlgorithm.HS512)
         .compact();
   }
+
+  public void addTokenToCookie(String token) {
+    Cookie cookie = new Cookie("Bearer", token);
+    cookie.setPath("/");
+    cookie.setHttpOnly(true);
+    cookie.setMaxAge((int) Duration.ofHours(10).toSeconds());
+   }
 }

@@ -1,17 +1,6 @@
 //package integrationTest.repository;
 //
-//import com.epam.upskill.GymApplication;
-//import com.epam.upskill.dao.TraineeRepository;
-//import com.epam.upskill.dao.TrainerRepository;
-//import com.epam.upskill.dao.TrainingRepository;
-//import com.epam.upskill.dao.TrainingTypeRepository;
-//import com.epam.upskill.dto.TrainingDtoRequest;
-//import com.epam.upskill.dto.TrainingTrainerDto;
-//import com.epam.upskill.dto.TrainingTypeEnum;
-//import com.epam.upskill.entity.Trainee;
-//import com.epam.upskill.entity.Trainer;
-//import com.epam.upskill.entity.Training;
-//import com.epam.upskill.entity.TrainingType;
+//
 //import org.junit.jupiter.api.Test;
 //import org.junit.jupiter.params.ParameterizedTest;
 //import org.junit.jupiter.params.provider.MethodSource;
@@ -21,6 +10,18 @@
 //import org.springframework.test.context.TestPropertySource;
 //import org.springframework.transaction.annotation.EnableTransactionManagement;
 //import org.springframework.transaction.annotation.Transactional;
+//import upskill.GymApplication;
+//import upskill.dao.TraineeRepository;
+//import upskill.dao.TrainerRepository;
+//import upskill.dao.TrainingRepository;
+//import upskill.dao.TrainingTypeRepository;
+//import upskill.dto.TrainingDtoRequest;
+//import upskill.dto.TrainingTrainerDto;
+//import upskill.dto.TrainingTypeEnum;
+//import upskill.entity.Trainee;
+//import upskill.entity.Trainer;
+//import upskill.entity.Training;
+//import upskill.entity.TrainingType;
 //
 //import java.time.LocalDate;
 //import java.util.List;
@@ -240,10 +241,14 @@
 //    return Stream.of(
 //        createAndSetTraining("Training1", LocalDate.now(), 60,
 //            createTrainee("trainee.vika"), createTrainer("ola.popova"),
-//            TrainerRepositoryImplIntegrationTest.createTrainingType("PILATES"))
+//           createTrainingType("PILATES"))
 //    );
 //  }
-//
+//    static TrainingType createTrainingType(String typeName) {
+//    TrainingType specialization = new TrainingType();
+//    specialization.setTrainingTypeName(TrainingTypeEnum.valueOf(typeName));
+//    return specialization;
+//  }
 //  static Training createAndSetTraining(String trainingName, LocalDate trainingDate, int trainingDuration,
 //                                       Trainee trainee, Trainer trainer, TrainingType trainingType) {
 //    Training training = new Training();

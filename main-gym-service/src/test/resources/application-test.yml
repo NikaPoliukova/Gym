@@ -2,6 +2,8 @@ server:
   port: 8092
 
 spring:
+  application:
+    name: gym-service
   config:
     activate:
       on-profile: test
@@ -15,7 +17,20 @@ spring:
 
   jpa:
     show-sql: true
-
+  sleuth:
+    sampler:
+      probability: 1.0
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+  zipkin:
+    base-url: http://127.0.0.1:9411/
 hibernate:
   dialect: org.hibernate.dialect.PostgreSQLDialect
   hbm2ddl.auto: update
@@ -23,13 +38,24 @@ hibernate:
 logging:
   level:
     org.hibernate.SQL: DEBUG
-    com.epam.upskill.logger: DEBUG
+#    upskill.logger: DEBUG
+#    org.springframework.web: DEBUG
+#    org.springframework.amqp: DEBUG
 
 management:
   endpoints:
     web:
       exposure:
         include: "*"
-      endpoint:
-        health:
-          show-details: ALWAYS
+  endpoint:
+    health:
+      show-details: ALWAYS
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://127.0.0.1:8761/eureka}
+  instance:
+    hostname: 127.0.0.1
+    preferIpAddress: false
+
+secret: "SECRET"

@@ -49,12 +49,7 @@ public class DeleteTrainingStepsDefinitions {
   @And("prepare token for request for delete training")
   public void prepareTokenForRequestForDeleteTraining() {
     token = jwtUtils.generateAccessTokenForTest(username);
-    var authentication = new UsernamePasswordAuthenticationToken(username, null, null);
-    SecurityContextHolder.getContext().setAuthentication(authentication);
-    cookie = new Cookie("Bearer", token);
-    cookie.setPath("/");
-    cookie.setHttpOnly(true);
-    cookie.setMaxAge((int) Duration.ofHours(10).toSeconds());
+    jwtUtils.addTokenToCookie(token);
   }
 
   @When("the user send a DELETE request for delete training and send request to Secondary microservice")

@@ -9,12 +9,8 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import upskill.security.JwtUtils;
 
-import javax.servlet.http.Cookie;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +19,14 @@ import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.util.AssertionErrors.assertNotNull;
 
 public class FindingTrainingsForTraineeStepsDefinition {
+  private static final String USERNAME = "username";
+  private static final String AUTHORIZATION = "Authorization";
+  private static final String USERNAME1 = "username";
+  private static final String PERIOD_FROM = "periodFrom";
+  private static final String PERIOD_TO = "periodTo";
+  private static final String TRAINER_NAME = "trainerName";
+  private static final String TRAINING_TYPE = "trainingType";
+
   private String username;
   private LocalDate periodFrom;
   private LocalDate periodTo;
@@ -31,30 +35,24 @@ public class FindingTrainingsForTraineeStepsDefinition {
   @Autowired
   private JwtUtils jwtUtils;
   private String token;
-  private Cookie cookie;
   private Response response;
-  private String baseUri = "http://localhost:8091/api/v1/trainees";
+  private static final String BASE_URI = "http://localhost:8091/api/v1/trainees";
 
   @Given("the user provides the following parameters for finding trainings")
   public void theUserProvidesTheFollowingParametersForFindingTrainings(DataTable dataTable) {
     List<Map<String, String>> data = dataTable.asMaps(String.class, String.class);
     Map<String, String> parameters = data.get(0);
-    username = parameters.get("username");
-    periodFrom = LocalDate.parse(parameters.get("periodFrom"));
-    periodTo = LocalDate.parse(parameters.get("periodTo"));
-    trainerName = parameters.get("trainerName");
-    trainingType = parameters.get("trainingType");
+    username = parameters.get(USERNAME);
+    periodFrom = LocalDate.parse(parameters.get(PERIOD_FROM));
+    periodTo = LocalDate.parse(parameters.get(PERIOD_TO));
+    trainerName = parameters.get(TRAINER_NAME);
+    trainingType = parameters.get(TRAINING_TYPE);
   }
 
   @And("prepare token for request for get trainers list for trainee")
   public void prepareTokenForRequestForGetTrainersListForTrainee() {
     token = jwtUtils.generateAccessTokenForTest(username);
-    var authentication = new UsernamePasswordAuthenticationToken(username, null, null);
-    SecurityContextHolder.getContext().setAuthentication(authentication);
-    cookie = new Cookie("Bearer", token);
-    cookie.setPath("/");
-    cookie.setHttpOnly(true);
-    cookie.setMaxAge((int) Duration.ofHours(10).toSeconds());
+    jwtUtils.addTokenToCookie(token);
   }
 
   @When("send a GET request to find trainers list for trainee")
@@ -63,13 +61,13 @@ public class FindingTrainingsForTraineeStepsDefinition {
         .given()
         .contentType(ContentType.JSON)
         .cookie("Bearer", token)
-        .header("Authorization", "Bearer " + token)
-        .param("username", username)
-        .param("periodFrom", periodFrom.toString())
-        .param("periodTo", periodTo.toString())
-        .param("trainerName", trainerName)
-        .param("trainingType", trainingType)
-        .get(baseUri + "/trainings");
+        .header(AUTHORIZATION, "Bearer " + token)
+        .param(USERNAME1, username)
+        .param(PERIOD_FROM, periodFrom.toString())
+        .param(PERIOD_TO, periodTo.toString())
+        .param(TRAINER_NAME, trainerName)
+        .param(TRAINING_TYPE, trainingType)
+        .get(BASE_URI + "/trainings");
   }
 
   @Then("the response contains list of training for trainee")
